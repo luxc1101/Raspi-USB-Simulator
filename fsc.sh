@@ -11,6 +11,7 @@ Red='\033[1;91m'
 Color_off='\033[0m'
 
 echo -e "going to create filesystem and partitions this is ${Red}$lcimg${Color_off} the mountpoint at ${Red}$MP${Color_off}"
+if [ -f $lcimg ];then sudo rm $lcimg;fi
 read -p "To create $lcimg with size(MB): " size
 echo -e "creating..."
 sudo dd bs=1M if=/dev/zero of=$lcimg count=$size
