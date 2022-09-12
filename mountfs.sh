@@ -61,7 +61,7 @@ echo -e "3: ext4"
 echo -e "4: fat16"
 echo -e "5: fat32"
 echo -e "6: ntfs"
-echo -e "7: exFat"
+echo -e "7: exfat"
 echo -e "8: hfsplus"
 echo -e "9: partitions"
 echo -e "10: Software update"
@@ -103,7 +103,7 @@ then
     sudo sed -i -e '$a path = '"$MP"'' $file
 else
     lineNr=$(grep -n "raspiusb" /etc/samba/smb.conf | cut -d: -f1)
-    sudo sed -i "${lineNr}s/.*/[raspiusb_"$A"]/" /etc/samba/smb.conf
+    sudo sedcd / -i "${lineNr}s/.*/[raspiusb_"$A"]/" /etc/samba/smb.conf
     sudo sed -i '/mnt/d' $file
     sudo sed -i -e '$a path = '"$MP"'' $file
 repeat ">"
@@ -218,6 +218,20 @@ else
                     # check if package samba installed and edit smb.conf
                     repeat '='
                     PKG_Install "samba" $MP
+					# reset watchdog filesystem and aktive watchdog service
+                    echo -e "${Cyan}watchdog service status:${Yellow}"
+					### python watchdog
+                    #sudo sed -i -e "s|^Img.*|Img = '/home/pi/"${lcimg}"'|g" /home/pi/fswd.py
+                    #sudo sed -i -e "s|^watch_path.*|watch_path = '"${MP}"'|g" /home/pi/fswd.py
+                    #sudo systemctl restart fswd
+                    #sudo systemctl status fswd | grep -E "Loaded|Active|CGroup|python"
+                    ### bash watchdog
+                    sudo sed -i -e "s|^Img.*|Img=/home/pi/${lcimg}|g" /home/pi/fswd.sh
+                    sudo sed -i -e "s|^watchpath.*|watchpath=${MP}|g" /home/pi/fswd.sh
+                    sudo systemctl restart fswd2
+                    sudo systemctl status fswd2 | grep -E "Loaded|Active|CGroup|inotify"
+                    echo -e "${Color_off}"
+
                 else
                     # partions
                     echo "NAME        FSTYPE    FSAVAIL    FSUES%    MOUNTPOINT"

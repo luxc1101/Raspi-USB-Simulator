@@ -16,56 +16,56 @@ echo -e "creating..."
 sudo dd bs=1M if=/dev/zero of=$lcimg count=$size
 
 case $lcimg in
-*"mib"*)
+*"mib"*) # media qt test source
 sudo mkdir $MP || echo -e "$MP already exist"
 sudo mkfs.fat -F 32 $lcimg;;
-*"ext2"*)
+*"ext2"*) # ext2 fs
 sudo mkdir $MP || echo -e "$MP already exist"
 sudo mkfs.ext2 ext2.img
 sudo tune2fs -c0 -i0 ext2.img;;
-*"ext3"*)
+*"ext3"*) # ext3 fs
 sudo mkdir $MP || echo -e "$MP already exist"
 sudo mkfs.ext3 ext3.img
 sudo tune2fs -c0 -i0 ext3.img;;
-*"ext4"*)
+*"ext4"*) # ext4 fs
 sudo mkdir $MP || echo -e "$MP already exist"
 sudo mkfs.ext4 ext4.img
 sudo tune2fs -c0 -i0 ext4.img;;
-*"fat16"*)
+*"fat16"*) # fat16 fs
 sudo mkdir $MP || echo -e "$MP already exist"
 sudo mkfs.fat -F 16 fat16.img;;
-*"fat32"*)
+*"fat32"*) # fat32 fs
 sudo mkdir $MP || echo -e "$MP already exist"
 sudo mkfs.fat -F 32 fat32.img;;
-*"exfat"*)
+*"exfat"*) # exfat fs
 sudo mkdir $MP || echo -e "$MP already exist"
 sudo mkfs.exfat exfat.img;;
-*"ntfs"*)
+*"ntfs"*) # ntfs fs
 sudo mkdir $MP || echo -e "$MP already exist"
 sudo apt-get install ntfs-3g
 sudo losetup /dev/loop11 $lcimg
 sudo mkfs.ntfs -Q /dev/loop11
 sudo mount /dev/loop11 $MP;;
-*"hfs"*)
+*"hfs"*) # hfs+ fs
 sudo mkdir $MP || echo -e "$MP already exist"
 sudo apt-get install hfsutils hfsprogs hfsutils
 sudo mkfs.hfsplus hfsplus.img -v hfsplus;;
-*"part"*)
+*"part"*) # to build 2 partitions with ntfs and fat32
 sudo mkdir /mnt/usb_part_ntfs
 sudo mkdir /mnt/usb_part_fat32
 sudo losetup -fP part.img
 lpd="$(losetup -a | grep "part")"
-lpd="$(cut -d':' -f1 <<<"$lpd")"
-echo $lpd
+lpd="$(cut -d':' -f1 <<<"$lpd")" # get next loopdevice's name
+# echo $lpd
 sudo fdisk $lpd
-lpd+="p1"
+lpd+="p1" # part1
 sudo mkfs.ntfs -Q $lpd
 sudo mount -o rw,users,sync,nofail $lpd /mnt/usb_part_ntfs
 lpd=${lpd::-2}
-lpd+="p2"
+lpd+="p2" # part2
 sudo mkfs.fat -F 32 $lpd
 sudo mount -o rw,users,sync,nofail,umask=0000 $lpd /mnt/usb_part_fat32;;
-*"sw"*)
+*"sw"*) # software update
 sudo mkdir $MP || echo -e "$MP already exist"
 sudo apt-get install ntfs-3g
 sudo losetup /dev/loop12 $lcimg
