@@ -231,7 +231,6 @@ else
                     sudo systemctl restart fswd2
                     sudo systemctl status fswd2 | grep -E "Loaded|Active|CGroup|inotify"
                     echo -e "${Color_off}"
-
                 else
                     # partions
                     echo "NAME        FSTYPE    FSAVAIL    FSUES%    MOUNTPOINT"
