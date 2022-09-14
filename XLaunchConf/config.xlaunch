@@ -1,2 +1,0 @@
-<?xml version="1.0"?>
-<XLaunch xmlns="http://www.straightrunning.com/XmingNotes" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.straightrunning.com/XmingNotes XLaunch.xsd" WindowMode="Windowed" ClientMode="StartProgram" Program="xterm" ClientStart="PuTTY" PasswordStart="true" RemoteHost="192.168.188.38" RemoteUser="pi" Display="2" Clipboard="true"/>

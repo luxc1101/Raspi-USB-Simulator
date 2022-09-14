@@ -83,7 +83,7 @@ sudo /sbin/modprobe g_multi -r # unmount first
 sudo /sbin/modprobe g_multi file=$1 stall=0 removable=1 # mount again
 }
 
-function PKG_Install()
+function Samba_Install()
 {
 REQUIRED_PKG=$1
 MP=$2
@@ -106,7 +106,6 @@ else
     sudo sedcd / -i "${lineNr}s/.*/[raspiusb_"$A"]/" /etc/samba/smb.conf
     sudo sed -i '/mnt/d' $file
     sudo sed -i -e '$a path = '"$MP"'' $file
-repeat ">"
 
 sudo systemctl restart smbd.service
 echo -e "${Cyan}status of smbd service:${Yellow}"
@@ -120,7 +119,6 @@ for eachfile in $MP/*
 do
     echo -e "${Yellow} - $(basename "$eachfile")${Color_off}"
 done
-repeat "<"
 fi
 }
 
@@ -217,7 +215,8 @@ else
                     # remote file access which enable network access to the /mnt/usb_share folder
                     # check if package samba installed and edit smb.conf
                     repeat '='
-                    PKG_Install "samba" $MP
+					repeat '>'
+                    Samba_Install "samba" $MP
 					# reset watchdog filesystem and aktive watchdog service
                     echo -e "${Cyan}watchdog service status:${Yellow}"
 					### python watchdog
@@ -231,6 +230,7 @@ else
                     sudo systemctl restart fswd2
                     sudo systemctl status fswd2 | grep -E "Loaded|Active|CGroup|inotify"
                     echo -e "${Color_off}"
+					repeat '<'
                 else
                     # partions
                     echo "NAME        FSTYPE    FSAVAIL    FSUES%    MOUNTPOINT"
