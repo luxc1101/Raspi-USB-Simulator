@@ -98,12 +98,12 @@ then
     sudo sed -i -e '$a browseable = yes' $file
     sudo sed -i -e '$a guest ok = yes' $file
     sudo sed -i -e '$a creat mask = 0777' $file
-
+    sudo sed -i -e '$a read only = no' $file
     sudo sed -i -e '$a writeable = yes' $file
     sudo sed -i -e '$a path = '"$MP"'' $file
 else
     lineNr=$(grep -n "raspiusb" /etc/samba/smb.conf | cut -d: -f1)
-    sudo sedcd / -i "${lineNr}s/.*/[raspiusb_"$A"]/" /etc/samba/smb.conf
+    sudo sed -i "${lineNr}s/.*/[raspiusb_"$A"]/" /etc/samba/smb.conf
     sudo sed -i '/mnt/d' $file
     sudo sed -i -e '$a path = '"$MP"'' $file
 

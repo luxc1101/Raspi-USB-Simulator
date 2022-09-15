@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 #*****************************************************
-# Project:   Raspberrypi Zero usb filesystem simulator
+# Project:   Raspberrypi Zero USB filesystem simulator
 # Autor:     Xiaochuan Lu
 # Abteilung: SWTE
 #*****************************************************
@@ -10,6 +10,7 @@
 import sys
 import os
 import time
+import fsc
 ##########################
 #       Paramters        #
 ##########################
@@ -53,16 +54,93 @@ C_off='\033[0m'
 #       Functions        #
 ##########################
 def getfsname(img):
-    return img.split(".")[-1]
+    return img.split(".")[0]
 
+### remount filesystem
 def remount(file):
     os.system('sudo /sbin/modprobe g_multi -r')
     time.sleep(2)
     os.system('sudo /sbin/modprobe g_multi file=./{} stall=0 removable=1'.format(file))
 
+#### check if a package installed or not and try to install it
 def installcheck(PKG):
     PKG_OK = "dpkg-query -W --showformat='${Status}\n' " + "{}|grep 'install ok installed'".format(PKG)
-    sys.stdout.write("Checking for {}: {}{}{}".format(PKG, Cyan, os.popen(PKG_OK).read(),C_off))
+    sys.stdout.write("Checking for {}: {}{}{}\n".format(PKG, Red, os.popen(PKG_OK).read().split("\n")[0],C_off))
+    status = True
+    if os.popen(PKG_OK).read() == "":
+        status = False
+        sys.stdout.write("going to install {}{}{} first\n".format(Red, PKG, C_off))
+        Install = 'sudo apt-get --yes install {}'.format(PKG)
+        os.system(Install)
+    return status
+
+### configuration of samba conf file       
+def sambaconf(PKG, img, MP):
+    conf = "/etc/samba/smb.conf"
+    status = installcheck(PKG)
+    if not status:
+        # after installation first init the samba conf file
+        os.system("sudo sed -i -e '$a [raspiusb_{}]' {}".format(getfsname(img),conf))
+        os.system("sudo sed -i -e '$a browseable = yes' {}".format(conf))
+        os.system("sudo sed -i -e '$a guest ok = yes' {}".format(conf))
+        os.system("sudo sed -i -e '$a creat mask = 0777' {}".format(conf))
+        os.system("sudo sed -i -e '$a read only = no' {}".format(conf))
+        os.system("sudo sed -i -e '$a writeable = yes' {}".format(conf))
+        os.system("sudo sed -i -e '$a path = {}' {}".format(MP,conf))
+    else:
+        # rewrite folder path and rename remote folder 
+        lineNr = os.popen("grep -n 'raspiusb' {} | cut -d: -f1".format(conf)).read().split("\n")[0]
+        # print ("the lineNr is: {}".format(lineNr))
+        os.system("sudo sed -i '{}s/.*/[raspiusb_{}]/' {}".format(lineNr,getfsname(img), conf))
+        os.system("sudo sed -i '/mnt/d' {}".format(conf))
+        os.system("sudo sed -i -e '$a path = {}' {}".format(MP,conf))
+    
+    os.system("sudo systemctl restart smbd.service")
+    sys.stdout.write("{}status of samba service: \n".format(Cyan))
+    sys.stdout.write("{}{}".format(Yellow,os.popen("sudo systemctl status smbd.service | grep -E 'Loaded|Active|Status'").read()))
+    sys.stdout.write("{}Network access: ".format(Cyan))
+    sys.stdout.write("{}Hostname and IP: {} {}\n".format(Yellow, os.popen('hostname').read().split("\n")[0], os.popen('hostname -I').read().split("\n")[0]))
+    os.system('sudo chmod 777 {}'.format(MP))
+    sys.stdout.write("{}file in {}: \n".format(Cyan, MP))
+    for f in os.listdir(MP):
+        path = os.path.join(MP,f)
+        if os.path.isdir(path):
+            sys.stdout.write(Yellow + "-" + f + " d" + "\n")
+        elif os.path.isfile(path):
+            sys.stdout.write(Yellow + "-" + f + " f" + "\n")
+        else:
+            sys.stdout.write(Yellow + "-" + f + " u" + "\n")
+
+def menu():
+    sys.stdout.write(Cyan + "Please select one filesystem to mount" + "\n")
+    sys.stdout.write(Yellow + "0: MIB Compliance Media" + "\n")
+    sys.stdout.write("1: ext2" + "\n")
+    sys.stdout.write("2: ext3" + "\n")
+    sys.stdout.write("3: ext4" + "\n")
+    sys.stdout.write("4: fat16" + "\n")
+    sys.stdout.write("5: fat32" + "\n")
+    sys.stdout.write("6: ntfs" + "\n")
+    sys.stdout.write("7: exfat" + "\n")
+    sys.stdout.write("8: hfsplus" + "\n")
+    sys.stdout.write("9: partitions" + "\n")
+    sys.stdout.write("10: Software update" + "\n")
+    sys.stdout.write(Green + "r: remount" + "\n")
+    sys.stdout.write("q: quit and eject the usb" + "\n")
+    sys.stdout.write("c: cancel or terminate the currently running program" + C_off + "\n")
+
+
+fsc.Cfilesystem("fat32.img", "/mnt/usb_fat32")
+
+
+
+
+
+
+
+
+
+
+
 
 
 
