@@ -53,7 +53,7 @@ C_off='\033[0m'
 ##########################
 #       Functions        #
 ##########################
-def getfsname(img):
+def getfsname(img:str):
     return img.split(".")[0]
 
 ### remount filesystem
@@ -63,7 +63,7 @@ def remount(file):
     os.system('sudo /sbin/modprobe g_multi file=./{} stall=0 removable=1'.format(file))
 
 #### check if a package installed or not and try to install it
-def installcheck(PKG):
+def installcheck(PKG:str):
     PKG_OK = "dpkg-query -W --showformat='${Status}\n' " + "{}|grep 'install ok installed'".format(PKG)
     sys.stdout.write("Checking for {}: {}{}{}\n".format(PKG, Red, os.popen(PKG_OK).read().split("\n")[0],C_off))
     status = True
@@ -75,7 +75,7 @@ def installcheck(PKG):
     return status
 
 ### configuration of samba conf file       
-def sambaconf(PKG, img, MP):
+def sambaconf(PKG:str, img:str, MP:str):
     conf = "/etc/samba/smb.conf"
     status = installcheck(PKG)
     if not status:
