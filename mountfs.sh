@@ -193,7 +193,7 @@ else
                          # mib compliance media (fat32)
                          sudo mount -o rw,users,sync,nofail,umask=0000 $lcimg $MP;;
                          *"part"*)
-                         # partitions but check if alreay partitions is mounted
+                         # partitions but check if it is already mounted
                          loopdev=$(lsblk -f | grep "loop")
                          # from all loop device looking for "p1" (loopxp1, loopxp2)if p1 not exist, paritions fs need to be mounted
                          if [[ ! $loopdev =~ "p1" ]];then echo -e "going to mount ${Red}NTFS${Color_off} and ${Red}FAT32${Color_off} partitions"; sudo losetup -fP $lcimg;

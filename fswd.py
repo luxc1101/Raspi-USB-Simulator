@@ -1,9 +1,9 @@
 #!/usr/bin/python3
-#***************************************************
-# Raspberrypi Zero usb filesystem simulator
-# Autor: Xiaochuan Lu
+#*****************************************************
+# Project:   Raspberrypi Zero USB filesystem simulator
+# Autor:     Xiaochuan Lu
 # Abteilung: SWTE
-#***************************************************
+#*****************************************************
 ##########################
 # import all needed libs #
 ##########################
@@ -16,14 +16,15 @@ from watchdog.events import *
 #############
 # paramters #
 #############
-img = "/home/pi/<?>.img"
-watch_path = "<?>"
-act_time_out = 2
-act_events = [DirDeletedEvent, DirMovedEvent, FileDeletedEvent, FileModifiedEvent, FileMovedEvent]
-
-cmd_mount = "sudo /sbin/modprobe g_multi file={} stall=0 removable=1".format(img)
+Img = '/home/pi/<?>.img'
+watchpath = '/mnt/<?>'
+cmd_mount = "sudo /sbin/modprobe g_multi file={} stall=0 removable=1".format(Img)
 cmd_unmount = "sudo /sbin/modprobe g_multi -r"
 cmd_sync = "sudo sync"
+act_time_out = 10 # 10 s
+act_events = [DirDeletedEvent, DirMovedEvent, FileDeletedEvent, FileModifiedEvent, FileMovedEvent]
+
+
 
 class Handler(FileSystemEventHandler):
     def __init__(self):
@@ -48,7 +49,7 @@ class Handler(FileSystemEventHandler):
 
 class OnMyWatch:
     # the folder on watch
-    watchpath = watch_path
+    watchpath = watchpath
     def __init__(self):
         self.observer = Observer()
 
