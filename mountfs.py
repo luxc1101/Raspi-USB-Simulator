@@ -208,6 +208,10 @@ def USBSIM(FileImgDic, MPDic):
                 print(Cyan + "remount " + Red +
                       Imgdic[int(Input)] + Cyan + " filesystem")
                 remount(Imgdic[int(Input)])
+                sambaconf(PKG='samba', img= Imgdic[int(Input)].lower(), MP= MPdic[int(Input)])
+                modifyfile(file="fswd.py", img = Imgdic[int(Input)].lower(), MP= MPdic[int(Input)])
+                os.system("sudo systemctl restart fswd")
+                return USBSIM(FileImgDic, MPDic)
         # base case: cancel currently programm
         elif Input.lower() == "c":
             print(Cyan + "terminate the programm")
@@ -253,14 +257,18 @@ def USBSIM(FileImgDic, MPDic):
                     os.system("lsblk --fs -o NAME,FSTYPE,FSAVAIL,FSUSE%,MOUNTPOINT | grep -i {} | grep 'mnt'".format(fsname))
                     print(Cyan + "=" * 60)
                     print(">"*60)
+                    # samba service config
                     sambaconf(PKG='samba', img= lcimg, MP= MPpath)
+                    # watchdog config
                     print(Cyan + "watchdog service status: " + Yellow)
-                    # watchdog py
                     modifyfile(file="fswd.py", img = lcimg, MP= MPpath)
                     os.system("sudo systemctl restart fswd")
                     os.system("sudo systemctl status fswd | grep -E 'Loaded|Active|CGroup|python'")
-                    print(Red + MPpath + Yellow + " is unter watching, action timeout is 10s")
+                    print(Red + MPpath + Yellow + "  is unter watching, action timeout is 10s")
                     print(Cyan + "<"*60 + C_off)
+                else:
+                    os.system("lsblk -f | grep -E 'p1|p2' | grep 'loop'")
+                    print(Cyan + "=" * 60)
 
                 remount(lcimg)
             else:

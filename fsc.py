@@ -32,9 +32,11 @@ def Cfilesystem(img:str, MP:str):
             os.system("sudo tune2fs -c0 -i0 {}".format(limg))
         elif "ext3" in limg:
             if not os.path.isdir(MP): os.system("sudo mkdir {}".format(MP))
+            os.system("sudo mkfs.ext3 {}".format(limg))
             os.system("sudo tune2fs -c0 -i0 {}".format(limg))
         elif "ext4" in limg:
             if not os.path.isdir(MP): os.system("sudo mkdir {}".format(MP))
+            os.system("sudo mkfs.ext4 {}".format(limg))
             os.system("sudo tune2fs -c0 -i0 {}".format(limg))
         elif "fat16" in limg:
             if not os.path.isdir(MP): os.system("sudo mkdir {}".format(MP))

@@ -8,12 +8,4 @@ gui.geometry("{}x{}".format(width, height))
 
 
 
-
-
-
-
-
-
-
-
 gui.mainloop() 
