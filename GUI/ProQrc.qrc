@@ -1,0 +1,7 @@
+<RCC>
+  <qresource prefix="">
+    <file>Image/AnpassenIcon.png</file>
+    <file>Image/AppIcon.png</file>
+    <file>Image/application-exit.png</file>
+  </qresource>
+</RCC>

@@ -1,0 +1,2 @@
+pyuic5 -x xxx.ui -o xxx.py
+pyrcc5 ProQrc.qrc -o Icons.py

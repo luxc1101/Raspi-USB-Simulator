@@ -19,28 +19,28 @@
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
-        <widget class="QPushButton" name="pushButton">
+        <widget class="QPushButton" name="B_ImgPath">
          <property name="text">
           <string>ImgPath</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="lineEdit"/>
+        <widget class="QLineEdit" name="LE_Path"/>
        </item>
       </layout>
      </item>
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_3">
        <item>
-        <widget class="QCheckBox" name="checkBox">
+        <widget class="QCheckBox" name="checkBox_WaDo">
          <property name="text">
           <string>Watchdog Service</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox_2">
+        <widget class="QCheckBox" name="checkBox_Samba">
          <property name="text">
           <string>Samba Service</string>
          </property>
@@ -62,7 +62,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="QDialogButtonBox" name="buttonBox">
+      <widget class="QDialogButtonBox" name="buttonBox_Conf">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
@@ -78,7 +78,7 @@
  <resources/>
  <connections>
   <connection>
-   <sender>buttonBox</sender>
+   <sender>buttonBox_Conf</sender>
    <signal>accepted()</signal>
    <receiver>ConfigDialog</receiver>
    <slot>accept()</slot>
@@ -94,7 +94,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>buttonBox</sender>
+   <sender>buttonBox_Conf</sender>
    <signal>rejected()</signal>
    <receiver>ConfigDialog</receiver>
    <slot>reject()</slot>

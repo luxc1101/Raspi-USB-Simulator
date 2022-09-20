@@ -1,26 +1,31 @@
 import sys
-from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtWidgets import QMainWindow, QLabel, QGridLayout, QWidget
-from PyQt5.QtWidgets import QPushButton
-from PyQt5.QtCore import QSize
 
-class MainWindow(QMainWindow):
+from PyQt5 import QtGui, QtWidgets
+from PyQt5.QtWidgets import QToolBar
+
+
+class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
-        QMainWindow.__init__(self)
+        super().__init__()
+        # set GUI icon
+        self.setWindowIcon(QtGui.QIcon("GUI/Image/AppIcon.png"))
+        self.setWindowTitle("Hello World")
+        self.button = QtWidgets.QPushButton("My button")
 
-        self.setMinimumSize(QSize(300, 200))
-        self.setWindowTitle("PyQt button example")
+        # icon = QtGui.QIcon("GUI/Image/AppIcon.png")
+        # self.button.setIcon(icon)
+        self.button.clicked.connect(self.change_icon)
+        toolbar = QToolBar("My main toolbar")
 
-        pybutton = QPushButton('Click me', self)
-        pybutton.clicked.connect(self.clickMethod)
-        pybutton.resize(100,32)
-        pybutton.move(50, 50)
+        self.setCentralWidget(self.button)
 
-    def clickMethod(self):
-        print('Clicked Pyqt button.')
+        self.show()
 
-if __name__ == "__main__":
-    app = QtWidgets.QApplication(sys.argv)
-    mainWin = MainWindow()
-    mainWin.show()
-    sys.exit( app.exec_() )
+    def change_icon(self):
+        icon = QtGui.QIcon("animal-monkey.png")
+        self.button.setIcon(icon)
+
+
+app = QtWidgets.QApplication(sys.argv)
+w = MainWindow()
+app.exec_()
