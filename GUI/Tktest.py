@@ -7,5 +7,4 @@ width = 350
 gui.geometry("{}x{}".format(width, height))
 
 
-
 gui.mainloop() 

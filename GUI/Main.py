@@ -10,10 +10,18 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMainWindow
+from Config import Ui_ConfigDialog
 # import Icons
 
 
 class Ui_MainWindow(QMainWindow):
+
+    def configWin(self):
+        self.Confwin = QtWidgets.QDialog()
+        self.ui = Ui_ConfigDialog()
+        self.ui.setupUi(self.Confwin)
+        self.Confwin.show()
+
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(289, 306)
@@ -58,6 +66,7 @@ class Ui_MainWindow(QMainWindow):
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
+
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "USB Simulator"))
@@ -73,4 +82,5 @@ if __name__ == "__main__":
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
     MainWindow.show()
+    ui.configWin()
     sys.exit(app.exec_())
