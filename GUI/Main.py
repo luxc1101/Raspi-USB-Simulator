@@ -9,24 +9,20 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QMainWindow
-# import Icons
 
 
-class Ui_MainWindow(QMainWindow):
+class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(289, 306)
-        # MainWindow.setWindowIcon(QtGui.QIcon(":/Image/AppIcon.png"))
+        MainWindow.resize(280, 302)
         self.centralWidget = QtWidgets.QWidget(MainWindow)
         self.centralWidget.setObjectName("centralWidget")
-        self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.centralWidget)
-        self.verticalLayout_2.setContentsMargins(11, 11, 11, 11)
-        self.verticalLayout_2.setSpacing(6)
-        self.verticalLayout_2.setObjectName("verticalLayout_2")
+        self.pushButton = QtWidgets.QPushButton(self.centralWidget)
+        self.pushButton.setGeometry(QtCore.QRect(60, 60, 75, 23))
+        self.pushButton.setObjectName("pushButton")
         MainWindow.setCentralWidget(self.centralWidget)
         self.menuBar = QtWidgets.QMenuBar(MainWindow)
-        self.menuBar.setGeometry(QtCore.QRect(0, 0, 289, 21))
+        self.menuBar.setGeometry(QtCore.QRect(0, 0, 280, 21))
         self.menuBar.setObjectName("menuBar")
         self.menuCalls = QtWidgets.QMenu(self.menuBar)
         self.menuCalls.setObjectName("menuCalls")
@@ -41,12 +37,14 @@ class Ui_MainWindow(QMainWindow):
         self.actionConnect = QtWidgets.QAction(MainWindow)
         self.actionConnect.setEnabled(True)
         # icon = QtGui.QIcon()
-        # icon.addPixmap(QtGui.QPixmap(":/Image/AnpassenIcon.png"),QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        # icon.addPixmap(QtGui.QPixmap(":/Image/AnpassenIcon.png"),
+        #                QtGui.QIcon.Normal, QtGui.QIcon.Off)
         # self.actionConnect.setIcon(icon)
         self.actionConnect.setObjectName("actionConnect")
         self.actionQuit = QtWidgets.QAction(MainWindow)
         # icon1 = QtGui.QIcon()
-        # icon1.addPixmap(QtGui.QPixmap(":/Image/application-exit.png"),QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        # icon1.addPixmap(QtGui.QPixmap(":/Image/application-exit.png"),
+        #                 QtGui.QIcon.Normal, QtGui.QIcon.Off)
         # self.actionQuit.setIcon(icon1)
         self.actionQuit.setObjectName("actionQuit")
         self.menuCalls.addAction(self.actionConnect)
@@ -61,9 +59,13 @@ class Ui_MainWindow(QMainWindow):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "USB Simulator"))
+        self.pushButton.setText(_translate("MainWindow", "PushButton"))
         self.menuCalls.setTitle(_translate("MainWindow", "Calls"))
         self.actionConnect.setText(_translate("MainWindow", "Anpassen"))
         self.actionQuit.setText(_translate("MainWindow", "Quit"))
+
+
+# import Icons
 
 
 if __name__ == "__main__":
