@@ -34,7 +34,7 @@
           <item row="1" column="1">
            <widget class="QLineEdit" name="LE_PTPath">
             <property name="text">
-             <string>C:\Program Files\PuTTY\putty.exe</string>
+             <string>C:/Program Files/PuTTY/putty.exe</string>
             </property>
            </widget>
           </item>
@@ -48,7 +48,7 @@
           <item row="2" column="1">
            <widget class="QLineEdit" name="LE_IP">
             <property name="text">
-             <string>192.168.188.38</string>
+             <string>192.168.2.36</string>
             </property>
            </widget>
           </item>
@@ -66,6 +66,20 @@
             </property>
             <property name="readOnly">
              <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="LB_Log">
+            <property name="text">
+             <string>Log</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QLineEdit" name="LE_LogPath">
+            <property name="text">
+             <string>C:/Users/ironm/Desktop/putty.log</string>
             </property>
            </widget>
           </item>
@@ -106,7 +120,7 @@
           <item row="0" column="1">
            <widget class="QLineEdit" name="LE_Path">
             <property name="text">
-             <string>test</string>
+             <string/>
             </property>
            </widget>
           </item>
