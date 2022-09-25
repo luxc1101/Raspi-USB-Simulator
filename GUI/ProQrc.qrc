@@ -2,6 +2,9 @@
   <qresource prefix="">
     <file>Image/AnpassenIcon.png</file>
     <file>Image/AppIcon.png</file>
-    <file>Image/application-exit.png</file>
+    <file>Image/putty-exit.png</file>
+    <file>Image/clear.png</file>
+    <file>Image/connect.png</file>
+    <file>Image/disconnect.png</file>
   </qresource>
 </RCC>

@@ -10,21 +10,20 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMessageBox, QFileDialog, QMainWindow
 import os
-import time
-from pywinauto.application import Application
-import pywinauto.keyboard
+# import time
+# from pywinauto.application import Application
+# import pywinauto.keyboard
 from PyQt5.QtCore import pyqtSignal
-
 
 
 class Ui_ConfigDialog(QMainWindow):
 
     my_signal = pyqtSignal(dict)
 
-
     def setupUi(self, ConfigDialog):
         ConfigDialog.setObjectName("ConfigDialog")
-        ConfigDialog.resize(306, 278)
+        ConfigDialog.resize(300, 280)
+        self.setWindowIcon(QtGui.QIcon(":/Image/AppIcon.png"))
         self.gridLayout_3 = QtWidgets.QGridLayout(ConfigDialog)
         self.gridLayout_3.setObjectName("gridLayout_3")
         self.verticalLayout = QtWidgets.QVBoxLayout()
@@ -37,23 +36,29 @@ class Ui_ConfigDialog(QMainWindow):
         self.formLayout_2.setObjectName("formLayout_2")
         self.LB_PTPath = QtWidgets.QLabel(self.groupBox)
         self.LB_PTPath.setObjectName("LB_PTPath")
-        self.formLayout_2.setWidget(1, QtWidgets.QFormLayout.LabelRole, self.LB_PTPath)
+        self.formLayout_2.setWidget(
+            1, QtWidgets.QFormLayout.LabelRole, self.LB_PTPath)
         self.LE_PTPath = QtWidgets.QLineEdit(self.groupBox)
         self.LE_PTPath.setObjectName("LE_PTPath")
-        self.formLayout_2.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.LE_PTPath)
+        self.formLayout_2.setWidget(
+            1, QtWidgets.QFormLayout.FieldRole, self.LE_PTPath)
         self.LB_IP = QtWidgets.QLabel(self.groupBox)
         self.LB_IP.setObjectName("LB_IP")
-        self.formLayout_2.setWidget(2, QtWidgets.QFormLayout.LabelRole, self.LB_IP)
+        self.formLayout_2.setWidget(
+            2, QtWidgets.QFormLayout.LabelRole, self.LB_IP)
         self.LE_IP = QtWidgets.QLineEdit(self.groupBox)
         self.LE_IP.setObjectName("LE_IP")
-        self.formLayout_2.setWidget(2, QtWidgets.QFormLayout.FieldRole, self.LE_IP)
+        self.formLayout_2.setWidget(
+            2, QtWidgets.QFormLayout.FieldRole, self.LE_IP)
         self.LB_Key = QtWidgets.QLabel(self.groupBox)
         self.LB_Key.setObjectName("LB_Key")
-        self.formLayout_2.setWidget(3, QtWidgets.QFormLayout.LabelRole, self.LB_Key)
+        self.formLayout_2.setWidget(
+            3, QtWidgets.QFormLayout.LabelRole, self.LB_Key)
         self.LE_Key = QtWidgets.QLineEdit(self.groupBox)
         self.LE_Key.setReadOnly(False)
         self.LE_Key.setObjectName("LE_Key")
-        self.formLayout_2.setWidget(3, QtWidgets.QFormLayout.FieldRole, self.LE_Key)
+        self.formLayout_2.setWidget(
+            3, QtWidgets.QFormLayout.FieldRole, self.LE_Key)
         self.gridLayout.addLayout(self.formLayout_2, 0, 0, 1, 1)
         self.verticalLayout.addWidget(self.groupBox)
         self.groupBox_2 = QtWidgets.QGroupBox(ConfigDialog)
@@ -64,56 +69,69 @@ class Ui_ConfigDialog(QMainWindow):
         self.formLayout.setObjectName("formLayout")
         self.checkBox_WaDo = QtWidgets.QCheckBox(self.groupBox_2)
         self.checkBox_WaDo.setObjectName("checkBox_WaDo")
-        self.formLayout.setWidget(1, QtWidgets.QFormLayout.LabelRole, self.checkBox_WaDo)
+        self.formLayout.setWidget(
+            1, QtWidgets.QFormLayout.LabelRole, self.checkBox_WaDo)
         self.checkBox_Samba = QtWidgets.QCheckBox(self.groupBox_2)
         self.checkBox_Samba.setObjectName("checkBox_Samba")
-        self.formLayout.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.checkBox_Samba)
+        self.formLayout.setWidget(
+            1, QtWidgets.QFormLayout.FieldRole, self.checkBox_Samba)
         self.B_ImgPath = QtWidgets.QPushButton(self.groupBox_2)
         self.B_ImgPath.setObjectName("B_ImgPath")
-        self.formLayout.setWidget(0, QtWidgets.QFormLayout.LabelRole, self.B_ImgPath)
+        self.formLayout.setWidget(
+            0, QtWidgets.QFormLayout.LabelRole, self.B_ImgPath)
         self.LE_Path = QtWidgets.QLineEdit(self.groupBox_2)
         self.LE_Path.setObjectName("LE_Path")
-        self.formLayout.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.LE_Path)
+        self.formLayout.setWidget(
+            0, QtWidgets.QFormLayout.FieldRole, self.LE_Path)
         self.gridLayout_2.addLayout(self.formLayout, 0, 0, 1, 1)
         self.verticalLayout.addWidget(self.groupBox_2)
-        spacerItem = QtWidgets.QSpacerItem(13, 20, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        spacerItem = QtWidgets.QSpacerItem(
+            13, 20, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout.addItem(spacerItem)
         self.buttonBox_Conf = QtWidgets.QDialogButtonBox(ConfigDialog)
         self.buttonBox_Conf.setOrientation(QtCore.Qt.Horizontal)
-        self.buttonBox_Conf.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Ok)
+        self.buttonBox_Conf.setStandardButtons(
+            QtWidgets.QDialogButtonBox.Cancel | QtWidgets.QDialogButtonBox.Ok)
         self.buttonBox_Conf.setObjectName("buttonBox_Conf")
         self.verticalLayout.addWidget(self.buttonBox_Conf)
         self.gridLayout_3.addLayout(self.verticalLayout, 0, 0, 1, 1)
 
-        self.buttonBox_Conf.button(QtWidgets.QDialogButtonBox.Ok).setEnabled(False)
-
+        self.buttonBox_Conf.button(
+            QtWidgets.QDialogButtonBox.Ok).setEnabled(False)
 
         self.retranslateUi(ConfigDialog)
-        self.buttonBox_Conf.accepted.connect(ConfigDialog.accept) # type: ignore
-        self.buttonBox_Conf.rejected.connect(ConfigDialog.reject) # type: ignore
+        self.buttonBox_Conf.accepted.connect(
+            ConfigDialog.accept)  # type: ignore
+        self.buttonBox_Conf.rejected.connect(
+            ConfigDialog.reject)  # type: ignore
         QtCore.QMetaObject.connectSlotsByName(ConfigDialog)
 
         self.B_ImgPath.clicked.connect(self.OCfolder)
         # self.buttonBox_Conf.button(QtWidgets.QDialogButtonBox.Ok).clicked.connect(self.PuTTY)
-        self.buttonBox_Conf.button(QtWidgets.QDialogButtonBox.Ok).clicked.connect(self.configparameter)
+        self.buttonBox_Conf.button(
+            QtWidgets.QDialogButtonBox.Ok).clicked.connect(self.configparameter)
 
     def retranslateUi(self, ConfigDialog):
         _translate = QtCore.QCoreApplication.translate
-        ConfigDialog.setWindowTitle(_translate("ConfigDialog", "Configuration"))
+        ConfigDialog.setWindowTitle(
+            _translate("ConfigDialog", "Configuration"))
         self.groupBox.setTitle(_translate("ConfigDialog", "PuTTY Conf"))
         self.LB_PTPath.setText(_translate("ConfigDialog", "PuTTYPath"))
-        self.LE_PTPath.setText(_translate("ConfigDialog", "C:\\Program Files\\PuTTY\\putty.exe"))
+        self.LE_PTPath.setText(_translate(
+            "ConfigDialog", "C:\\Program Files\\PuTTY\\putty.exe"))
         self.LB_IP.setText(_translate("ConfigDialog", "IP Address"))
-        self.LE_IP.setText(_translate("ConfigDialog", "192.168.188.38"))
+        self.LE_IP.setText(_translate("ConfigDialog", "192.168.2.36"))
         self.LB_Key.setText(_translate("ConfigDialog", "Key"))
         self.LE_Key.setText(_translate("ConfigDialog", "raspberry"))
         self.groupBox_2.setTitle(_translate("ConfigDialog", "Others"))
-        self.checkBox_WaDo.setText(_translate("ConfigDialog", "Watchdog Service"))
-        self.checkBox_Samba.setText(_translate("ConfigDialog", "Samba Service"))
+        self.checkBox_WaDo.setText(_translate(
+            "ConfigDialog", "Watchdog Service"))
+        self.checkBox_Samba.setText(
+            _translate("ConfigDialog", "Samba Service"))
         self.B_ImgPath.setText(_translate("ConfigDialog", "Open|Create"))
-        
-        self.LE_Path.setText(_translate("ConfigDialog",os.path.join(os.path.dirname(os.path.realpath(__file__)), "filesystem")))
-    
+
+        self.LE_Path.setText(_translate("ConfigDialog", os.path.join(
+            os.path.dirname(os.path.realpath(__file__)), "filesystem")))
 
     def OCfolder(self):
         '''
@@ -128,12 +146,15 @@ class Ui_ConfigDialog(QMainWindow):
                 os.makedirs(path)
                 QMessageBox.information(self, 'Info', 'create folder done')
             else:
-                QMessageBox.information(self, 'Info', 'folder is already existed')
+                QMessageBox.information(
+                    self, 'Info', 'folder is already existed')
         except:
-           root = QFileDialog.getExistingDirectory(parent = self, caption="Open directroy", directory=os.path.abspath(os.curdir))
-           path = self.LE_Path.setText(root)
-           return self.OCfolder
-        self.buttonBox_Conf.button(QtWidgets.QDialogButtonBox.Ok).setEnabled(True)
+            root = QFileDialog.getExistingDirectory(
+                parent=self, caption="Open directroy", directory=os.path.abspath(os.curdir))
+            path = self.LE_Path.setText(root)
+            return self.OCfolder
+        self.buttonBox_Conf.button(
+            QtWidgets.QDialogButtonBox.Ok).setEnabled(True)
 
     # def PuTTYLogin(self):
     #     '''
@@ -154,14 +175,18 @@ class Ui_ConfigDialog(QMainWindow):
         PuTTY_Path = self.LE_PTPath.text()
         IP = self.LE_IP.text()
         Key = self.LE_Key.text()
-        param = {"PuTTY_Path": PuTTY_Path, "IP": IP, "Key": Key}
+        Samba = self.checkBox_Samba.checkState()
+        WaDo = self.checkBox_WaDo.checkState()
+        param = {"PuTTY_Path": PuTTY_Path, "IP": IP,
+                 "Key": Key, "Samba": Samba, "WaDo": WaDo}
         self.my_signal.emit(param)
 
-# if __name__ == "__main__":
-#     import sys
-#     app = QtWidgets.QApplication(sys.argv)
-#     ConfigDialog = QtWidgets.QDialog()
-#     ui = Ui_ConfigDialog()
-#     ui.setupUi(ConfigDialog)
-#     ConfigDialog.show()
-#     sys.exit(app.exec_())
+
+if __name__ == "__main__":
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    ConfigDialog = QtWidgets.QDialog()
+    ui = Ui_ConfigDialog()
+    ui.setupUi(ConfigDialog)
+    ConfigDialog.show()
+    sys.exit(app.exec_())

@@ -6,34 +6,159 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>280</width>
-    <height>302</height>
+    <width>342</width>
+    <height>332</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>USB Simulator</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QPushButton" name="pushButton">
-    <property name="geometry">
-     <rect>
-      <x>60</x>
-      <y>60</y>
-      <width>75</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>PushButton</string>
-    </property>
-   </widget>
+   <layout class="QGridLayout" name="gridLayout_4">
+    <item row="0" column="0">
+     <widget class="QGroupBox" name="groupBox_mtfs">
+      <property name="title">
+       <string>Mount Filesystem</string>
+      </property>
+      <layout class="QGridLayout" name="gridLayout_2">
+       <item row="0" column="0">
+        <layout class="QGridLayout" name="gridLayout_3">
+         <item row="0" column="0">
+          <layout class="QFormLayout" name="formLayout">
+           <item row="0" column="0">
+            <widget class="QLabel" name="LB_Filesystem">
+             <property name="text">
+              <string>Filesystem</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QComboBox" name="comboBox">
+             <item>
+              <property name="text">
+               <string>MIB Compliance Media</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>ext2</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>ext3</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>ext4</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>fat16</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>fat32</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>ntfs</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>exfat</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>hfsplus</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>partitions</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Software update</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <layout class="QHBoxLayout" name="horizontalLayout">
+             <item>
+              <widget class="QLabel" name="LB_Img">
+               <property name="text">
+                <string>Img</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="LB_WaDo">
+               <property name="text">
+                <string>Watchdog</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="LB_Samba">
+               <property name="text">
+                <string>Samba</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="LB_Status">
+             <property name="text">
+              <string>Status</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QGroupBox" name="groupBox_trace">
+      <property name="title">
+       <string>Trace</string>
+      </property>
+      <layout class="QGridLayout" name="gridLayout">
+       <item row="0" column="0">
+        <widget class="QTextEdit" name="textEdit_trace"/>
+       </item>
+      </layout>
+     </widget>
+    </item>
+   </layout>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>280</width>
+     <width>342</width>
      <height>21</height>
     </rect>
    </property>
@@ -41,7 +166,10 @@
     <property name="title">
      <string>Calls</string>
     </property>
-    <addaction name="actionConnect"/>
+    <addaction name="actionAnpassen"/>
+    <addaction name="actionMount"/>
+    <addaction name="actionEject"/>
+    <addaction name="actionClear"/>
     <addaction name="actionQuit"/>
    </widget>
    <addaction name="menuCalls"/>
@@ -56,11 +184,14 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionConnect"/>
+   <addaction name="actionAnpassen"/>
+   <addaction name="actionMount"/>
+   <addaction name="actionEject"/>
+   <addaction name="actionClear"/>
    <addaction name="actionQuit"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
-  <action name="actionConnect">
+  <action name="actionAnpassen">
    <property name="enabled">
     <bool>true</bool>
    </property>
@@ -75,10 +206,37 @@
   <action name="actionQuit">
    <property name="icon">
     <iconset resource="ProQrc.qrc">
-     <normaloff>:/Image/application-exit.png</normaloff>:/Image/application-exit.png</iconset>
+     <normaloff>:/Image/putty-exit.png</normaloff>:/Image/putty-exit.png</iconset>
    </property>
    <property name="text">
     <string>Quit</string>
+   </property>
+  </action>
+  <action name="actionEject">
+   <property name="icon">
+    <iconset resource="ProQrc.qrc">
+     <normaloff>:/Image/disconnect.png</normaloff>:/Image/disconnect.png</iconset>
+   </property>
+   <property name="text">
+    <string>Eject</string>
+   </property>
+  </action>
+  <action name="actionMount">
+   <property name="icon">
+    <iconset resource="ProQrc.qrc">
+     <normaloff>:/Image/connect.png</normaloff>:/Image/connect.png</iconset>
+   </property>
+   <property name="text">
+    <string>Mount</string>
+   </property>
+  </action>
+  <action name="actionClear">
+   <property name="icon">
+    <iconset resource="ProQrc.qrc">
+     <normaloff>:/Image/clear.png</normaloff>:/Image/clear.png</iconset>
+   </property>
+   <property name="text">
+    <string>Clear</string>
    </property>
   </action>
  </widget>

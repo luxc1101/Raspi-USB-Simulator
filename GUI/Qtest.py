@@ -1,31 +1,16 @@
-import sys
+import time
 
-from PyQt5 import QtGui, QtWidgets
-from PyQt5.QtWidgets import QToolBar
+syslog = 'C:/Users/ironm/Desktop/putty.log'
+sleep_time_in_seconds = 1
 
-
-class MainWindow(QtWidgets.QMainWindow):
-    def __init__(self):
-        super().__init__()
-        # set GUI icon
-        self.setWindowIcon(QtGui.QIcon("GUI/Image/AppIcon.png"))
-        self.setWindowTitle("Hello World")
-        self.button = QtWidgets.QPushButton("My button")
-
-        # icon = QtGui.QIcon("GUI/Image/AppIcon.png")
-        # self.button.setIcon(icon)
-        self.button.clicked.connect(self.change_icon)
-        toolbar = QToolBar("My main toolbar")
-
-        self.setCentralWidget(self.button)
-
-        self.show()
-
-    def change_icon(self):
-        icon = QtGui.QIcon("animal-monkey.png")
-        self.button.setIcon(icon)
-
-
-app = QtWidgets.QApplication(sys.argv)
-w = MainWindow()
-app.exec_()
+try:
+    with open(syslog, 'r', errors='ignore') as f:
+        while True:
+            for line in f:
+                if line:
+                    if "ext2" in line:
+                        print("ext2")
+                    # do whatever you want to do on the line
+            time.sleep(sleep_time_in_seconds)
+except IOError as e:
+    print('Cannot open the file {}. Error: {}'.format(syslog, e))
