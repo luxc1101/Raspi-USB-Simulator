@@ -6,5 +6,6 @@
     <file>Image/clear.png</file>
     <file>Image/connect.png</file>
     <file>Image/disconnect.png</file>
+    <file>Image/help.png</file>
   </qresource>
 </RCC>
