@@ -28,18 +28,19 @@ class VLine(QFrame):
 class Ui_MainWindow(QMainWindow):
     Putty = None
     Logging = None
+    # Param = None
     Filesysdict = {
-        "MIB Compliance Media": ['mib_compliance', 0],
-        "ext2": ["ext2",1],
-        "ext3": ["ext3", 2],
-        "ext4": ["ext4", 3],
-        "fat16": ["fat16", 4],
-        "fat32": ["fat32", 5],
-        "ntfs": ["ntfs", 6],
-        "exfat": ["exfat", 7],
-        "hfsplus": ["hfsplus", 8],
-        "part": ["part", 9],
-        "Software update": ["sw", 10],
+        "MIB Compliance Media": ['mib_compliance', "0"],
+        "ext2": ["ext2","1"],
+        "ext3": ["ext3", "2"],
+        "ext4": ["ext4", "3"],
+        "fat16": ["fat16", "4"],
+        "fat32": ["fat32", "5"],
+        "ntfs": ["ntfs", "6"],
+        "exfat": ["exfat", "7"],
+        "hfsplus": ["hfsplus", "8"],
+        "partitions": ["part", "9"],
+        "Software update": ["sw", "10"],
     }
 
     def configWin(self):
@@ -213,14 +214,14 @@ class Ui_MainWindow(QMainWindow):
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         self.actionAnpassen.triggered.connect(self.configWin)
-        self.actionMount.triggered.connect(self.Tracedata)
+        self.actionMount.triggered.connect(self.Mount)
         self.actionEject.triggered.connect(self.Eject)
         self.actionQuit.triggered.connect(self.PuTTYExit)
         self.actionClear.triggered.connect(self.TraceClear)
         self.actionHelp.triggered.connect(lambda: Ui_MainWindow.MSG(title="help", 
                                                                     message="Tutorial: <a href=\"https://git1.jnd.joynext.com/lu_x4/priapos.git\">Raspberrypi Zero USB filesystem simulator</a>",
                                                                     type="i"))
-
+        # self.B_SendCmd.clicked.connect(lambda: self.SendCommand(self.LE_SendCmd.text()))
         self.thread = {}
         
 
@@ -288,7 +289,7 @@ class Ui_MainWindow(QMainWindow):
         try:
             app = Application().start(
                 r"{} -ssh pi@{}".format(param["PuTTY_Path"], param["IP"]))
-            time.sleep(2)
+            time.sleep(1)
             self.Putty = app.PuTTY
             self.Logging = param["Log"]
             PT_sec_alert = app.PuTTYSecurityAlert
@@ -296,19 +297,26 @@ class Ui_MainWindow(QMainWindow):
                 PT_sec_alert.Yes.click()
                 # PT_sec_alert.No.click()
                 # PT_sec_alert.Cancel.click()
-            time.sleep(2)
+            if not os.path.exists(self.Logging):
+                self.statusBar.showMessage("Login failed")
+                Ui_MainWindow.MSG(title="Error", message="Please check PuTTY configuration and WiFi", type="e")
+                return
+            time.sleep(1)
             self.SendCommand(param["Key"])
             self.SendCommand("ls")
-            self.actionMount.setEnabled(True)
-            self.actionQuit.setEnabled(True)
             if not param["Samba"]:
                 self.SendCommand("sudo systemctl stop smbd")
             if not param["WaDo"]:
                 self.SendCommand("sudo systemctl stop fswd")
-            self.statusBar.showMessage("PuTTY open successfully")
+            self.SendCommand("python mountfs.py")
+            # self.statusBar.showMessage("PuTTY open successfully")
+            self.statusBar.showMessage("Login successfully")
+            self.actionMount.setEnabled(True)
+            self.actionQuit.setEnabled(True)
+            self.comboBox.setEnabled(True)
         except:
-            Ui_MainWindow.MSG(title="Error", message="Please check PuTTY configuration and WiFi", type="e")
-            self.statusBar.showMessage("PuTTY open failed")
+            pass
+
 
     def PuTTYExit(self):
         '''
@@ -320,12 +328,27 @@ class Ui_MainWindow(QMainWindow):
             self.actionMount.setEnabled(False)
             self.actionQuit.setEnabled(False)
             self.comboBox.setEnabled(False)
-            time.sleep(1)
-            self.thread[1].stop()
-            self.statusBar.showMessage("PuTTY exited")
+            self.statusBar.showMessage("Logout and PuTTY exited")
+            try:
+                # condition of threadstop is the threadstart first, otherweis error
+                if self.thread[1].file is not None:
+                    self.thread[1].file.close()
+                self.thread[1].stop()
+                del(self.thread[1])
+                # print("del thread")
+            except:
+                pass            
         except:
             Ui_MainWindow.MSG(title="Info", message="please exicute putty first", type="i")
             self.statusBar.showMessage("PuTTY exit failed")
+        trytimes = 5
+        while trytimes>0:
+            try:   
+                os.remove(self.Logging)
+                break
+            except:
+                time.sleep(1)
+                trytimes-=1
 
     def TraceClear(self):
         '''
@@ -339,13 +362,13 @@ class Ui_MainWindow(QMainWindow):
         '''
         self.textEdit_trace.append(msg)
 
-    def Tracedata(self):
+    def Mount(self):
         '''
         run the TraceThread class
         '''
         self.textEdit_trace.clear()
         self.actionEject.setEnabled(True)
-        self.actionMount.setEnabled(False)
+        self.actionMount.setEnabled(True)
         self.actionQuit.setEnabled(False)
         self.comboBox.setEnabled(False)
         self.thread[1] = TraceThread(parent=None, Logfile=self.Logging, 
@@ -355,6 +378,7 @@ class Ui_MainWindow(QMainWindow):
                                     )
         self.thread[1].start()
         self.thread[1].trace_singal.connect(self.Update_logging)
+        self.SendCommand(self.Filesysdict[self.comboBox.currentText()][1])
         # self.img = self.comboBox.currentText()
         # print(self.textEdit_trace.toPlainText())
         
@@ -367,10 +391,14 @@ class Ui_MainWindow(QMainWindow):
         self.actionQuit.setEnabled(True)
         self.comboBox.setEnabled(True)
         try:
-            self.SendCommand("sudo /sbin/modprobe g_multi -r")
-            time.sleep(1)
-            self.thread[1].stop()
+            # self.SendCommand("sudo /sbin/modprobe g_multi -r")
+            self.SendCommand("q")
+            self.SendCommand("python mountfs.py")
+            self.thread[1].file.close()
+            # self.thread[1].stop()
+            # del(self.thread[1])
             self.statusBar.showMessage("{} eject successfully".format(self.comboBox.currentText()))
+            # print("del thread")
         except:
             self.statusBar.showMessage("{} eject failed".format(self.comboBox.currentText()))
 
@@ -386,6 +414,7 @@ class TraceThread(QThread):
     read data from log file and send data to trace window of Main window class
     '''
     trace_singal = pyqtSignal(str)
+    file = None
     # status_signal = pyqtSignal(int)
     def __init__(self, parent, Logfile, sleep_time_in_seconds, img, imgstaus):
         super(TraceThread, self).__init__(parent)
@@ -399,31 +428,34 @@ class TraceThread(QThread):
         LogStartFlag = False
         try:
             with open(self.Logfile, 'r', errors='ignore') as f:
+                self.file = f
                 while True:
-                    for line in f:
-                        if "pi@raspberrypi" in line:
-                            LogStartFlag = True
-                        if LogStartFlag:
-                            if (line) and ("pi@raspberrypi" not in line):
-                                if self.img in line:
-                                    self.imgstatus.setStyleSheet("background-color: #a4efaf; border: 1px solid black; border-radius: 4px")
-                                self.trace_singal.emit(line.strip()) 
-                            else:
-                                color_content =  "<span style=\" font-size:8pt; font-weight:800; color:{};\" >".format("#32CD32")
-                                color_content += line.strip()
-                                color_content += "</span>"
-                                self.trace_singal.emit(color_content)
-                    time.sleep(self.sleep_time_in_seconds)
+                    try:
+                        for line in f:
+                            if "pi@raspberrypi" in line:
+                                LogStartFlag = True
+                            if LogStartFlag:
+                                if (line) and ("pi@raspberrypi" not in line):
+                                    if self.img in line:
+                                        self.imgstatus.setStyleSheet("background-color: #a4efaf; border: 1px solid black; border-radius: 4px")
+                                    self.trace_singal.emit(line.strip()) 
+                                else:
+                                    color_content =  "<span style=\" font-size:8pt; font-weight:800; color:{};\" >".format("#32CD32")
+                                    color_content += line.strip()
+                                    color_content += "</span>"
+                                    self.trace_singal.emit(color_content)
+                        time.sleep(self.sleep_time_in_seconds)
+                    except:
+                        pass
         except IOError as e:
             line = 'Cannot open the file {}. Error: {}'.format(self.Logfile, e)
             self.trace_singal.emit(line)
 
     def stop(self):
         self.imgstatus.setStyleSheet("background-color: #f9e1dd; border: 1px solid black; border-radius: 4px")
-        self.terminate() 
+        self.quit()
 
-
-
+         
 
 
 if __name__ == "__main__":
