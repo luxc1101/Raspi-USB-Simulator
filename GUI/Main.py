@@ -308,7 +308,7 @@ class Ui_MainWindow(QMainWindow):
                 self.SendCommand("sudo systemctl stop smbd")
             if not param["WaDo"]:
                 self.SendCommand("sudo systemctl stop fswd")
-            self.SendCommand("python mountfs.py")
+            self.SendCommand("python mountfs_gui.py")
             # self.statusBar.showMessage("PuTTY open successfully")
             self.statusBar.showMessage("Login successfully")
             self.actionMount.setEnabled(True)
@@ -323,6 +323,7 @@ class Ui_MainWindow(QMainWindow):
         exit PuTTY
         '''
         try:
+            self.SendCommand("q")
             self.SendCommand("exit")
             self.actionAnpassen.setEnabled(True)
             self.actionMount.setEnabled(False)
@@ -331,11 +332,11 @@ class Ui_MainWindow(QMainWindow):
             self.statusBar.showMessage("Logout and PuTTY exited")
             try:
                 # condition of threadstop is the threadstart first, otherweis error
-                if self.thread[1].file is not None:
-                    self.thread[1].file.close()
+                # if self.thread[1].file is not None:
+                #     self.thread[1].file.close()
                 self.thread[1].stop()
                 del(self.thread[1])
-                # print("del thread")
+                print("del thread")
             except:
                 pass            
         except:
@@ -370,17 +371,19 @@ class Ui_MainWindow(QMainWindow):
         self.actionEject.setEnabled(True)
         self.actionMount.setEnabled(True)
         self.actionQuit.setEnabled(False)
-        self.comboBox.setEnabled(False)
+        self.comboBox.setEnabled(True)
+        try:
+            self.thread[1].file.close()
+        except:
+            pass
         self.thread[1] = TraceThread(parent=None, Logfile=self.Logging, 
-                                    sleep_time_in_seconds=1.5, 
+                                    sleep_time_in_seconds=0.05, 
                                     img=self.Filesysdict[self.comboBox.currentText()][0],
                                     imgstaus=self.LB_Img
                                     )
         self.thread[1].start()
         self.thread[1].trace_singal.connect(self.Update_logging)
         self.SendCommand(self.Filesysdict[self.comboBox.currentText()][1])
-        # self.img = self.comboBox.currentText()
-        # print(self.textEdit_trace.toPlainText())
         
     def Eject(self):
         '''
@@ -392,13 +395,13 @@ class Ui_MainWindow(QMainWindow):
         self.comboBox.setEnabled(True)
         try:
             # self.SendCommand("sudo /sbin/modprobe g_multi -r")
-            self.SendCommand("q")
-            self.SendCommand("python mountfs.py")
+            self.SendCommand("e")
+            # self.SendCommand("python mountfs_gui.py")
             self.thread[1].file.close()
             # self.thread[1].stop()
             # del(self.thread[1])
             self.statusBar.showMessage("{} eject successfully".format(self.comboBox.currentText()))
-            # print("del thread")
+            print("file.close")
         except:
             self.statusBar.showMessage("{} eject failed".format(self.comboBox.currentText()))
 
@@ -423,30 +426,38 @@ class TraceThread(QThread):
         self.sleep_time_in_seconds = sleep_time_in_seconds
         self.img = img
         self.imgstatus = imgstaus
+        self.f = open(self.Logfile, 'r', errors='ignore')
+        self.file = self.f
 
     def run(self):
         LogStartFlag = False
         try:
-            with open(self.Logfile, 'r', errors='ignore') as f:
-                self.file = f
-                while True:
-                    try:
-                        for line in f:
-                            if "pi@raspberrypi" in line:
-                                LogStartFlag = True
-                            if LogStartFlag:
-                                if (line) and ("pi@raspberrypi" not in line):
-                                    if self.img in line:
-                                        self.imgstatus.setStyleSheet("background-color: #a4efaf; border: 1px solid black; border-radius: 4px")
-                                    self.trace_singal.emit(line.strip()) 
-                                else:
-                                    color_content =  "<span style=\" font-size:8pt; font-weight:800; color:{};\" >".format("#32CD32")
-                                    color_content += line.strip()
-                                    color_content += "</span>"
-                                    self.trace_singal.emit(color_content)
-                        time.sleep(self.sleep_time_in_seconds)
-                    except:
-                        pass
+            # with open(self.Logfile, 'r', errors='ignore') as f:
+            #     self.file = f
+            while True:
+                try:
+                    line = self.file.readline().strip()
+                    if "pi@raspberrypi" in line:
+                            LogStartFlag = True
+                    if LogStartFlag:   
+                        if line:
+                            self.trace_singal.emit(line)
+                    # for line in self.f:
+                    #     if "pi@raspberrypi" in line:
+                    #         LogStartFlag = True
+                    #     if LogStartFlag:
+                    #         if (line) and ("pi@raspberrypi" not in line):
+                    #             if self.img in line:
+                    #                 self.imgstatus.setStyleSheet("background-color: #a4efaf; border: 1px solid black; border-radius: 4px")
+                    #             self.trace_singal.emit(line.strip()) 
+                    #         else:
+                    #             color_content =  "<span style=\" font-size:8pt; font-weight:800; color:{};\" >".format("#32CD32")
+                    #             color_content += line.strip()
+                    #             color_content += "</span>"
+                    #             self.trace_singal.emit(color_content)
+                    # time.sleep(self.sleep_time_in_seconds)
+                except:
+                    pass
         except IOError as e:
             line = 'Cannot open the file {}. Error: {}'.format(self.Logfile, e)
             self.trace_singal.emit(line)

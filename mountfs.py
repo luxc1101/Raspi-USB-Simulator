@@ -145,7 +145,8 @@ def menu():
     sys.stdout.write("9: partitions" + "\n")
     sys.stdout.write("10: Software update" + "\n")
     sys.stdout.write(Green + "r: remount" + "\n")
-    sys.stdout.write("q: quit and eject the usb" + "\n")
+    sys.stdout.write("q: quit and eject the USB" + "\n")
+    sys.stdout.write("e: eject current USB drive" + "\n")
     sys.stdout.write(
         "c: cancel or terminate the currently running program" + C_off + "\n")
 
@@ -182,7 +183,7 @@ def USBSIM(FileImgDic, MPDic):
     MPdic = MPDic
 
     def checkinput(Input):
-        if (Input.lower() not in ["r", "q", "c"]) and (Input not in [str(i) for i in range(diclen)]):
+        if (Input.lower() not in ["r", "q", "c", "e"]) and (Input not in [str(i) for i in range(diclen)]):
             print(Red + "Warning: " + "invalid input, retry to enter" + C_off)
             return False
         return True
@@ -223,6 +224,10 @@ def USBSIM(FileImgDic, MPDic):
             lsblk()
             os.system('sudo /sbin/modprobe g_multi -r')  # unmount first
             return
+        elif Input.lower() == "e":
+            print(Cyan + "eject current USB drive")
+            os.system('sudo /sbin/modprobe g_multi -r')  # unmount first
+            return USBSIM(FileImgDic, MPDic)
         # base case: USB simulator
         else:
             fsname = getfsname(Imgdic[int(Input)])
