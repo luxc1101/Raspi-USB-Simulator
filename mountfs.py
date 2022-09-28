@@ -265,7 +265,7 @@ def USBSIM(FileImgDic, MPDic):
                     # samba service config
                     sambaconf(PKG='samba', img= lcimg, MP= MPpath)
                     # watchdog config
-                    print(Cyan + "watchdog service status: " + Yellow)
+                    print(Cyan + "status of watchdog service: " + Yellow)
                     modifyfile(file="fswd.py", img = lcimg, MP= MPpath)
                     os.system("sudo systemctl restart fswd")
                     os.system("sudo systemctl status fswd | grep -E 'Loaded|Active|CGroup|python'")

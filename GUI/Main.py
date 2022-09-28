@@ -287,12 +287,12 @@ class Ui_MainWindow(QMainWindow):
         trying to login Rapberry Pi zero by IP via PuTTY
         '''
         try:
-            app = Application().start(
+            self.app = Application().start(
                 r"{} -ssh pi@{}".format(param["PuTTY_Path"], param["IP"]))
             time.sleep(1)
-            self.Putty = app.PuTTY
+            self.Putty = self.app.PuTTY
             self.Logging = param["Log"]
-            PT_sec_alert = app.PuTTYSecurityAlert
+            PT_sec_alert = self.app.PuTTYSecurityAlert
             if PT_sec_alert.exists():
                 PT_sec_alert.Yes.click()
                 # PT_sec_alert.No.click()
@@ -323,8 +323,9 @@ class Ui_MainWindow(QMainWindow):
         exit PuTTY
         '''
         try:
-            self.SendCommand("q")
-            self.SendCommand("exit")
+            # self.SendCommand("q")
+            # self.SendCommand("exit")
+            os.system("taskkill /im PuTTY.exe")
             self.actionAnpassen.setEnabled(True)
             self.actionMount.setEnabled(False)
             self.actionQuit.setEnabled(False)
@@ -332,8 +333,6 @@ class Ui_MainWindow(QMainWindow):
             self.statusBar.showMessage("Logout and PuTTY exited")
             try:
                 # condition of threadstop is the threadstart first, otherweis error
-                # if self.thread[1].file is not None:
-                #     self.thread[1].file.close()
                 self.thread[1].stop()
                 del(self.thread[1])
                 print("del thread")
@@ -374,6 +373,8 @@ class Ui_MainWindow(QMainWindow):
         self.comboBox.setEnabled(True)
         try:
             self.thread[1].file.close()
+            self.thread[1].stop()
+            del(self.thread[1])
         except:
             pass
         self.thread[1] = TraceThread(parent=None, Logfile=self.Logging, 
@@ -426,8 +427,7 @@ class TraceThread(QThread):
         self.sleep_time_in_seconds = sleep_time_in_seconds
         self.img = img
         self.imgstatus = imgstaus
-        self.f = open(self.Logfile, 'r', errors='ignore')
-        self.file = self.f
+        self.file = open(self.Logfile, 'r', errors='ignore')
 
     def run(self):
         LogStartFlag = False
@@ -441,7 +441,26 @@ class TraceThread(QThread):
                             LogStartFlag = True
                     if LogStartFlag:   
                         if line:
-                            self.trace_singal.emit(line)
+                            if "enter" in line.lower():
+                                color_content =  "<span style=\" font-size:8pt; font-weight:800; color:{};\" >".format("#32CD32")
+                                color_content += line
+                                color_content += "</span>"
+                                self.trace_singal.emit(color_content)
+                            elif "please" in line.lower():
+                                color_content =  "<span style=\" font-size:8pt; font-weight:800; color:{};\" >".format("#00FFFF")
+                                color_content += line
+                                color_content += "</span>"
+                                self.trace_singal.emit(color_content)
+                            elif self.img in line:
+                                self.imgstatus.setStyleSheet("background-color: #a4efaf; border: 1px solid black; border-radius: 4px")
+                                self.imgstatus.setText(self.img)
+                            elif ("status of samba" in line.lower()) or ("status of watchdog" in line.lower()):
+                                color_content =  "<span style=\" font-size:8pt; font-weight:800; color:{};\" >".format("red")
+                                color_content += line
+                                color_content += "</span>"
+                                self.trace_singal.emit(color_content)
+                            else:
+                                self.trace_singal.emit(line)
                     # for line in self.f:
                     #     if "pi@raspberrypi" in line:
                     #         LogStartFlag = True

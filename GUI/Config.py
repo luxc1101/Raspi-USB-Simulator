@@ -90,7 +90,7 @@ class Ui_ConfigDialog(QMainWindow):
 
         
 ###############################################################################################  
-        self.buttonBox_Conf.button(QtWidgets.QDialogButtonBox.Ok).setEnabled(False)
+        self.buttonBox_Conf.button(QtWidgets.QDialogButtonBox.Ok).setEnabled(True)
         with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), "Config.json"),'r',encoding="utf8") as f:
             self.setup_dict = json.load(f) 
 

@@ -1,9 +1,9 @@
 {
     "PuTTYConf": {
       "PuTTYPath": "C:/Program Files/PuTTY/putty.exe",
-      "IPAddress": "192.168.2.36",
+      "IPAddress": "192.168.188.38",
       "Key": "raspberry",
-      "Log": "C:/Users/ironm/Desktop/putty.log"
+      "Log": "C:/Users/wrk_TestRadio/Desktop/putty.log"
     },
     "Others": {
       "WoDa": true,
