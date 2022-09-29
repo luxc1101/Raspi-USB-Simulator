@@ -8,6 +8,7 @@ import os
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMainWindow, QMessageBox, QFrame, QLabel
 from Config import Ui_ConfigDialog
+from Help import Ui_Form
 from PyQt5.QtCore import pyqtSignal, QThread, QDate, Qt
 from pywinauto.application import Application
 import sys
@@ -44,11 +45,23 @@ class Ui_MainWindow(QMainWindow):
     }
 
     def configWin(self):
+        '''
+        show configuration dialog and pass config param to main window
+        '''
         self.Confwin = QtWidgets.QDialog()
         self.ui = Ui_ConfigDialog()
         self.ui.setupUi(self.Confwin)
-        self.Confwin.show()
         self.ui.my_signal.connect(self.PuTTYLogin)
+        self.Confwin.show()
+        
+    def helpWin(self):
+        '''
+        show info about this tool and quick user guide
+        '''
+        self.Helpwin = QtWidgets.QDialog()
+        self.ui = Ui_Form()
+        self.ui.setupUi(self.Helpwin)
+        self.Helpwin.show()
 
     def setupUi(self, MainWindow):
         # self.configWin()
@@ -188,6 +201,8 @@ class Ui_MainWindow(QMainWindow):
         self.mainToolBar.addAction(self.actionEject)
         self.mainToolBar.addAction(self.actionClear)
         self.mainToolBar.addAction(self.actionQuit)
+        self.mainToolBar.addAction(self.actionHelp)
+
 
 ###########################################################################
         self.actionMount.setEnabled(False)
@@ -218,9 +233,7 @@ class Ui_MainWindow(QMainWindow):
         self.actionEject.triggered.connect(self.Eject)
         self.actionQuit.triggered.connect(self.PuTTYExit)
         self.actionClear.triggered.connect(self.TraceClear)
-        self.actionHelp.triggered.connect(lambda: Ui_MainWindow.MSG(title="help", 
-                                                                    message="Tutorial: <a href=\"https://git1.jnd.joynext.com/lu_x4/priapos.git\">Raspberrypi Zero USB filesystem simulator</a>",
-                                                                    type="i"))
+        self.actionHelp.triggered.connect(self.helpWin)
         # self.B_SendCmd.clicked.connect(lambda: self.SendCommand(self.LE_SendCmd.text()))
         self.thread = {}
         
@@ -256,7 +269,7 @@ class Ui_MainWindow(QMainWindow):
         self.groupBox_Cmd.setTitle(_translate("MainWindow", "Command Window"))
         self.textEdit_trace.setPlaceholderText(_translate("Form", "PuTTY's output is shown here"))
         self.LE_SendCmd.setPlaceholderText(_translate("Form", "Send the command manually here"))
-        self.actionHelp.setText(_translate("MainWindow", "Help"))
+        self.actionHelp.setText(_translate("MainWindow", "About USB Simulator"))
     
     @staticmethod
     def MSG(title, message, type):
@@ -308,7 +321,8 @@ class Ui_MainWindow(QMainWindow):
                 self.SendCommand("sudo systemctl stop smbd")
             if not param["WaDo"]:
                 self.SendCommand("sudo systemctl stop fswd")
-            self.SendCommand("python mountfs_gui.py")
+            # self.SendCommand("python mountfs_gui.py")
+            self.SendCommand("python test.py 'watchdog' 'samba'")
             # self.statusBar.showMessage("PuTTY open successfully")
             self.statusBar.showMessage("Login successfully")
             self.actionMount.setEnabled(True)
@@ -341,6 +355,7 @@ class Ui_MainWindow(QMainWindow):
         except:
             Ui_MainWindow.MSG(title="Info", message="please exicute putty first", type="i")
             self.statusBar.showMessage("PuTTY exit failed")
+        # try 5 time to delet putty.log file once ok then jump out
         trytimes = 5
         while trytimes>0:
             try:   

@@ -69,7 +69,6 @@ def remount(file):
 
 # check if a package installed or not and try to install it
 
-
 def installcheck(PKG: str):
     PKG_OK = "dpkg-query -W --showformat='${Status}\n' " + \
         "{}|grep 'install ok installed'".format(PKG)
