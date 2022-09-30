@@ -69,6 +69,7 @@ def remount(file):
 
 # check if a package installed or not and try to install it
 
+
 def installcheck(PKG: str):
     PKG_OK = "dpkg-query -W --showformat='${Status}\n' " + \
         "{}|grep 'install ok installed'".format(PKG)
@@ -223,6 +224,7 @@ def USBSIM(FileImgDic, MPDic):
             lsblk()
             os.system('sudo /sbin/modprobe g_multi -r')  # unmount first
             return
+        # base case: eject
         elif Input.lower() == "e":
             print(Cyan + "eject current USB drive")
             os.system('sudo /sbin/modprobe g_multi -r')  # unmount first

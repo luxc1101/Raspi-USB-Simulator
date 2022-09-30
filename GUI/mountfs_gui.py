@@ -49,12 +49,14 @@ MPDic[10] = "/mnt/usb_sw"
 
 diclen = len(FileImgDic)
 # color
-# sys.stdout.write("{}hallo".format(Cyan))
 Cyan = '\033[1;96m'
 Yellow = '\033[1;93m'
 Green = '\033[1;92m'
 Red = '\033[1;91m'
 C_off = '\033[0m'
+# others
+WaDo = sys.argv[1]
+Samba = sys.argv[2]
 
 ##########################
 #       Functions        #
@@ -180,7 +182,7 @@ def modifyfile(file:str, img:str, MP:str):
 ##########################
 #     Recursive Algo     #
 ##########################
-def USBSIM(FileImgDic, MPDic):
+def USBSIM(FileImgDic, MPDic, WaDo, Samba):
     Imgdic = FileImgDic
     MPdic = MPDic
 
@@ -197,5 +199,105 @@ def USBSIM(FileImgDic, MPDic):
 
     menu()
     Input = input(Cyan + "Enter a value: " + C_off)
+    
+    # base case: invalid input
     if not checkinput(Input):
-        return USBSIM(FileImgDic, MPDic)
+        return USBSIM(FileImgDic, MPDic, WaDo, Samba)
+    
+    # base case: remount
+    elif Input.lower() == "r":
+        print(Cyan + "list the already remounted filesytems")
+        lsblk()
+        Input = input(
+            Cyan + "which filesystem will be remounted: " + C_off)
+        if checkinput(Input):
+            print(Cyan + "remount " + Red +
+                    Imgdic[int(Input)] + Cyan + " filesystem")
+            remount(Imgdic[int(Input)])
+            # check if samba and watchdog service active or not, active return '0' deactive return '2' 
+            if int(Samba) == 2:
+                sambaconf(PKG='samba', img= Imgdic[int(Input)].lower(), MP= MPdic[int(Input)])
+            if int(WaDo) == 2:
+                modifyfile(file="fswd.py", img = Imgdic[int(Input)].lower(), MP= MPdic[int(Input)])
+                os.system("sudo systemctl restart fswd")
+            return USBSIM(FileImgDic, MPDic, WaDo, Samba)
+    
+    # base case: cancel currently programm
+    elif Input.lower() == "c":
+        print(Cyan + "terminate the programm")
+        lsblk()
+        return
+
+    # base case: quit and eject
+    elif Input.lower() == "q":
+        print(Cyan + "terminate the programm and eject")
+        lsblk()
+        os.system('sudo /sbin/modprobe g_multi -r')  # unmount first
+        return
+
+    # base case: eject current mounted USB Filesystem 
+    elif Input.lower() == "e":
+        print(Cyan + "eject current USB drive")
+        os.system('sudo /sbin/modprobe g_multi -r')  # unmount first
+        return USBSIM(FileImgDic, MPDic, WaDo, Samba)
+
+    # base case: USB simulator
+    else:
+        fsname = getfsname(Imgdic[int(Input)])
+        lcimg = Imgdic[int(Input)].lower()
+        MPpath = MPdic[int(Input)]
+        print(Cyan + "prepare to mount " + Red + fsname + Cyan + " filesystem" + C_off)
+        # check if the img file is already existed or not
+        if os.path.exists("./{}".format(lcimg)):
+            print("{}{}{} is already existed{}".format(Red, lcimg, Cyan, C_off))
+            if os.path.ismount(MPpath):
+                print("{}{}{} already mounted".format(Red, MPpath, Cyan))
+            else:
+                print(Cyan + "going to mount " + Red + lcimg + C_off)
+                if ("fat" in lcimg) or ("mib" in lcimg): # fat: fat32 fat16 ; mib: fat32
+                    os.system('sudo mount -o rw,users,sync,nofail,umask=0000 {} {}'.format(lcimg, MPpath))
+                elif "part" in lcimg: # partitions but check if it is already mounted 
+                    loopdev = "lsblk -f | grep 'loop'"
+                    # from all loop device looking for "p1 (loopxp1, loopxp2) if p1 not exist, partitions fs need to be mounted"
+                    if "p1" not in os.popen(loopdev).read():
+                        print("going to mount {}NTFS{} and {}FAT32{} partitions".format(Red, Cyan, Red, Cyan))
+                        os.system("sudo losetup -fP {}".format(lcimg))
+                    else:
+                        print("{}NTFS{} and {}FAT32{} partitions already mounted".format(Red, Cyan, Red, Cyan))
+                else:
+                    os.system('sudo mount -o rw,users,sync,nofail {} {}'.format(lcimg, MPpath))
+                # showing info about the mounted filesystem
+            print(Cyan + "Information about the mounted filesystem:")
+            print("="*60 + Yellow)
+            if int(Input) != 9:
+                # other filesystem
+                os.system("findmnt | grep -i {} | grep 'mnt'".format(fsname))
+                os.system("lsblk --fs -o NAME,FSTYPE,FSAVAIL,FSUSE%,MOUNTPOINT | grep -i {} | grep 'mnt'".format(fsname))
+                print(Cyan + "=" * 60)
+                print(">"*60)
+                # samba service config
+                if int(Samba) == 2:
+                    sambaconf(PKG='samba', img= lcimg, MP= MPpath)
+                if int(WaDo) == 2:
+                    print(Cyan + "status of watchdog service: " + Yellow)
+                    modifyfile(file="fswd.py", img = lcimg, MP= MPpath)
+                    os.system("sudo systemctl restart fswd")
+                    os.system("sudo systemctl status fswd | grep -E 'Loaded|Active|CGroup|python'")
+                    print(Red + MPpath + Yellow + "  is unter watching, action timeout is 10s")
+                print(Cyan + "<"*60 + C_off)
+            else:
+                os.system("lsblk -f | grep -E 'p1|p2' | grep 'loop'")
+                print(Cyan + "=" * 60)  
+
+            remount(lcimg)
+        else:
+            print(Cyan + "+" * 60)
+            # fsc.Cfilesystem(lcimg, MPpath)
+            print("run fsc.py")
+            print(Cyan + "+" * 60 + C_off)
+
+        
+        return USBSIM(FileImgDic, MPDic, WaDo, Samba)
+
+if __name__ == "__main__":
+    USBSIM(FileImgDic, MPDic, WaDo, Samba)

@@ -322,7 +322,7 @@ class Ui_MainWindow(QMainWindow):
             if not param["WaDo"]:
                 self.SendCommand("sudo systemctl stop fswd")
             # self.SendCommand("python mountfs_gui.py")
-            self.SendCommand("python test.py 'watchdog' 'samba'")
+            self.SendCommand("python {}.py '{}' '{}'".format("mountfs_gui" ,param["WaDo"], param["Samba"]))
             # self.statusBar.showMessage("PuTTY open successfully")
             self.statusBar.showMessage("Login successfully")
             self.actionMount.setEnabled(True)
@@ -383,9 +383,9 @@ class Ui_MainWindow(QMainWindow):
         '''
         self.textEdit_trace.clear()
         self.actionEject.setEnabled(True)
-        self.actionMount.setEnabled(True)
+        self.actionMount.setEnabled(False)
         self.actionQuit.setEnabled(False)
-        self.comboBox.setEnabled(True)
+        self.comboBox.setEnabled(False)
         try:
             self.thread[1].file.close()
             self.thread[1].stop()
@@ -414,7 +414,7 @@ class Ui_MainWindow(QMainWindow):
             self.SendCommand("e")
             # self.SendCommand("python mountfs_gui.py")
             self.thread[1].file.close()
-            # self.thread[1].stop()
+            self.thread[1].stop()
             # del(self.thread[1])
             self.statusBar.showMessage("{} eject successfully".format(self.comboBox.currentText()))
             print("file.close")
@@ -498,7 +498,7 @@ class TraceThread(QThread):
 
     def stop(self):
         self.imgstatus.setStyleSheet("background-color: #f9e1dd; border: 1px solid black; border-radius: 4px")
-        self.quit()
+        self.terminate()
 
          
 
