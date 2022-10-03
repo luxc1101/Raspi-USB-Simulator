@@ -5,6 +5,7 @@
 # Abteilung: SWTE
 #*****************************************************
 import os
+from turtle import title
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMainWindow, QMessageBox, QFrame, QLabel
 from Config import Ui_ConfigDialog
@@ -14,6 +15,7 @@ from pywinauto.application import Application
 import sys
 import Icons
 import time
+import win32ui
 
 class VLine(QFrame):
     '''
@@ -221,9 +223,9 @@ class Ui_MainWindow(QMainWindow):
         self.statusBar.addPermanentWidget(self.VersionQL)
         self.statusBar.addPermanentWidget(VLine())
         self.statusBar.addPermanentWidget(self.DataQL)
-        self.LB_Img.setStyleSheet("background-color: #f9e1dd; border: 1px solid black; border-radius: 4px")
-        self.LB_Samba.setStyleSheet("background-color: #f9e1dd; border: 1px solid black; border-radius: 4px")
-        self.LB_WaDo.setStyleSheet("background-color: #f9e1dd; border: 1px solid black; border-radius: 4px")
+        self.LB_Img.setStyleSheet("background-color: gray; border: 1px solid black; border-radius: 4px")
+        self.LB_Samba.setStyleSheet("background-color: gray; border: 1px solid black; border-radius: 4px")
+        self.LB_WaDo.setStyleSheet("background-color: gray; border: 1px solid black; border-radius: 4px")
 
 
         self.retranslateUi(MainWindow)
@@ -234,7 +236,7 @@ class Ui_MainWindow(QMainWindow):
         self.actionQuit.triggered.connect(self.PuTTYExit)
         self.actionClear.triggered.connect(self.TraceClear)
         self.actionHelp.triggered.connect(self.helpWin)
-        # self.B_SendCmd.clicked.connect(lambda: self.SendCommand(self.LE_SendCmd.text()))
+        self.B_SendCmd.clicked.connect(lambda: self.SendCommand(self.LE_SendCmd.text()))
         self.thread = {}
         
 
@@ -287,6 +289,15 @@ class Ui_MainWindow(QMainWindow):
         elif type == "e":
             msg.setIcon(QMessageBox.Critical) 
         msg.exec()
+    
+
+    def process_exists(self, process_name):
+        try:
+            win32ui.FindWindow(process_name, None)
+        except win32ui.error:
+            return False
+        else:
+            return True  
 
     def SendCommand(self, cmd:str):
         '''
@@ -302,8 +313,9 @@ class Ui_MainWindow(QMainWindow):
         try:
             self.app = Application().start(
                 r"{} -ssh pi@{}".format(param["PuTTY_Path"], param["IP"]))
-            time.sleep(1)
             self.Putty = self.app.PuTTY
+            self.Putty.Wait('ready')
+            time.sleep(1)
             self.Logging = param["Log"]
             PT_sec_alert = self.app.PuTTYSecurityAlert
             if PT_sec_alert.exists():
@@ -319,8 +331,18 @@ class Ui_MainWindow(QMainWindow):
             self.SendCommand("ls")
             if not param["Samba"]:
                 self.SendCommand("sudo systemctl stop smbd")
+                self.LB_Samba.setStyleSheet("background-color: #f9e1dd; border: 1px solid black; border-radius: 4px")
+                self.LB_Samba.setText("Samba stop")
+            else:
+                self.LB_Samba.setStyleSheet("background-color: #a4efaf; border: 1px solid black; border-radius: 4px")
+                self.LB_Samba.setText("Samba start")
             if not param["WaDo"]:
                 self.SendCommand("sudo systemctl stop fswd")
+                self.LB_WaDo.setStyleSheet("background-color: #f9e1dd; border: 1px solid black; border-radius: 4px")
+                self.LB_WaDo.setText("WaDo stop")
+            else:
+                self.LB_WaDo.setStyleSheet("background-color: #a4efaf; border: 1px solid black; border-radius: 4px")
+                self.LB_WaDo.setText("WaDo start")
             # self.SendCommand("python mountfs_gui.py")
             self.SendCommand("python {}.py '{}' '{}'".format("mountfs_gui" ,param["WaDo"], param["Samba"]))
             # self.statusBar.showMessage("PuTTY open successfully")
@@ -336,34 +358,80 @@ class Ui_MainWindow(QMainWindow):
         '''
         exit PuTTY
         '''
+        self.actionAnpassen.setEnabled(True)
+        self.actionMount.setEnabled(False)
+        self.actionQuit.setEnabled(False)
+        self.comboBox.setEnabled(False)
+        self.statusBar.showMessage("Logout and PuTTY exited")
+        self.LB_Samba.setStyleSheet("background-color: gray; border: 1px solid black; border-radius: 4px")
+        self.LB_Samba.setText("Samba")
+        self.LB_WaDo.setStyleSheet("background-color: gray; border: 1px solid black; border-radius: 4px")
+        self.LB_WaDo.setText("Watchdog")
         try:
-            # self.SendCommand("q")
-            # self.SendCommand("exit")
-            os.system("taskkill /im PuTTY.exe")
-            self.actionAnpassen.setEnabled(True)
-            self.actionMount.setEnabled(False)
-            self.actionQuit.setEnabled(False)
-            self.comboBox.setEnabled(False)
-            self.statusBar.showMessage("Logout and PuTTY exited")
-            try:
-                # condition of threadstop is the threadstart first, otherweis error
-                self.thread[1].stop()
-                del(self.thread[1])
-                print("del thread")
-            except:
-                pass            
+            # condition of threadstop is the threadstart first, otherweis error
+            self.thread[1].stop()
+            del(self.thread[1])
+            # print("del thread")
         except:
-            Ui_MainWindow.MSG(title="Info", message="please exicute putty first", type="i")
+            pass   
+
+        if self.process_exists("PuTTY"):
+            trytimes = 5
+            self.app.kill_()
+            while trytimes>0:
+                try:   
+                    os.remove(self.Logging)
+                    self.statusBar.showMessage("Logout and PuTTY exited")
+                    break
+                except:
+                    time.sleep(1)
+                    trytimes-=1
+        else:
             self.statusBar.showMessage("PuTTY exit failed")
-        # try 5 time to delet putty.log file once ok then jump out
-        trytimes = 5
-        while trytimes>0:
-            try:   
-                os.remove(self.Logging)
-                break
-            except:
-                time.sleep(1)
-                trytimes-=1
+
+
+            
+            # try:
+            #     os.remove(self.Logging)
+            # except:
+            #     return self.PuTTYExit()
+
+
+        # try:
+        #     # self.SendCommand("q")
+        #     # self.SendCommand("exit")
+        #     os.system("taskkill /im PuTTY.exe")
+
+        #     # self.actionAnpassen.setEnabled(True)
+        #     # self.actionMount.setEnabled(False)
+        #     # self.actionQuit.setEnabled(False)
+        #     # self.comboBox.setEnabled(False)
+        #     # self.statusBar.showMessage("Logout and PuTTY exited")
+        #     # self.LB_Samba.setStyleSheet("background-color: gray; border: 1px solid black; border-radius: 4px")
+        #     # self.LB_Samba.setText("Samba")
+        #     # self.LB_WaDo.setStyleSheet("background-color: gray; border: 1px solid black; border-radius: 4px")
+        #     # self.LB_WaDo.setText("Watchdog")
+        #     try:
+        #         # condition of threadstop is the threadstart first, otherweis error
+        #         self.thread[1].stop()
+        #         del(self.thread[1])
+        #         # print("del thread")
+        #     except:
+        #         pass            
+        # except:
+        #     Ui_MainWindow.MSG(title="Info", message="please exicute putty first", type="i")
+        #     self.statusBar.showMessage("PuTTY exit failed")
+        # # try 5 time to delet putty.log file once ok then jump out
+        # trytimes = 5
+        # while trytimes>0:
+        #     try:   
+        #         os.remove(self.Logging)
+        #         break
+        #     except:
+        #         if not self.process_exists("PuTTY"):
+        #             time.sleep(1)
+        #             trytimes-=1
+        #         time.sleep(1)
 
     def TraceClear(self):
         '''
@@ -410,14 +478,12 @@ class Ui_MainWindow(QMainWindow):
         self.actionQuit.setEnabled(True)
         self.comboBox.setEnabled(True)
         try:
-            # self.SendCommand("sudo /sbin/modprobe g_multi -r")
             self.SendCommand("e")
-            # self.SendCommand("python mountfs_gui.py")
             self.thread[1].file.close()
             self.thread[1].stop()
             # del(self.thread[1])
             self.statusBar.showMessage("{} eject successfully".format(self.comboBox.currentText()))
-            print("file.close")
+            # print("file.close")
         except:
             self.statusBar.showMessage("{} eject failed".format(self.comboBox.currentText()))
 
@@ -438,7 +504,7 @@ class TraceThread(QThread):
     def __init__(self, parent, Logfile, sleep_time_in_seconds, img, imgstaus):
         super(TraceThread, self).__init__(parent)
         self.Logfile = Logfile
-        print("thread:" + self.Logfile)
+        # print("thread:" + self.Logfile)
         self.sleep_time_in_seconds = sleep_time_in_seconds
         self.img = img
         self.imgstatus = imgstaus
@@ -466,9 +532,10 @@ class TraceThread(QThread):
                                 color_content += line
                                 color_content += "</span>"
                                 self.trace_singal.emit(color_content)
-                            elif self.img in line:
+                            elif (self.img + ".img") in line:
                                 self.imgstatus.setStyleSheet("background-color: #a4efaf; border: 1px solid black; border-radius: 4px")
                                 self.imgstatus.setText(self.img)
+                                self.trace_singal.emit(line)
                             elif ("status of samba" in line.lower()) or ("status of watchdog" in line.lower()):
                                 color_content =  "<span style=\" font-size:8pt; font-weight:800; color:{};\" >".format("red")
                                 color_content += line
@@ -497,7 +564,8 @@ class TraceThread(QThread):
             self.trace_singal.emit(line)
 
     def stop(self):
-        self.imgstatus.setStyleSheet("background-color: #f9e1dd; border: 1px solid black; border-radius: 4px")
+        self.imgstatus.setStyleSheet("background-color: gray; border: 1px solid black; border-radius: 4px")
+        self.imgstatus.setText("Img")
         self.terminate()
 
          
