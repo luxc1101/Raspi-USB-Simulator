@@ -5,8 +5,6 @@
 # Abteilung: SWTE
 #*****************************************************
 import os
-from sqlite3 import connect
-from turtle import title
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMainWindow, QMessageBox, QFrame, QLabel
 from Config import Ui_ConfigDialog

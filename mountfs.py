@@ -69,7 +69,6 @@ def remount(file):
 
 # check if a package installed or not and try to install it
 
-
 def installcheck(PKG: str):
     PKG_OK = "dpkg-query -W --showformat='${Status}\n' " + \
         "{}|grep 'install ok installed'".format(PKG)
@@ -174,7 +173,6 @@ def modifyfile(file:str, img:str, MP:str):
     writing_file.write(new_file_content)
     writing_file.close()
 
-# fsc.Cfilesystem("fat32.img", "/mnt/usb_fat32")
 ##########################
 #     Recursive Algo     #
 ##########################
@@ -224,7 +222,6 @@ def USBSIM(FileImgDic, MPDic):
             lsblk()
             os.system('sudo /sbin/modprobe g_multi -r')  # unmount first
             return
-        # base case: eject
         elif Input.lower() == "e":
             print(Cyan + "eject current USB drive")
             os.system('sudo /sbin/modprobe g_multi -r')  # unmount first

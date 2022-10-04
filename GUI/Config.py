@@ -11,6 +11,7 @@ import os
 import Icons
 from PyQt5.QtCore import pyqtSignal
 import json
+import sys
 
 
 class Ui_ConfigDialog(QMainWindow):
@@ -91,8 +92,16 @@ class Ui_ConfigDialog(QMainWindow):
         
 ###############################################################################################  
         self.buttonBox_Conf.button(QtWidgets.QDialogButtonBox.Ok).setEnabled(True)
-        with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), "Config.json"),'r',encoding="utf8") as f:
+        # with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), "Config.json"),'r',encoding="utf8") as f:
+        #     self.setup_dict = json.load(f) 
+        #     f.close()
+
+        # print(os.getcwd())
+
+        with open(os.path.join(os.getcwd(), "Config.json"),'r',encoding="utf8") as f:
             self.setup_dict = json.load(f) 
+            f.close()
+        
 
         self.retranslateUi(ConfigDialog)
         self.buttonBox_Conf.accepted.connect(ConfigDialog.accept) # type: ignore
@@ -178,11 +187,10 @@ class Ui_ConfigDialog(QMainWindow):
         self.my_signal.emit(param)
 
 
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    ConfigDialog = QtWidgets.QDialog()
-    ui = Ui_ConfigDialog()
-    ui.setupUi(ConfigDialog)
-    ConfigDialog.show()
-    sys.exit(app.exec_())
+# if __name__ == "__main__":
+#     app = QtWidgets.QApplication(sys.argv)
+#     ConfigDialog = QtWidgets.QDialog()
+#     ui = Ui_ConfigDialog()
+#     ui.setupUi(ConfigDialog)
+#     ConfigDialog.show()
+#     sys.exit(app.exec_())
