@@ -18,7 +18,17 @@ import json
 
 # if os.path.exists(syslog):
 #     print("yes")
-with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), "Config.json"),'r',encoding="utf8") as f:
-    setup_dict = json.load(f)
+# with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), "Config.json"),'r',encoding="utf8") as f:
+#     setup_dict = json.load(f)
 
-print(setup_dict["Others"]["WoDa"])
+# print(setup_dict["Others"]["WoDa"])
+a = set()
+a.add("ab")
+a.add("cd")
+print(a)
+if "a" in ','.join(a):
+    print("ya")
+else:
+    print("ne")
+    
+# print(','.join(a))

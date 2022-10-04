@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(349, 407)
+        MainWindow.resize(517, 496)
         self.centralWidget = QtWidgets.QWidget(MainWindow)
         self.centralWidget.setObjectName("centralWidget")
         self.gridLayout_5 = QtWidgets.QGridLayout(self.centralWidget)
@@ -22,6 +22,12 @@ class Ui_MainWindow(object):
         self.gridLayout_5.setSpacing(6)
         self.gridLayout_5.setObjectName("gridLayout_5")
         self.groupBox_mtfs = QtWidgets.QGroupBox(self.centralWidget)
+        font = QtGui.QFont()
+        font.setBold(False)
+        font.setWeight(50)
+        self.groupBox_mtfs.setFont(font)
+        self.groupBox_mtfs.setStyleSheet("")
+        self.groupBox_mtfs.setFlat(False)
         self.groupBox_mtfs.setObjectName("groupBox_mtfs")
         self.gridLayout_2 = QtWidgets.QGridLayout(self.groupBox_mtfs)
         self.gridLayout_2.setContentsMargins(11, 11, 11, 11)
@@ -101,7 +107,7 @@ class Ui_MainWindow(object):
         self.gridLayout_5.addWidget(self.groupBox_Cmd, 2, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralWidget)
         self.menuBar = QtWidgets.QMenuBar(MainWindow)
-        self.menuBar.setGeometry(QtCore.QRect(0, 0, 349, 21))
+        self.menuBar.setGeometry(QtCore.QRect(0, 0, 517, 21))
         self.menuBar.setObjectName("menuBar")
         self.menuCalls = QtWidgets.QMenu(self.menuBar)
         self.menuCalls.setObjectName("menuCalls")
@@ -144,6 +150,11 @@ class Ui_MainWindow(object):
         icon5.addPixmap(QtGui.QPixmap(":/Image/help.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionHelp.setIcon(icon5)
         self.actionHelp.setObjectName("actionHelp")
+        self.actionDelect_Img = QtWidgets.QAction(MainWindow)
+        icon6 = QtGui.QIcon()
+        icon6.addPixmap(QtGui.QPixmap(":/Image/delete.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionDelect_Img.setIcon(icon6)
+        self.actionDelect_Img.setObjectName("actionDelect_Img")
         self.menuCalls.addAction(self.actionAnpassen)
         self.menuCalls.addAction(self.actionMount)
         self.menuCalls.addAction(self.actionEject)
@@ -155,6 +166,7 @@ class Ui_MainWindow(object):
         self.mainToolBar.addAction(self.actionMount)
         self.mainToolBar.addAction(self.actionEject)
         self.mainToolBar.addAction(self.actionClear)
+        self.mainToolBar.addAction(self.actionDelect_Img)
         self.mainToolBar.addAction(self.actionQuit)
         self.mainToolBar.addAction(self.actionHelp)
 
@@ -191,7 +203,8 @@ class Ui_MainWindow(object):
         self.actionMount.setText(_translate("MainWindow", "Mount"))
         self.actionClear.setText(_translate("MainWindow", "Clear"))
         self.actionHelp.setText(_translate("MainWindow", "Help"))
-import Icons
+        self.actionDelect_Img.setText(_translate("MainWindow", "Delete Img"))
+import ProQrc_rc
 
 
 if __name__ == "__main__":

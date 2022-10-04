@@ -150,7 +150,8 @@ def menu():
     sys.stdout.write("q: quit and eject the USB" + "\n")
     sys.stdout.write("e: eject current USB drive" + "\n")
     sys.stdout.write(
-        "c: cancel or terminate the currently running program" + C_off + "\n")
+        "c: cancel or terminate the currently running program")
+    sys.stdout.write("d: delete filesystem image"+ C_off + "\n")
 
 def modifyfile(file:str, img:str, MP:str):
     '''
@@ -187,7 +188,7 @@ def USBSIM(FileImgDic, MPDic, WaDo, Samba):
     MPdic = MPDic
 
     def checkinput(Input):
-        if (Input.lower() not in ["r", "q", "c", "e"]) and (Input not in [str(i) for i in range(diclen)]):
+        if (Input.lower() not in ["r", "q", "c", "e", "d"]) and (Input not in [str(i) for i in range(diclen)]):
             print(Red + "Warning: " + "invalid input, retry to enter" + C_off)
             return False
         return True
@@ -235,10 +236,19 @@ def USBSIM(FileImgDic, MPDic, WaDo, Samba):
         os.system('sudo /sbin/modprobe g_multi -r')  # unmount first
         return
 
-    # base case: eject current mounted USB Filesystem 
+    # base case: eject current mounted USB Filesystem or refresh
     elif Input.lower() == "e":
-        print(Cyan + "eject current USB drive")
+        print(Cyan + "eject current USB drive and refresh")
         os.system('sudo /sbin/modprobe g_multi -r')  # unmount first
+        return USBSIM(FileImgDic, MPDic, WaDo, Samba)
+
+    # base case: delete filesystem img
+    elif Input.lower() == "d":
+        dInput = input(Cyan + "which filesystem will be deleted: " + C_off)
+        try:
+            os.system("sudo rm {}.img".format(dInput))
+        except FileExistsError as e:
+            print(Red + e + C_off)
         return USBSIM(FileImgDic, MPDic, WaDo, Samba)
 
     # base case: USB simulator
@@ -249,11 +259,11 @@ def USBSIM(FileImgDic, MPDic, WaDo, Samba):
         print(Cyan + "prepare to mount " + Red + fsname + Cyan + " filesystem" + C_off)
         # check if the img file is already existed or not
         if os.path.exists("./{}".format(lcimg)):
-            print("{}{}{} is already existed{}".format(Red, lcimg, Cyan, C_off))
+            print("{}{}{} is already existed{}".format(Red, lcimg.split(".")[0], Cyan, C_off))
             if os.path.ismount(MPpath):
                 print("{}{}{} already mounted".format(Red, MPpath, Cyan))
             else:
-                print(Cyan + "going to mount " + Red + lcimg + C_off)
+                print(Cyan + "going to mount " + Red + lcimg.split(".")[0] + C_off)
                 if ("fat" in lcimg) or ("mib" in lcimg): # fat: fat32 fat16 ; mib: fat32
                     os.system('sudo mount -o rw,users,sync,nofail,umask=0000 {} {}'.format(lcimg, MPpath))
                 elif "part" in lcimg: # partitions but check if it is already mounted 
@@ -292,8 +302,8 @@ def USBSIM(FileImgDic, MPDic, WaDo, Samba):
             remount(lcimg)
         else:
             print(Cyan + "+" * 60)
-            # fsc.Cfilesystem(lcimg, MPpath)
-            print("run fsc.py")
+            fsc.Cfilesystem(lcimg, MPpath)
+            # print("run fsc.py")
             print(Cyan + "+" * 60 + C_off)
 
         

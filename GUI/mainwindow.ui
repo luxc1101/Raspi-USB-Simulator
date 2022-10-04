@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>349</width>
-    <height>407</height>
+    <width>517</width>
+    <height>496</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,8 +17,20 @@
    <layout class="QGridLayout" name="gridLayout_5">
     <item row="0" column="0">
      <widget class="QGroupBox" name="groupBox_mtfs">
+      <property name="font">
+       <font>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true"/>
+      </property>
       <property name="title">
        <string>Mount Filesystem</string>
+      </property>
+      <property name="flat">
+       <bool>false</bool>
       </property>
       <layout class="QGridLayout" name="gridLayout_2">
        <item row="0" column="0">
@@ -181,7 +193,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>349</width>
+     <width>517</width>
      <height>21</height>
     </rect>
    </property>
@@ -212,6 +224,7 @@
    <addaction name="actionMount"/>
    <addaction name="actionEject"/>
    <addaction name="actionClear"/>
+   <addaction name="actionDelect_Img"/>
    <addaction name="actionQuit"/>
    <addaction name="actionHelp"/>
   </widget>
@@ -271,6 +284,15 @@
    </property>
    <property name="text">
     <string>Help</string>
+   </property>
+  </action>
+  <action name="actionDelect_Img">
+   <property name="icon">
+    <iconset resource="ProQrc.qrc">
+     <normaloff>:/Image/delete.png</normaloff>:/Image/delete.png</iconset>
+   </property>
+   <property name="text">
+    <string>Delete Img</string>
    </property>
   </action>
  </widget>

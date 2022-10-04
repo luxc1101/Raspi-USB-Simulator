@@ -18,9 +18,9 @@ def Cfilesystem(img:str, MP:str):
     limg = img.lower()
     try:
         sys.stdout.write(Cyan +
-        "going to create filesystem and partitions this is " + C_off + Red + limg + Cyan
+        "going to create filesystem and partitions this is " + C_off + Red + limg.split(".")[0] + Cyan
         + " the mountpoint at " + Red + MP + C_off + "\n")
-        size = input(Cyan + "To create {}{}{} with size (MB): ".format(Red, limg, Cyan) + C_off)
+        size = input(Cyan + "To create {}{}{} with size (MB): ".format(Red, limg.split(".")[0], Cyan) + C_off)
         sys.stdout.write(Cyan + "Creating......" + C_off + "\n")
         os.system("sudo dd bs=1M if=/dev/zero of={} count={}".format(limg,size))
         if "mib" in limg:

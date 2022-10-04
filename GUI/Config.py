@@ -19,7 +19,7 @@ class Ui_ConfigDialog(QMainWindow):
 
     def setupUi(self, ConfigDialog):
         ConfigDialog.setObjectName("ConfigDialog")
-        ConfigDialog.resize(305, 280)
+        ConfigDialog.resize(300, 250)
         ConfigDialog.setWindowIcon(QtGui.QIcon(":/Image/AnpassenIcon.png"))
         self.gridLayout_3 = QtWidgets.QGridLayout(ConfigDialog)
         self.gridLayout_3.setObjectName("gridLayout_3")
@@ -70,13 +70,13 @@ class Ui_ConfigDialog(QMainWindow):
         self.checkBox_Samba = QtWidgets.QCheckBox(self.groupBox_2)
         self.checkBox_Samba.setObjectName("checkBox_Samba")
         self.formLayout.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.checkBox_Samba)
-        self.B_ImgPath = QtWidgets.QPushButton(self.groupBox_2)
-        self.B_ImgPath.setObjectName("B_ImgPath")
-        self.formLayout.setWidget(0, QtWidgets.QFormLayout.LabelRole, self.B_ImgPath)
-        self.LE_Path = QtWidgets.QLineEdit(self.groupBox_2)
-        self.LE_Path.setText("")
-        self.LE_Path.setObjectName("LE_Path")
-        self.formLayout.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.LE_Path)
+        # self.B_ImgPath = QtWidgets.QPushButton(self.groupBox_2)
+        # self.B_ImgPath.setObjectName("B_ImgPath")
+        # self.formLayout.setWidget(0, QtWidgets.QFormLayout.LabelRole, self.B_ImgPath)
+        # self.LE_Path = QtWidgets.QLineEdit(self.groupBox_2)
+        # self.LE_Path.setText("")
+        # self.LE_Path.setObjectName("LE_Path")
+        # self.formLayout.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.LE_Path)
         self.gridLayout_2.addLayout(self.formLayout, 0, 0, 1, 1)
         self.verticalLayout.addWidget(self.groupBox_2)
         spacerItem = QtWidgets.QSpacerItem(13, 20, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
@@ -100,8 +100,10 @@ class Ui_ConfigDialog(QMainWindow):
         QtCore.QMetaObject.connectSlotsByName(ConfigDialog)
  
 
-        self.B_ImgPath.clicked.connect(self.OCfolder)
+        # self.B_ImgPath.clicked.connect(self.OCfolder)
         self.buttonBox_Conf.button(QtWidgets.QDialogButtonBox.Ok).clicked.connect(self.configparameter)
+        # self.buttonBox_Conf.button(QtWidgets.QDialogButtonBox.Ok).clicked.connect(self.OCfolder)
+
         self.checkBox_Samba.setChecked(self.setup_dict["Others"]["WoDa"])
         self.checkBox_WaDo.setChecked(self.setup_dict["Others"]["Samba"])
 
@@ -120,10 +122,10 @@ class Ui_ConfigDialog(QMainWindow):
         self.groupBox_2.setTitle(_translate("ConfigDialog", "Others"))
         self.checkBox_WaDo.setText(_translate("ConfigDialog", "Watchdog Service"))
         self.checkBox_Samba.setText(_translate("ConfigDialog", "Samba Service"))
-        self.B_ImgPath.setText(_translate("ConfigDialog", "Open|Create"))
+        # self.B_ImgPath.setText(_translate("ConfigDialog", "Open|Create"))
 ################################################################################################
-        self.LE_Path.setText(_translate("ConfigDialog", os.path.join(
-            os.path.dirname(os.path.realpath(__file__)), "filesystem")))
+        # self.LE_Path.setText(_translate("ConfigDialog", os.path.join(
+            # os.path.dirname(os.path.realpath(__file__)), "filesystem")))
 
 
     def OCfolder(self):
@@ -138,17 +140,15 @@ class Ui_ConfigDialog(QMainWindow):
             check_folder = os.path.isdir(path)
             if not check_folder:
                 os.makedirs(path)
-                QMessageBox.information(self, 'Info', 'create folder done')
-            else:
-                QMessageBox.information(
-                    self, 'Info', "folder is already existed")
+                # QMessageBox.information(self, 'Info', 'create folder done')
+            # else:
+                #QMessageBox.information(self, 'Info', "folder is already existed")
         except:
             root = QFileDialog.getExistingDirectory(
                 parent=self, caption="Open directroy", directory=os.path.abspath(os.curdir))
             path = self.LE_Path.setText(root)
             return self.OCfolder
-        self.buttonBox_Conf.button(
-            QtWidgets.QDialogButtonBox.Ok).setEnabled(True)
+        # self.buttonBox_Conf.button(QtWidgets.QDialogButtonBox.Ok).setEnabled(True)
 
     # def PuTTYLogin(self):
     #     '''
@@ -172,6 +172,7 @@ class Ui_ConfigDialog(QMainWindow):
         Log = self.LE_LogPath.text()
         Samba = self.checkBox_Samba.checkState()
         WaDo = self.checkBox_WaDo.checkState()
+        # FSPath = self.LE_Path.text()
         param = {"PuTTY_Path": PuTTY_Path, "IP": IP,
                  "Key": Key, "Log": Log,"Samba": Samba, "WaDo": WaDo}
         self.my_signal.emit(param)

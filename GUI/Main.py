@@ -5,6 +5,7 @@
 # Abteilung: SWTE
 #*****************************************************
 import os
+from sqlite3 import connect
 from turtle import title
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMainWindow, QMessageBox, QFrame, QLabel
@@ -79,6 +80,10 @@ class Ui_MainWindow(QMainWindow):
         self.gridLayout_5.setObjectName("gridLayout_5")
         self.groupBox_mtfs = QtWidgets.QGroupBox(self.centralWidget)
         self.groupBox_mtfs.setObjectName("groupBox_mtfs")
+        font = QtGui.QFont()
+        font.setBold(True)
+        font.setWeight(75)
+
         self.gridLayout_2 = QtWidgets.QGridLayout(self.groupBox_mtfs)
         self.gridLayout_2.setContentsMargins(11, 11, 11, 11)
         self.gridLayout_2.setSpacing(6)
@@ -125,7 +130,7 @@ class Ui_MainWindow(QMainWindow):
         self.gridLayout.setContentsMargins(11, 11, 11, 11)
         self.gridLayout.setSpacing(6)
         self.gridLayout.setObjectName("gridLayout")
-        self.textEdit_trace = QtWidgets.QTextEdit(self.groupBox_trace)
+        self.textEdit_trace = QtWidgets.QTextEdit(self.groupBox_trace, readOnly= True)
         self.textEdit_trace.setObjectName("textEdit_trace")
         self.gridLayout.addWidget(self.textEdit_trace, 0, 0, 1, 1)
         self.gridLayout_5.addWidget(self.groupBox_trace, 1, 0, 1, 1)
@@ -191,6 +196,12 @@ class Ui_MainWindow(QMainWindow):
         icon5.addPixmap(QtGui.QPixmap(":/Image/help.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionHelp.setIcon(icon5)
         self.actionHelp.setObjectName("actionHelp")
+        self.actionDelect_Img = QtWidgets.QAction(MainWindow)
+        icon6 = QtGui.QIcon()
+        icon6.addPixmap(QtGui.QPixmap(":/Image/delete.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionDelect_Img.setIcon(icon6)
+        self.actionDelect_Img.setObjectName("actionDelect_Img")  
+
         self.menuCalls.addAction(self.actionAnpassen)
         self.menuCalls.addAction(self.actionMount)
         self.menuCalls.addAction(self.actionEject)
@@ -202,14 +213,17 @@ class Ui_MainWindow(QMainWindow):
         self.mainToolBar.addAction(self.actionMount)
         self.mainToolBar.addAction(self.actionEject)
         self.mainToolBar.addAction(self.actionClear)
+        self.mainToolBar.addAction(self.actionDelect_Img)
         self.mainToolBar.addAction(self.actionQuit)
         self.mainToolBar.addAction(self.actionHelp)
+
 
 
 ###########################################################################
         self.actionMount.setEnabled(False)
         self.actionEject.setEnabled(False)
         self.actionQuit.setEnabled(False)
+        self.actionDelect_Img.setEnabled(False)
         self.statusBar.showMessage("Status: not connected")
         self.VersionQL = QLabel("Version: 1.0")
         self.VersionQL.setStyleSheet('font-size:9px')
@@ -226,6 +240,10 @@ class Ui_MainWindow(QMainWindow):
         self.LB_Img.setStyleSheet("background-color: gray; border: 1px solid black; border-radius: 4px")
         self.LB_Samba.setStyleSheet("background-color: gray; border: 1px solid black; border-radius: 4px")
         self.LB_WaDo.setStyleSheet("background-color: gray; border: 1px solid black; border-radius: 4px")
+        self.QP = QtGui.QPalette()
+        self.QP.setColor(QtGui.QPalette.Base, Qt.black) # BG
+        self.QP.setColor(QtGui.QPalette.Text, Qt.white)
+        self.textEdit_trace.setPalette(self.QP)
 
 
         self.retranslateUi(MainWindow)
@@ -236,6 +254,7 @@ class Ui_MainWindow(QMainWindow):
         self.actionQuit.triggered.connect(self.PuTTYExit)
         self.actionClear.triggered.connect(self.TraceClear)
         self.actionHelp.triggered.connect(self.helpWin)
+        self.actionDelect_Img.triggered.connect(self.DeleteImg)
         self.B_SendCmd.clicked.connect(lambda: self.SendCommand(self.LE_SendCmd.text()))
         self.thread = {}
         
@@ -264,7 +283,7 @@ class Ui_MainWindow(QMainWindow):
         self.menuCalls.setTitle(_translate("MainWindow", "Calls"))
         self.actionAnpassen.setText(_translate("MainWindow", "Anpassen"))
         self.actionQuit.setText(_translate("MainWindow", "Quit"))
-        self.actionEject.setText(_translate("MainWindow", "Eject"))
+        self.actionEject.setText(_translate("MainWindow", "Eject/Refresh"))
         self.actionMount.setText(_translate("MainWindow", "Mount"))
         self.actionClear.setText(_translate("MainWindow", "Clear"))
         self.B_SendCmd.setText(_translate("MainWindow", "CMD Send"))
@@ -314,7 +333,7 @@ class Ui_MainWindow(QMainWindow):
             self.app = Application().start(
                 r"{} -ssh pi@{}".format(param["PuTTY_Path"], param["IP"]))
             self.Putty = self.app.PuTTY
-            self.Putty.Wait('ready')
+            self.Putty.wait('ready')
             time.sleep(1)
             self.Logging = param["Log"]
             PT_sec_alert = self.app.PuTTYSecurityAlert
@@ -350,6 +369,8 @@ class Ui_MainWindow(QMainWindow):
             self.actionMount.setEnabled(True)
             self.actionQuit.setEnabled(True)
             self.comboBox.setEnabled(True)
+            self.actionDelect_Img.setEnabled(True)
+            self.actionAnpassen.setEnabled(False)
         except:
             pass
 
@@ -362,6 +383,7 @@ class Ui_MainWindow(QMainWindow):
         self.actionMount.setEnabled(False)
         self.actionQuit.setEnabled(False)
         self.comboBox.setEnabled(False)
+        self.actionDelect_Img.setEnabled(False)
         self.statusBar.showMessage("Logout and PuTTY exited")
         self.LB_Samba.setStyleSheet("background-color: gray; border: 1px solid black; border-radius: 4px")
         self.LB_Samba.setText("Samba")
@@ -377,7 +399,7 @@ class Ui_MainWindow(QMainWindow):
 
         if self.process_exists("PuTTY"):
             trytimes = 5
-            self.app.kill_()
+            self.app.kill()
             while trytimes>0:
                 try:   
                     os.remove(self.Logging)
@@ -432,6 +454,10 @@ class Ui_MainWindow(QMainWindow):
         #             time.sleep(1)
         #             trytimes-=1
         #         time.sleep(1)
+    def DeleteImg(self):
+        self.SendCommand("d")
+        self.SendCommand("{}".format(self.Filesysdict[self.comboBox.currentText()][0]))
+
 
     def TraceClear(self):
         '''
@@ -454,6 +480,7 @@ class Ui_MainWindow(QMainWindow):
         self.actionMount.setEnabled(False)
         self.actionQuit.setEnabled(False)
         self.comboBox.setEnabled(False)
+        self.actionDelect_Img.setEnabled(False)
         try:
             self.thread[1].file.close()
             self.thread[1].stop()
@@ -468,6 +495,9 @@ class Ui_MainWindow(QMainWindow):
         self.thread[1].start()
         self.thread[1].trace_singal.connect(self.Update_logging)
         self.SendCommand(self.Filesysdict[self.comboBox.currentText()][1])
+        self.statusBar.showMessage("{} mount successfully".format(self.comboBox.currentText()))
+        
+
         
     def Eject(self):
         '''
@@ -476,6 +506,7 @@ class Ui_MainWindow(QMainWindow):
         self.actionEject.setEnabled(False)
         self.actionMount.setEnabled(True)
         self.actionQuit.setEnabled(True)
+        self.actionDelect_Img.setEnabled(True)
         self.comboBox.setEnabled(True)
         try:
             self.SendCommand("e")
@@ -509,54 +540,41 @@ class TraceThread(QThread):
         self.img = img
         self.imgstatus = imgstaus
         self.file = open(self.Logfile, 'r', errors='ignore')
+    
+    def colorText(self, content:str, color:str):
+        color_content =  "<span style=\" font-size:8pt; font-weight:800; color:{};\" >".format(color)
+        color_content += content
+        color_content += "</span>"
+        return color_content
 
     def run(self):
         LogStartFlag = False
         try:
-            # with open(self.Logfile, 'r', errors='ignore') as f:
-            #     self.file = f
             while True:
                 try:
                     line = self.file.readline().strip()
-                    if "pi@raspberrypi" in line:
+                    if line:
+                        if "please select" in line.lower():
                             LogStartFlag = True
-                    if LogStartFlag:   
-                        if line:
+                        if LogStartFlag:   
                             if "enter" in line.lower():
-                                color_content =  "<span style=\" font-size:8pt; font-weight:800; color:{};\" >".format("#32CD32")
-                                color_content += line
-                                color_content += "</span>"
-                                self.trace_singal.emit(color_content)
-                            elif "please" in line.lower():
-                                color_content =  "<span style=\" font-size:8pt; font-weight:800; color:{};\" >".format("#00FFFF")
-                                color_content += line
-                                color_content += "</span>"
-                                self.trace_singal.emit(color_content)
-                            elif (self.img + ".img") in line:
+                                self.trace_singal.emit(self.colorText(line, "#32CD32"))
+                            elif "please select" in line.lower():
+                                self.trace_singal.emit(self.colorText(line, "#00FFFF"))
+                            elif any(x in line for x in ["0:","1:","2:","3:","4:","5:","6:","7:","8:","9:","10:","r:","e:","c:","q:", "d:"]):
+                                self.trace_singal.emit(self.colorText(line, "orange"))
+                            elif "{} is already existed".format(self.img) in line:
                                 self.imgstatus.setStyleSheet("background-color: #a4efaf; border: 1px solid black; border-radius: 4px")
                                 self.imgstatus.setText(self.img)
-                                self.trace_singal.emit(line)
+                                self.trace_singal.emit(self.colorText(line, "#FFFFFF"))
                             elif ("status of samba" in line.lower()) or ("status of watchdog" in line.lower()):
-                                color_content =  "<span style=\" font-size:8pt; font-weight:800; color:{};\" >".format("red")
-                                color_content += line
-                                color_content += "</span>"
-                                self.trace_singal.emit(color_content)
+                                self.trace_singal.emit(self.colorText(line, "red"))
+                            elif "to create {}".format(self.img) in line.lower():
+                                self.trace_singal.emit(self.colorText(line, "#32CD32"))
+                                self.imgstatus.setStyleSheet("background-color: gray; border: 1px solid black; border-radius: 4px")
+                                self.imgstatus.setText(self.img)
                             else:
-                                self.trace_singal.emit(line)
-                    # for line in self.f:
-                    #     if "pi@raspberrypi" in line:
-                    #         LogStartFlag = True
-                    #     if LogStartFlag:
-                    #         if (line) and ("pi@raspberrypi" not in line):
-                    #             if self.img in line:
-                    #                 self.imgstatus.setStyleSheet("background-color: #a4efaf; border: 1px solid black; border-radius: 4px")
-                    #             self.trace_singal.emit(line.strip()) 
-                    #         else:
-                    #             color_content =  "<span style=\" font-size:8pt; font-weight:800; color:{};\" >".format("#32CD32")
-                    #             color_content += line.strip()
-                    #             color_content += "</span>"
-                    #             self.trace_singal.emit(color_content)
-                    # time.sleep(self.sleep_time_in_seconds)
+                                self.trace_singal.emit(self.colorText(line, "#FFFFFF"))
                 except:
                     pass
         except IOError as e:
@@ -573,6 +591,7 @@ class TraceThread(QThread):
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
+    app.setStyle("Fusion")
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
