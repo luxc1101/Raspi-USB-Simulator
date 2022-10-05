@@ -143,20 +143,22 @@ class Ui_ConfigDialog(QMainWindow):
         the usually the folder will be created in the path which shows in lineEdit
         but it could also be changed by ourselves if the path in the lineEdit come to be empty 
         '''
-        try:
-            QMessageBox.setWindowIcon(self, QtGui.QIcon(":/Image/AnpassenIcon.png"))
-            path = self.LE_Path.text()
-            check_folder = os.path.isdir(path)
-            if not check_folder:
-                os.makedirs(path)
-                # QMessageBox.information(self, 'Info', 'create folder done')
-            # else:
-                #QMessageBox.information(self, 'Info', "folder is already existed")
-        except:
-            root = QFileDialog.getExistingDirectory(
-                parent=self, caption="Open directroy", directory=os.path.abspath(os.curdir))
-            path = self.LE_Path.setText(root)
-            return self.OCfolder
+        QFileDialog.getExistingDirectory(parent=self, caption="Open directroy", directory="//{}".format("DEDREVMDC04.Joynext.com"))
+
+        # try:
+        #     QMessageBox.setWindowIcon(self, QtGui.QIcon(":/Image/AnpassenIcon.png"))
+        #     path = self.LE_Path.text()
+        #     check_folder = os.path.isdir(path)
+        #     if not check_folder:
+        #         os.makedirs(path)
+        #         # QMessageBox.information(self, 'Info', 'create folder done')
+        #     # else:
+        #         #QMessageBox.information(self, 'Info', "folder is already existed")
+        # except:
+        #     root = QFileDialog.getExistingDirectory(
+        #         parent=self, caption="Open directroy", directory=os.path.abspath(os.curdir))
+        #     path = self.LE_Path.setText(root)
+        #     return self.OCfolder
         # self.buttonBox_Conf.button(QtWidgets.QDialogButtonBox.Ok).setEnabled(True)
 
     # def PuTTYLogin(self):
@@ -187,10 +189,10 @@ class Ui_ConfigDialog(QMainWindow):
         self.my_signal.emit(param)
 
 
-# if __name__ == "__main__":
-#     app = QtWidgets.QApplication(sys.argv)
-#     ConfigDialog = QtWidgets.QDialog()
-#     ui = Ui_ConfigDialog()
-#     ui.setupUi(ConfigDialog)
-#     ConfigDialog.show()
-#     sys.exit(app.exec_())
+if __name__ == "__main__":
+    app = QtWidgets.QApplication(sys.argv)
+    ConfigDialog = QtWidgets.QDialog()
+    ui = Ui_ConfigDialog()
+    ui.setupUi(ConfigDialog)
+    ConfigDialog.show()
+    sys.exit(app.exec_())

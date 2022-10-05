@@ -207,6 +207,7 @@
     <addaction name="actionClear"/>
     <addaction name="actionQuit"/>
     <addaction name="actionHelp"/>
+    <addaction name="actionRemote_folder"/>
    </widget>
    <addaction name="menuCalls"/>
   </widget>
@@ -223,6 +224,7 @@
    <addaction name="actionAnpassen"/>
    <addaction name="actionMount"/>
    <addaction name="actionEject"/>
+   <addaction name="actionRemote_folder"/>
    <addaction name="actionClear"/>
    <addaction name="actionDelect_Img"/>
    <addaction name="actionQuit"/>
@@ -293,6 +295,15 @@
    </property>
    <property name="text">
     <string>Delete Img</string>
+   </property>
+  </action>
+  <action name="actionRemote_folder">
+   <property name="icon">
+    <iconset resource="ProQrc.qrc">
+     <normaloff>:/Image/remote.png</normaloff>:/Image/remote.png</iconset>
+   </property>
+   <property name="text">
+    <string>Remote folder</string>
    </property>
   </action>
  </widget>

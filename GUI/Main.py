@@ -4,9 +4,12 @@
 # Autor:     Xiaochuan Lu
 # Abteilung: SWTE
 #*****************************************************
+from ast import Param
 import os
+import re
+from tracemalloc import start
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QMainWindow, QMessageBox, QFrame, QLabel
+from PyQt5.QtWidgets import QMainWindow, QMessageBox, QFrame, QLabel, QFileDialog
 from Config import Ui_ConfigDialog
 from Help import Ui_Form
 from PyQt5.QtCore import pyqtSignal, QThread, QDate, Qt
@@ -30,7 +33,7 @@ class VLine(QFrame):
 class Ui_MainWindow(QMainWindow):
     Putty = None
     Logging = None
-    # Param = None
+    Param = None
     Filesysdict = {
         "MIB Compliance Media": ['mib_compliance', "0"],
         "ext2": ["ext2","1"],
@@ -198,11 +201,17 @@ class Ui_MainWindow(QMainWindow):
         icon6 = QtGui.QIcon()
         icon6.addPixmap(QtGui.QPixmap(":/Image/delete.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionDelect_Img.setIcon(icon6)
-        self.actionDelect_Img.setObjectName("actionDelect_Img")  
+        self.actionDelect_Img.setObjectName("actionDelect_Img") 
+        self.actionRemote_folder = QtWidgets.QAction(MainWindow)
+        icon7 = QtGui.QIcon()
+        icon7.addPixmap(QtGui.QPixmap(":/Image/remote.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionRemote_folder.setIcon(icon7)
+        self.actionRemote_folder.setObjectName("actionRemote_folder") 
 
         self.menuCalls.addAction(self.actionAnpassen)
         self.menuCalls.addAction(self.actionMount)
         self.menuCalls.addAction(self.actionEject)
+        self.menuCalls.addAction(self.actionRemote_folder)       
         self.menuCalls.addAction(self.actionClear)
         self.menuCalls.addAction(self.actionQuit)
         self.menuCalls.addAction(self.actionHelp)
@@ -210,18 +219,18 @@ class Ui_MainWindow(QMainWindow):
         self.mainToolBar.addAction(self.actionAnpassen)
         self.mainToolBar.addAction(self.actionMount)
         self.mainToolBar.addAction(self.actionEject)
+        self.mainToolBar.addAction(self.actionRemote_folder)
         self.mainToolBar.addAction(self.actionClear)
         self.mainToolBar.addAction(self.actionDelect_Img)
         self.mainToolBar.addAction(self.actionQuit)
         self.mainToolBar.addAction(self.actionHelp)
-
-
 
 ###########################################################################
         self.actionMount.setEnabled(False)
         self.actionEject.setEnabled(False)
         self.actionQuit.setEnabled(False)
         self.actionDelect_Img.setEnabled(False)
+        self.actionRemote_folder.setEnabled(False)
         self.statusBar.showMessage("Status: not connected")
         self.VersionQL = QLabel("Version: 1.0")
         self.VersionQL.setStyleSheet('font-size:9px')
@@ -253,6 +262,7 @@ class Ui_MainWindow(QMainWindow):
         self.actionClear.triggered.connect(self.TraceClear)
         self.actionHelp.triggered.connect(self.helpWin)
         self.actionDelect_Img.triggered.connect(self.DeleteImg)
+        self.actionRemote_folder.triggered.connect(self.remoteFolder)
         self.B_SendCmd.clicked.connect(lambda: self.SendCommand(self.LE_SendCmd.text()))
         self.thread = {}
         
@@ -289,6 +299,7 @@ class Ui_MainWindow(QMainWindow):
         self.textEdit_trace.setPlaceholderText(_translate("Form", "PuTTY's output is shown here"))
         self.LE_SendCmd.setPlaceholderText(_translate("Form", "Send the command manually here"))
         self.actionHelp.setText(_translate("MainWindow", "About USB Simulator"))
+        self.actionRemote_folder.setText(_translate("MainWindow", "Remote folder"))
     
     @staticmethod
     def MSG(title, message, type):
@@ -307,7 +318,6 @@ class Ui_MainWindow(QMainWindow):
             msg.setIcon(QMessageBox.Critical) 
         msg.exec()
     
-
     def process_exists(self, process_name):
         try:
             win32ui.FindWindow(process_name, None)
@@ -327,6 +337,7 @@ class Ui_MainWindow(QMainWindow):
         '''
         trying to login Rapberry Pi zero by IP via PuTTY
         '''
+        self.Param = param
         try:
             self.app = Application().start(
                 r"{} -ssh pi@{}".format(param["PuTTY_Path"], param["IP"]))
@@ -369,6 +380,7 @@ class Ui_MainWindow(QMainWindow):
             self.comboBox.setEnabled(True)
             self.actionDelect_Img.setEnabled(True)
             self.actionAnpassen.setEnabled(False)
+            self.actionRemote_folder.setEnabled(False)
         except:
             pass
 
@@ -410,52 +422,21 @@ class Ui_MainWindow(QMainWindow):
             self.statusBar.showMessage("PuTTY exit failed")
 
 
-            
-            # try:
-            #     os.remove(self.Logging)
-            # except:
-            #     return self.PuTTYExit()
+    def remoteFolder(self):
+        '''
+        open remote folder if samba service active
+        '''
+        if self.Param["Samba"] == 2:
+            self.thread[2] = Remote(parent=None, remoteParam=self.Param)
+            self.thread[2].start()
 
-
-        # try:
-        #     # self.SendCommand("q")
-        #     # self.SendCommand("exit")
-        #     os.system("taskkill /im PuTTY.exe")
-
-        #     # self.actionAnpassen.setEnabled(True)
-        #     # self.actionMount.setEnabled(False)
-        #     # self.actionQuit.setEnabled(False)
-        #     # self.comboBox.setEnabled(False)
-        #     # self.statusBar.showMessage("Logout and PuTTY exited")
-        #     # self.LB_Samba.setStyleSheet("background-color: gray; border: 1px solid black; border-radius: 4px")
-        #     # self.LB_Samba.setText("Samba")
-        #     # self.LB_WaDo.setStyleSheet("background-color: gray; border: 1px solid black; border-radius: 4px")
-        #     # self.LB_WaDo.setText("Watchdog")
-        #     try:
-        #         # condition of threadstop is the threadstart first, otherweis error
-        #         self.thread[1].stop()
-        #         del(self.thread[1])
-        #         # print("del thread")
-        #     except:
-        #         pass            
-        # except:
-        #     Ui_MainWindow.MSG(title="Info", message="please exicute putty first", type="i")
-        #     self.statusBar.showMessage("PuTTY exit failed")
-        # # try 5 time to delet putty.log file once ok then jump out
-        # trytimes = 5
-        # while trytimes>0:
-        #     try:   
-        #         os.remove(self.Logging)
-        #         break
-        #     except:
-        #         if not self.process_exists("PuTTY"):
-        #             time.sleep(1)
-        #             trytimes-=1
-        #         time.sleep(1)
     def DeleteImg(self):
+        '''
+        delete image file of current filesytem in combobox
+        '''
         self.SendCommand("d")
         self.SendCommand("{}".format(self.Filesysdict[self.comboBox.currentText()][0]))
-
+        self.actionRemote_folder.setEnabled(False)
 
     def TraceClear(self):
         '''
@@ -488,14 +469,15 @@ class Ui_MainWindow(QMainWindow):
         self.thread[1] = TraceThread(parent=None, Logfile=self.Logging, 
                                     sleep_time_in_seconds=0.05, 
                                     img=self.Filesysdict[self.comboBox.currentText()][0],
-                                    imgstaus=self.LB_Img
+                                    imgstaus=self.LB_Img,
+                                    statusbar=self.statusBar,
+                                    remoteParam = self.Param,
+                                    remote = self.actionRemote_folder
                                     )
         self.thread[1].start()
         self.thread[1].trace_singal.connect(self.Update_logging)
         self.SendCommand(self.Filesysdict[self.comboBox.currentText()][1])
-        self.statusBar.showMessage("{} mount successfully".format(self.comboBox.currentText()))
-        
-
+        # self.statusBar.showMessage("{} mount successfully".format(self.comboBox.currentText()))
         
     def Eject(self):
         '''
@@ -506,6 +488,7 @@ class Ui_MainWindow(QMainWindow):
         self.actionQuit.setEnabled(True)
         self.actionDelect_Img.setEnabled(True)
         self.comboBox.setEnabled(True)
+        self.actionRemote_folder.setEnabled(False)
         try:
             self.SendCommand("e")
             self.thread[1].file.close()
@@ -515,6 +498,11 @@ class Ui_MainWindow(QMainWindow):
             # print("file.close")
         except:
             self.statusBar.showMessage("{} eject failed".format(self.comboBox.currentText()))
+        try:
+            self.thread[2].stop()
+            del(self.thread[2])
+        except:
+            pass
 
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -530,7 +518,7 @@ class TraceThread(QThread):
     trace_singal = pyqtSignal(str)
     file = None
     # status_signal = pyqtSignal(int)
-    def __init__(self, parent, Logfile, sleep_time_in_seconds, img, imgstaus):
+    def __init__(self, parent, Logfile, sleep_time_in_seconds, img, imgstaus, statusbar, remoteParam,remote):
         super(TraceThread, self).__init__(parent)
         self.Logfile = Logfile
         # print("thread:" + self.Logfile)
@@ -538,6 +526,9 @@ class TraceThread(QThread):
         self.img = img
         self.imgstatus = imgstaus
         self.file = open(self.Logfile, 'r', errors='ignore')
+        self.statusbar = statusbar
+        self.remoteParam = remoteParam
+        self.remote = remote
     
     def colorText(self, content:str, color:str):
         color_content =  "<span style=\" font-size:8pt; font-weight:800; color:{};\" >".format(color)
@@ -559,18 +550,24 @@ class TraceThread(QThread):
                                 self.trace_singal.emit(self.colorText(line, "#32CD32"))
                             elif "please select" in line.lower():
                                 self.trace_singal.emit(self.colorText(line, "#00FFFF"))
-                            elif any(x in line for x in ["0:","1:","2:","3:","4:","5:","6:","7:","8:","9:","10:","r:","e:","c:","q:", "d:"]):
+                            elif any(x in line for x in ["0: ","1: ","2: ","3: ","4: ","5: ","6: ","7: ","8: ","9: ","10: ","r: remount","e: eject","c: cancel","q: quit", "d: delete"]):
                                 self.trace_singal.emit(self.colorText(line, "orange"))
                             elif "{} is already existed".format(self.img) in line:
                                 self.imgstatus.setStyleSheet("background-color: #a4efaf; border: 1px solid black; border-radius: 4px")
                                 self.imgstatus.setText(self.img)
                                 self.trace_singal.emit(self.colorText(line, "#FFFFFF"))
+                                if self.remoteParam["Samba"] == 2:
+                                    self.remote.setEnabled(True)
+                                self.statusbar.showMessage("mount successfully")
                             elif ("status of samba" in line.lower()) or ("status of watchdog" in line.lower()):
-                                self.trace_singal.emit(self.colorText(line, "red"))
+                                self.trace_singal.emit(self.colorText(line, "#FF0000"))
                             elif "to create {}".format(self.img) in line.lower():
                                 self.trace_singal.emit(self.colorText(line, "#32CD32"))
-                                self.imgstatus.setStyleSheet("background-color: gray; border: 1px solid black; border-radius: 4px")
+                                self.imgstatus.setStyleSheet("background-color: #f9e1dd; border: 1px solid black; border-radius: 4px")
                                 self.imgstatus.setText(self.img)
+                                self.statusbar.showMessage("please assign a size of image")
+                                if self.remoteParam["Samba"] == 2:
+                                    self.remote.setEnabled(False)
                             else:
                                 self.trace_singal.emit(self.colorText(line, "#FFFFFF"))
                 except:
@@ -584,7 +581,16 @@ class TraceThread(QThread):
         self.imgstatus.setText("Img")
         self.terminate()
 
-         
+
+class Remote(QThread):
+    def __init__(self, parent, remoteParam):
+        super(Remote, self).__init__(parent)
+        self.remoteParam = remoteParam
+    def run(self):
+        QFileDialog.getExistingDirectory(parent=None, caption="Open directory", directory= "//{}".format(self.remoteParam["IP"]))
+    def stop(self):
+        self.terminate()
+
 
 
 if __name__ == "__main__":

@@ -8,5 +8,6 @@
     <file>Image/disconnect.png</file>
     <file>Image/help.png</file>
     <file>Image/delete.png</file>
+    <file>Image/remote.png</file>
   </qresource>
 </RCC>
