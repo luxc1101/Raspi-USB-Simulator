@@ -587,7 +587,9 @@ class Remote(QThread):
         super(Remote, self).__init__(parent)
         self.remoteParam = remoteParam
     def run(self):
-        QFileDialog.getExistingDirectory(parent=None, caption="Open directory", directory= "//{}".format(self.remoteParam["IP"]))
+        # QFileDialog.getExistingDirectory(parent=None, caption="Open directory", directory= "//{}".format(self.remoteParam["IP"]))
+        QFileDialog.getOpenFileName(parent=None, caption="Open directory", directory= "//{}".format(self.remoteParam["IP"]))
+
     def stop(self):
         self.terminate()
 
