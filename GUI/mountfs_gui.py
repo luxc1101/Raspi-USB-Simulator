@@ -143,7 +143,7 @@ def menu():
     sys.stdout.write("q: quit and eject the USB" + "\n")
     sys.stdout.write("e: eject current USB drive" + "\n")
     sys.stdout.write(
-        "c: cancel or terminate the currently running program")
+        "c: cancel or terminate the currently running program" + "\n")
     sys.stdout.write("d: delete filesystem image"+ C_off + "\n")
 
 def modifyfile(file:str, img:str, MP:str):
@@ -240,6 +240,7 @@ def USBSIM(FileImgDic, MPDic, WaDo, Samba):
         dInput = input(Cyan + "which filesystem will be deleted: " + C_off)
         try:
             os.system("sudo rm {}.img".format(dInput))
+            os.system("sudo reboot")
         except FileExistsError as e:
             print(Red + e + C_off)
         return USBSIM(FileImgDic, MPDic, WaDo, Samba)
