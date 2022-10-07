@@ -4,10 +4,7 @@
 # Autor:     Xiaochuan Lu
 # Abteilung: SWTE
 #*****************************************************
-from ast import Param
 import os
-import re
-from tracemalloc import start
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMainWindow, QMessageBox, QFrame, QLabel, QFileDialog
 from Config import Ui_ConfigDialog
@@ -23,7 +20,7 @@ class VLine(QFrame):
     '''
     Setting up a customized status bar like:
     -------------------------------------------------
-    |status message       |version: 1.x |Data: Y-M-D|
+    |status message       |version: 0.0.1 |Data: Y-M-D|
     -------------------------------------------------
     '''
     def __init__(self):
@@ -213,6 +210,7 @@ class Ui_MainWindow(QMainWindow):
         self.menuCalls.addAction(self.actionEject)
         self.menuCalls.addAction(self.actionRemote_folder)       
         self.menuCalls.addAction(self.actionClear)
+        self.menuCalls.addAction(self.actionDelect_Img)
         self.menuCalls.addAction(self.actionQuit)
         self.menuCalls.addAction(self.actionHelp)
         self.menuBar.addAction(self.menuCalls.menuAction())
@@ -232,7 +230,7 @@ class Ui_MainWindow(QMainWindow):
         self.actionDelect_Img.setEnabled(False)
         self.actionRemote_folder.setEnabled(False)
         self.statusBar.showMessage("Status: not connected")
-        self.VersionQL = QLabel("Version: 1.0")
+        self.VersionQL = QLabel("Version: 0.0.1")
         self.VersionQL.setStyleSheet('font-size:9px')
         date = "Data: {}".format(QDate.currentDate().toString(Qt.ISODate))
         self.DataQL = QLabel(date)
@@ -294,6 +292,7 @@ class Ui_MainWindow(QMainWindow):
         self.actionEject.setText(_translate("MainWindow", "Eject/Refresh"))
         self.actionMount.setText(_translate("MainWindow", "Mount"))
         self.actionClear.setText(_translate("MainWindow", "Clear"))
+        self.actionDelect_Img.setText(_translate("MainWindow", "Delete Img"))
         self.B_SendCmd.setText(_translate("MainWindow", "CMD Send"))
         self.groupBox_Cmd.setTitle(_translate("MainWindow", "Command Window"))
         self.textEdit_trace.setPlaceholderText(_translate("Form", "PuTTY's output is shown here"))

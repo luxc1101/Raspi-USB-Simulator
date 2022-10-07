@@ -49,9 +49,9 @@ class Ui_Form(object):
         _translate = QtCore.QCoreApplication.translate
         Form.setWindowTitle(_translate("Form", "About USB Simulator"))
         self.LB_Contact.setText(_translate("Form", "Contact: "))
-        self.LB_Name.setText(_translate("Form", "<a href='mailto:xiaochuan.lu@joynext.com'>Xiaochuan Lu</a>"))
+        self.LB_Name.setText(_translate("Form", "<a href='mailto:xiaochuan.lu@joynext.com'>Xiaochuan Lu</a> (SWTE)"))
         self.LB_Tutorial.setText(_translate("Form", "Tutorial:"))
-        self.LB_TutorialLink.setText(_translate("Form", "<a href=\"https://git1.jnd.joynext.com/lu_x4/priapos.git\">USB filesystem simulator</a>"))
+        self.LB_TutorialLink.setText(_translate("Form", "<a href=\"https://git1.jnd.joynext.com/lu_x4/priapos/-/blob/master/README.md\">USB filesystem simulator</a>"))
         self.textEdit.setHtml(_translate("Form", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
