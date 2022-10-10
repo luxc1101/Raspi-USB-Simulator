@@ -28,7 +28,7 @@ FileImgDic[9] = "part.img"
 FileImgDic[10] = "sw.img"  # ntfs
 # mount point dict
 MPDic = {}
-MPDic[0] = "/mnt/usb_MIB_Compliance"
+MPDic[0] = "/mnt/usb_mib_compliance"
 MPDic[1] = "/mnt/usb_ext2"
 MPDic[2] = "/mnt/usb_ext3"
 MPDic[3] = "/mnt/usb_ext4"
@@ -108,7 +108,7 @@ def sambaconf(PKG: str, img: str, MP: str):
         os.system("sudo sed -i -e '$a path = {}' {}".format(MP, conf))
 
     os.system("sudo systemctl restart smbd.service")
-    sys.stdout.write("{}status of samba service: \n".format(Cyan))
+    sys.stdout.write("{}status of samba service-> \n".format(Cyan))
     sys.stdout.write("{}{}".format(Yellow, os.popen(
         "sudo systemctl status smbd.service | grep -E 'Loaded|Active|Status'").read()))
     sys.stdout.write("{}Network access: ".format(Cyan))
@@ -240,7 +240,10 @@ def USBSIM(FileImgDic, MPDic, WaDo, Samba):
         dInput = input(Cyan + "which filesystem will be deleted: " + C_off)
         try:
             os.system("sudo rm {}.img".format(dInput))
-            os.system("sudo reboot")
+            lpd = os.popen("lsblk -f | grep '/mnt/usb_{}'".format(dInput)).read().split("\n")[0].split(" ")[0]
+            os.system("sudo umount /dev/{}".format(lpd))
+            os.system("sudo rm -r /mnt/usb_{}".format(dInput))
+            print("delete {}.img -> umount {} -> remove /mnt/usb_{}".format(dInput, lpd, dInput))
         except FileExistsError as e:
             print(Red + e + C_off)
         return USBSIM(FileImgDic, MPDic, WaDo, Samba)
@@ -283,7 +286,7 @@ def USBSIM(FileImgDic, MPDic, WaDo, Samba):
                 if int(Samba) == 2:
                     sambaconf(PKG='samba', img= lcimg, MP= MPpath)
                 if int(WaDo) == 2:
-                    print(Cyan + "status of watchdog service: " + Yellow)
+                    print(Cyan + "status of watchdog service-> " + Yellow)
                     modifyfile(file="fswd.py", img = lcimg, MP= MPpath)
                     os.system("sudo systemctl restart fswd")
                     os.system("sudo systemctl status fswd | grep -E 'Loaded|Active|CGroup|python'")
