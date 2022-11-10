@@ -5,7 +5,7 @@ The idea comes from Mauch Nico to lighten the amount of work for USB sticks plug
 
 In a word the plan is to have a dynamical usb storage device, which is configurable in format and content.
 ## Big Picture
-<img src="BigPic.PNG" width="250">
+<img src="image/BigPic.png" width="250">
 
 ## Preparation
 
