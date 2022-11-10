@@ -4,9 +4,8 @@
 # Autor:     Xiaochuan Lu
 # Abteilung: SWTE
 #*****************************************************
-import sys
 import os
-
+import sys
 
 Cyan='\033[1;96m'
 Yellow='\033[1;93m'
@@ -24,8 +23,13 @@ def Cfilesystem(img:str, MP:str):
         sys.stdout.write(Cyan + "Creating......" + C_off + "\n")
         os.system("sudo dd bs=1M if=/dev/zero of={} count={}".format(limg,size))
         if "mib" in limg:
+            # if not os.path.isdir(MP): os.system("sudo mkdir {}".format(MP))
+            # os.system("sudo mkfs.fat -F 32 {}".format(limg))
             if not os.path.isdir(MP): os.system("sudo mkdir {}".format(MP))
-            os.system("sudo mkfs.fat -F 32 {}".format(limg))
+            os.system("sudo apt-get install ntfs-3g")
+            os.system("sudo losetup /dev/loop10 {}".format(limg))
+            os.system("sudo mkfs.ntfs -Q /dev/loop10")
+            os.system("sudo mount /dev/loop10 {}".format(MP))
         elif "ext2" in limg:
             if not os.path.isdir(MP): os.system("sudo mkdir {}".format(MP))
             os.system("sudo mkfs.ext2 {}".format(limg))

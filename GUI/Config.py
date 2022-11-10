@@ -5,13 +5,15 @@
 # Abteilung: SWTE
 #*****************************************************
 
-from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QMessageBox, QFileDialog, QMainWindow
-import os
-import Icons
-from PyQt5.QtCore import pyqtSignal
 import json
+import os
 import sys
+
+from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtWidgets import QFileDialog, QMainWindow, QMessageBox
+
+import Icons
 
 
 class Ui_ConfigDialog(QMainWindow):
