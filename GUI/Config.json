@@ -8,5 +8,10 @@
     "Others": {
       "WoDa": false,
       "Samba": false
+    },
+    "WiFi": {
+      "ssid": "AMB-StreamWLAN",
+      "psk": "1bis56789"
     }
+
   }

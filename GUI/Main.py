@@ -5,16 +5,20 @@
 # Abteilung: SWTE
 #*****************************************************
 import os
+import sys
+import time
+
+import win32ui
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QMainWindow, QMessageBox, QFrame, QLabel, QFileDialog
+from PyQt5.QtCore import QDate, Qt, QThread, pyqtSignal
+from PyQt5.QtWidgets import (QFileDialog, QFrame, QLabel, QMainWindow,
+                             QMessageBox)
+from pywinauto.application import Application
+
+import Icons
 from Config import Ui_ConfigDialog
 from Help import Ui_Form
-from PyQt5.QtCore import pyqtSignal, QThread, QDate, Qt
-from pywinauto.application import Application
-import sys
-import Icons
-import time
-import win32ui
+
 
 class VLine(QFrame):
     '''
@@ -230,7 +234,7 @@ class Ui_MainWindow(QMainWindow):
         self.actionDelect_Img.setEnabled(False)
         self.actionRemote_folder.setEnabled(False)
         self.statusBar.showMessage("Status: not connected")
-        self.VersionQL = QLabel("Version: 0.0.1")
+        self.VersionQL = QLabel("Version: 0.0.2")
         self.VersionQL.setStyleSheet('font-size:9px')
         date = "Data: {}".format(QDate.currentDate().toString(Qt.ISODate))
         self.DataQL = QLabel(date)
@@ -331,6 +335,8 @@ class Ui_MainWindow(QMainWindow):
         '''
         self.Putty.send_keystrokes(cmd)
         self.Putty.send_keystrokes("{ENTER}")
+        if len(self.LE_SendCmd.text()) != 0:
+            self.LE_SendCmd.clear()
 
     def PuTTYLogin(self, param):
         '''
@@ -426,7 +432,7 @@ class Ui_MainWindow(QMainWindow):
         open remote folder if samba service active
         '''
         if self.Param["Samba"] == 2:
-            self.thread[2] = Remote(parent=None, remoteParam=self.Param)
+            self.thread[2] = Remote(parent=None, remoteParam=self.Param, img = self.Filesysdict[self.comboBox.currentText()][0])
             self.thread[2].start()
 
     def DeleteImg(self):
@@ -582,13 +588,16 @@ class TraceThread(QThread):
 
 
 class Remote(QThread):
-    def __init__(self, parent, remoteParam):
+    def __init__(self, parent, remoteParam, img):
         super(Remote, self).__init__(parent)
         self.remoteParam = remoteParam
+        self.img = img
     def run(self):
+        try:
         # QFileDialog.getExistingDirectory(parent=None, caption="Open directory", directory= "//{}".format(self.remoteParam["IP"]))
-        QFileDialog.getOpenFileName(parent=None, caption="Open directory", directory= "//{}".format(self.remoteParam["IP"]))
-
+            QFileDialog.getOpenFileName(parent=None, caption="Open directory", directory= "//{}/raspiusb_{}".format(self.remoteParam["IP"], self.img))
+        except:
+            pass
     def stop(self):
         self.terminate()
 

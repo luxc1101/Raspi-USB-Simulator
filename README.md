@@ -5,7 +5,7 @@ The idea comes from Mauch Nico to lighten the amount of work for USB sticks plug
 
 In a word the plan is to have a dynamical usb storage device, which is configurable in format and content.
 ## Big Picture
-<img src="BigPic.PNG" width="250">
+<img src="image/BigPic.png" width="250">
 
 ## Preparation
 
@@ -48,6 +48,8 @@ In a word the plan is to have a dynamical usb storage device, which is configura
     }
     ```
 **USB Simulator**
+
+<img src="image/USBSIM.gif" width="250">
 
 - Menubar
     - _Setting_ (Anpassen): this function can configre the parameters for PuTTY in order to login and trace log data. It will open a configuration dialog, where could be configred. PuTTY logging should be active before using and copy the path of PuTTY.log file to "Log" in PuTTY Conf. Watchdog and Samba service could be active if they will be needed, but please make sure your PC is able to connect the internet.
