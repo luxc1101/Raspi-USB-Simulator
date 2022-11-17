@@ -7,12 +7,14 @@
 ##########################
 # import all needed libs #
 ##########################
+import logging
 import sys
 import time
-import logging
-from watchdog.observers import Observer
-from watchdog.events import FileSystemEventHandler
+
 from watchdog.events import *
+from watchdog.events import FileSystemEventHandler
+from watchdog.observers import Observer
+
 #############
 # paramters #
 #############

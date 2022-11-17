@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>306</width>
-    <height>278</height>
+    <width>280</width>
+    <height>368</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -80,6 +80,43 @@
            <widget class="QLineEdit" name="LE_LogPath">
             <property name="text">
              <string>C:/Users/ironm/Desktop/putty.log</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <widget class="QGroupBox" name="groupBox_3">
+       <property name="title">
+        <string>WiFi</string>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <layout class="QFormLayout" name="formLayout_3">
+          <item row="0" column="0">
+           <widget class="QLabel" name="LB_ssid">
+            <property name="text">
+             <string>ssid</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="LE_ssid"/>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="LB_psk">
+            <property name="text">
+             <string>password</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="LE_psk">
+            <property name="echoMode">
+             <enum>QLineEdit::Password</enum>
             </property>
            </widget>
           </item>

@@ -7,10 +7,12 @@
 
 import json
 import os
+import subprocess
 import sys
+import time
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtCore import QTimer, pyqtSignal
 from PyQt5.QtWidgets import QFileDialog, QMainWindow, QMessageBox
 
 import Icons
@@ -22,7 +24,7 @@ class Ui_ConfigDialog(QMainWindow):
 
     def setupUi(self, ConfigDialog):
         ConfigDialog.setObjectName("ConfigDialog")
-        ConfigDialog.resize(300, 250)
+        ConfigDialog.resize(300, 280)
         ConfigDialog.setWindowIcon(QtGui.QIcon(":/Image/AnpassenIcon.png"))
         self.gridLayout_3 = QtWidgets.QGridLayout(ConfigDialog)
         self.gridLayout_3.setObjectName("gridLayout_3")
@@ -61,6 +63,29 @@ class Ui_ConfigDialog(QMainWindow):
         self.formLayout_2.setWidget(4, QtWidgets.QFormLayout.FieldRole, self.LE_LogPath)
         self.gridLayout.addLayout(self.formLayout_2, 0, 0, 1, 1)
         self.verticalLayout.addWidget(self.groupBox)
+
+        self.groupBox_3 = QtWidgets.QGroupBox(ConfigDialog)
+        self.groupBox_3.setObjectName("groupBox_3")
+        self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.groupBox_3)
+        self.verticalLayout_2.setObjectName("verticalLayout_2")
+        self.formLayout_3 = QtWidgets.QFormLayout()
+        self.formLayout_3.setObjectName("formLayout_3")
+        self.LB_ssid = QtWidgets.QLabel(self.groupBox_3)
+        self.LB_ssid.setObjectName("LB_ssid")
+        self.formLayout_3.setWidget(0, QtWidgets.QFormLayout.LabelRole, self.LB_ssid)
+        self.LE_ssid = QtWidgets.QLineEdit(self.groupBox_3)
+        self.LE_ssid.setObjectName("LE_ssid")
+        self.formLayout_3.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.LE_ssid)
+        self.LB_psk = QtWidgets.QLabel(self.groupBox_3)
+        self.LB_psk.setObjectName("LB_psk")
+        self.formLayout_3.setWidget(1, QtWidgets.QFormLayout.LabelRole, self.LB_psk)
+        self.LE_psk = QtWidgets.QLineEdit(self.groupBox_3)
+        self.LE_psk.setObjectName("LE_psk")
+        self.LE_psk.setEchoMode(QtWidgets.QLineEdit.Password)
+        self.formLayout_3.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.LE_psk)
+        self.verticalLayout_2.addLayout(self.formLayout_3)
+        self.verticalLayout.addWidget(self.groupBox_3)
+
         self.groupBox_2 = QtWidgets.QGroupBox(ConfigDialog)
         self.groupBox_2.setObjectName("groupBox_2")
         self.gridLayout_2 = QtWidgets.QGridLayout(self.groupBox_2)
@@ -82,6 +107,7 @@ class Ui_ConfigDialog(QMainWindow):
         # self.formLayout.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.LE_Path)
         self.gridLayout_2.addLayout(self.formLayout, 0, 0, 1, 1)
         self.verticalLayout.addWidget(self.groupBox_2)
+
         spacerItem = QtWidgets.QSpacerItem(13, 20, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout.addItem(spacerItem)
         self.buttonBox_Conf = QtWidgets.QDialogButtonBox(ConfigDialog)
@@ -131,6 +157,11 @@ class Ui_ConfigDialog(QMainWindow):
         self.LB_Log.setText(_translate("ConfigDialog", "Log"))
         self.LE_LogPath.setText(_translate("ConfigDialog", self.setup_dict["PuTTYConf"]["Log"]))
         self.groupBox_2.setTitle(_translate("ConfigDialog", "Others"))
+        self.groupBox_3.setTitle(_translate("ConfigDialog", "WiFi"))
+        self.LB_ssid.setText(_translate("ConfigDialog", "SSID"))
+        self.LB_psk.setText(_translate("ConfigDialog", "Password"))
+        self.LE_ssid.setText(_translate("ConfigDialog", self.setup_dict["WiFi"]["ssid"]))
+        self.LE_psk.setText(_translate("ConfigDialog", self.setup_dict["WiFi"]["psk"]))
         self.checkBox_WaDo.setText(_translate("ConfigDialog", "Watchdog Service"))
         self.checkBox_Samba.setText(_translate("ConfigDialog", "Samba Service"))
         # self.B_ImgPath.setText(_translate("ConfigDialog", "Open|Create"))
@@ -139,13 +170,13 @@ class Ui_ConfigDialog(QMainWindow):
             # os.path.dirname(os.path.realpath(__file__)), "filesystem")))
 
 
-    def OCfolder(self):
-        '''
-        to create filsystem folder to save the to be creadted .img files
-        the usually the folder will be created in the path which shows in lineEdit
-        but it could also be changed by ourselves if the path in the lineEdit come to be empty 
-        '''
-        QFileDialog.getExistingDirectory(parent=self, caption="Open directroy", directory="//{}".format("DEDREVMDC04.Joynext.com"))
+    # def OCfolder(self):
+    #     '''
+    #     to create filsystem folder to save the to be creadted .img files
+    #     the usually the folder will be created in the path which shows in lineEdit
+    #     but it could also be changed by ourselves if the path in the lineEdit come to be empty 
+    #     '''
+    #     QFileDialog.getExistingDirectory(parent=self, caption="Open directroy", directory="//{}".format("DEDREVMDC04.Joynext.com"))
 
         # try:
         #     QMessageBox.setWindowIcon(self, QtGui.QIcon(":/Image/AnpassenIcon.png"))
@@ -177,18 +208,59 @@ class Ui_ConfigDialog(QMainWindow):
     #     time.sleep(2)
     #     PT.send_keystrokes(Key)
     #     PT.send_keystrokes("{ENTER}")
-
+        
+    def wificonnect(self):
+        ssid = self.LE_ssid.text()
+        psk = self.LE_psk.text()
+        msg = QMessageBox()
+        msg.setWindowTitle("WiFi Status")
+        msg.setWindowIcon(QtGui.QIcon(":/Image/AnpassenIcon.png"))
+        # connect a previously connected SSID
+        WiFiexit = subprocess.getoutput('netsh wlan show networks | findstr {}'.format(ssid))
+        print(str(WiFiexit))
+        if ssid in WiFiexit:
+            os.system(f'''cmd /c "netsh wlan connect name={ssid}"''')
+            data = subprocess.check_output(['netsh', 'WLAN', 'show', 'interfaces']).decode('ascii', 'ignore')
+            # print(data)
+            time.sleep(1)
+            if ssid in data:
+                msg.setIcon(QMessageBox.Information)
+                msg.setText("WiFi connected")
+                QTimer.singleShot(1500, lambda : msg.done(0))
+                msg.exec()
+                # os.system('cmd /c "netsh wlan disconnect"')
+                return True
+            else:
+                msg.setIcon(QMessageBox.Critical)
+                msg.setText("WiFi connect fail")
+                QTimer.singleShot(1500, lambda : msg.done(0))
+                msg.exec()
+                return False
+        else:
+            msg.setIcon(QMessageBox.Critical)
+            msg.setText("WiFi {} not avaiable".format(ssid))
+            QTimer.singleShot(1500, lambda : msg.done(0))
+            msg.exec()
+            return False        
+        
     def configparameter(self):
-        PuTTY_Path = self.LE_PTPath.text()
-        IP = self.LE_IP.text()
-        Key = self.LE_Key.text()
-        Log = self.LE_LogPath.text()
-        Samba = self.checkBox_Samba.checkState()
-        WaDo = self.checkBox_WaDo.checkState()
-        # FSPath = self.LE_Path.text()
-        param = {"PuTTY_Path": PuTTY_Path, "IP": IP,
-                 "Key": Key, "Log": Log,"Samba": Samba, "WaDo": WaDo}
-        self.my_signal.emit(param)
+        if self.wificonnect():
+            PuTTY_Path = self.LE_PTPath.text()
+            IP = self.LE_IP.text()
+            Key = self.LE_Key.text()
+            Log = self.LE_LogPath.text()
+            Samba = self.checkBox_Samba.checkState()
+            WaDo = self.checkBox_WaDo.checkState()
+            # FSPath = self.LE_Path.text()
+            param = {"PuTTY_Path": PuTTY_Path, "IP": IP,
+                    "Key": Key, "Log": Log,"Samba": Samba, "WaDo": WaDo}
+            self.my_signal.emit(param)
+            return
+        
+        self.Confwin = QtWidgets.QDialog()
+        self.ui = Ui_ConfigDialog()
+        self.ui.setupUi(self.Confwin)
+        self.Confwin.show()
 
 
 if __name__ == "__main__":
