@@ -211,13 +211,13 @@ class Ui_ConfigDialog(QMainWindow):
         
     def wificonnect(self):
         ssid = self.LE_ssid.text()
+        # ssid = "Automotive-QS"
         psk = self.LE_psk.text()
         msg = QMessageBox()
         msg.setWindowTitle("WiFi Status")
         msg.setWindowIcon(QtGui.QIcon(":/Image/AnpassenIcon.png"))
         # connect a previously connected SSID
         WiFiexit = subprocess.getoutput('netsh wlan show networks | findstr {}'.format(ssid))
-        # print(str(WiFiexit))
         if ssid in WiFiexit:
             # connect wifi with ssid
             os.system(f'''cmd /c "netsh wlan connect name={ssid}"''')
