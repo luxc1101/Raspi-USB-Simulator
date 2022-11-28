@@ -217,13 +217,18 @@ class Ui_ConfigDialog(QMainWindow):
         msg.setWindowIcon(QtGui.QIcon(":/Image/AnpassenIcon.png"))
         # connect a previously connected SSID
         WiFiexit = subprocess.getoutput('netsh wlan show networks | findstr {}'.format(ssid))
-        print(str(WiFiexit))
+        # print(str(WiFiexit))
         if ssid in WiFiexit:
+            # connect wifi with ssid
             os.system(f'''cmd /c "netsh wlan connect name={ssid}"''')
-            data = subprocess.check_output(['netsh', 'WLAN', 'show', 'interfaces']).decode('ascii', 'ignore')
-            # print(data)
+            # cmd to check the connected signal if signal -> echo oneline otherweis -> echo offline
+            cmd_netsig = 'netsh wlan show interfaces | Findstr /c:"Signal" && Echo Online || Echo Offline'
+            # wait a sec cause sometime connect to build needs time
             time.sleep(1)
-            if ssid in data:
+            # data = subprocess.check_output(['netsh', 'WLAN', 'show', 'interfaces']).strip().decode('ascii', 'ignore')
+            data = subprocess.check_output(cmd_netsig, shell=True).strip().decode('ascii', 'ignore')
+            #print(data)
+            if 'Online' in data:
                 msg.setIcon(QMessageBox.Information)
                 msg.setText("WiFi connected")
                 QTimer.singleShot(1500, lambda : msg.done(0))

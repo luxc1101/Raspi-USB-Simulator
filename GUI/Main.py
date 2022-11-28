@@ -415,6 +415,8 @@ class Ui_MainWindow(QMainWindow):
         if self.process_exists("PuTTY"):
             trytimes = 5
             self.app.kill()
+            # diconnect wifi
+            os.system('cmd /c "netsh wlan disconnect"')
             while trytimes>0:
                 try:   
                     os.remove(self.Logging)
