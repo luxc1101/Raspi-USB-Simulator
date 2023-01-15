@@ -11,6 +11,7 @@ import sys
 import os
 import time
 import fsc
+from subprocess import PIPE, Popen, check_output, run
 ##########################
 #       Paramters        #
 ##########################
@@ -59,8 +60,6 @@ def getfsname(img: str):
     return img.split(".")[0]
 
 # remount filesystem
-
-
 def remount(file):
     os.system('sudo /sbin/modprobe g_multi -r')
     time.sleep(2)

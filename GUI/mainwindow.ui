@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>517</width>
-    <height>496</height>
+    <width>335</width>
+    <height>505</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,139 +16,206 @@
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout_5">
     <item row="0" column="0">
-     <widget class="QGroupBox" name="groupBox_mtfs">
-      <property name="font">
-       <font>
-        <weight>50</weight>
-        <bold>false</bold>
-       </font>
+     <widget class="QTabWidget" name="tabWidget_">
+      <property name="currentIndex">
+       <number>1</number>
       </property>
-      <property name="styleSheet">
-       <string notr="true"/>
-      </property>
-      <property name="title">
-       <string>Mount Filesystem</string>
-      </property>
-      <property name="flat">
-       <bool>false</bool>
-      </property>
-      <layout class="QGridLayout" name="gridLayout_2">
-       <item row="0" column="0">
-        <layout class="QGridLayout" name="gridLayout_3">
-         <item row="0" column="0">
-          <layout class="QFormLayout" name="formLayout">
-           <item row="0" column="0">
-            <widget class="QLabel" name="LB_Filesystem">
-             <property name="text">
-              <string>Filesystem</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QComboBox" name="comboBox">
-             <item>
-              <property name="text">
-               <string>MIB Compliance Media</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>ext2</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>ext3</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>ext4</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>fat16</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>fat32</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>ntfs</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>exfat</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>hfsplus</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>partitions</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>Software update</string>
-              </property>
-             </item>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <layout class="QHBoxLayout" name="horizontalLayout">
-             <item>
-              <widget class="QLabel" name="LB_Img">
-               <property name="text">
-                <string>Img</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="LB_WaDo">
-               <property name="text">
-                <string>Watchdog</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="LB_Samba">
-               <property name="text">
-                <string>Samba</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-              </widget>
+      <widget class="QWidget" name="USBFS">
+       <attribute name="title">
+        <string>File Systems</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_6">
+        <item row="0" column="0">
+         <widget class="QGroupBox" name="groupBox_mtfs">
+          <property name="font">
+           <font>
+            <weight>50</weight>
+            <bold>false</bold>
+           </font>
+          </property>
+          <property name="styleSheet">
+           <string notr="true"/>
+          </property>
+          <property name="title">
+           <string>Mount Filesystem</string>
+          </property>
+          <property name="flat">
+           <bool>false</bool>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_2">
+           <item row="1" column="0">
+            <layout class="QGridLayout" name="gridLayout_3">
+             <item row="0" column="0">
+              <layout class="QFormLayout" name="formLayout">
+               <item row="0" column="0">
+                <widget class="QLabel" name="LB_Filesystem">
+                 <property name="text">
+                  <string>Filesystem</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <widget class="QComboBox" name="comboBox">
+                 <item>
+                  <property name="text">
+                   <string>MIB Compliance Media</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>ext2</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>ext3</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>ext4</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>fat16</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>fat32</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>ntfs</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>exfat</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>hfsplus</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>partitions</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Software update</string>
+                  </property>
+                 </item>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <layout class="QHBoxLayout" name="horizontalLayout">
+                 <item>
+                  <widget class="QLabel" name="LB_Img">
+                   <property name="text">
+                    <string>Img</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="LB_WaDo">
+                   <property name="text">
+                    <string>Watchdog</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="LB_Samba">
+                   <property name="text">
+                    <string>Samba</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item row="1" column="0">
+                <widget class="QLabel" name="LB_Status">
+                 <property name="text">
+                  <string>Status</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
              </item>
             </layout>
            </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="LB_Status">
-             <property name="text">
-              <string>Status</string>
-             </property>
-            </widget>
-           </item>
           </layout>
-         </item>
-        </layout>
-       </item>
-      </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="DeviceSim">
+       <attribute name="title">
+        <string>Device Simulation</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <layout class="QFormLayout" name="formLayout_2">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_Device">
+            <property name="text">
+             <string>Device Class</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QComboBox" name="comboBox_Device"/>
+          </item>
+          <item row="1" column="1">
+           <layout class="QHBoxLayout" name="horizontalLayout_3">
+            <item>
+             <widget class="QRadioButton" name="radioButton_0">
+              <property name="text">
+               <string>supported</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="radioButton_1">
+              <property name="text">
+               <string>unsupported</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QFormLayout" name="formLayout_3">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_DeviceInfo">
+            <property name="text">
+             <string>Device Info</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QComboBox" name="comboBox_3"/>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
      </widget>
     </item>
     <item row="1" column="0">
@@ -193,7 +260,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>517</width>
+     <width>335</width>
      <height>21</height>
     </rect>
    </property>

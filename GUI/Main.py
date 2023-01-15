@@ -7,6 +7,7 @@
 import os
 import sys
 import time
+import json
 
 import win32ui
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -80,12 +81,25 @@ class Ui_MainWindow(QMainWindow):
         self.gridLayout_5.setContentsMargins(11, 11, 11, 11)
         self.gridLayout_5.setSpacing(6)
         self.gridLayout_5.setObjectName("gridLayout_5")
-        self.groupBox_mtfs = QtWidgets.QGroupBox(self.centralWidget)
-        self.groupBox_mtfs.setObjectName("groupBox_mtfs")
+
+        self.tabWidget_ = QtWidgets.QTabWidget(self.centralWidget)
+        self.tabWidget_.setObjectName("tabWidget_")
+        self.USBFS = QtWidgets.QWidget()
+        self.USBFS.setObjectName("USBFS")
+        self.gridLayout_6 = QtWidgets.QGridLayout(self.USBFS)
+        self.gridLayout_6.setContentsMargins(11, 11, 11, 11)
+        self.gridLayout_6.setSpacing(6)
+        self.gridLayout_6.setObjectName("gridLayout_6")
+        self.groupBox_mtfs = QtWidgets.QGroupBox(self.USBFS)
+        
         font = QtGui.QFont()
         font.setBold(True)
-        font.setWeight(75)
-
+        font.setWeight(50)
+        # self.groupBox_mtfs = QtWidgets.QGroupBox(self.centralWidget)
+        self.groupBox_mtfs.setFont(font)
+        self.groupBox_mtfs.setStyleSheet("")
+        self.groupBox_mtfs.setFlat(False)
+        self.groupBox_mtfs.setObjectName("groupBox_mtfs")
         self.gridLayout_2 = QtWidgets.QGridLayout(self.groupBox_mtfs)
         self.gridLayout_2.setContentsMargins(11, 11, 11, 11)
         self.gridLayout_2.setSpacing(6)
@@ -125,7 +139,49 @@ class Ui_MainWindow(QMainWindow):
         self.formLayout.setWidget(1, QtWidgets.QFormLayout.LabelRole, self.LB_Status)
         self.gridLayout_3.addLayout(self.formLayout, 0, 0, 1, 1)
         self.gridLayout_2.addLayout(self.gridLayout_3, 0, 0, 1, 1)
-        self.gridLayout_5.addWidget(self.groupBox_mtfs, 0, 0, 1, 1)
+        # self.gridLayout_5.addWidget(self.groupBox_mtfs, 0, 0, 1, 1)
+        self.gridLayout_6.addWidget(self.groupBox_mtfs, 0, 0, 1, 1)
+
+        self.tabWidget_.addTab(self.USBFS, "")
+        self.DeviceSim = QtWidgets.QWidget()
+        self.DeviceSim.setObjectName("DeviceSim")
+        self.verticalLayout = QtWidgets.QVBoxLayout(self.DeviceSim)
+        self.verticalLayout.setContentsMargins(11, 11, 11, 11)
+        self.verticalLayout.setSpacing(6)
+        self.verticalLayout.setObjectName("verticalLayout")
+        self.formLayout_2 = QtWidgets.QFormLayout()
+        self.formLayout_2.setSpacing(6)
+        self.formLayout_2.setObjectName("formLayout_2")
+        self.label_Device = QtWidgets.QLabel(self.DeviceSim)
+        self.label_Device.setObjectName("label_Device")
+        self.formLayout_2.setWidget(0, QtWidgets.QFormLayout.LabelRole, self.label_Device)
+        self.comboBox_Device = QtWidgets.QComboBox(self.DeviceSim)
+        self.comboBox_Device.setObjectName("comboBox_Device")
+        self.formLayout_2.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.comboBox_Device)
+        self.horizontalLayout_3 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_3.setSpacing(6)
+        self.horizontalLayout_3.setObjectName("horizontalLayout_3")
+        self.radioButton_0 = QtWidgets.QRadioButton(self.DeviceSim)
+        self.radioButton_0.setObjectName("radioButton_0")
+        self.horizontalLayout_3.addWidget(self.radioButton_0)
+        self.radioButton_1 = QtWidgets.QRadioButton(self.DeviceSim)
+        self.radioButton_1.setObjectName("radioButton_1")
+        self.horizontalLayout_3.addWidget(self.radioButton_1)
+        self.formLayout_2.setLayout(1, QtWidgets.QFormLayout.FieldRole, self.horizontalLayout_3)
+        self.verticalLayout.addLayout(self.formLayout_2)
+        self.formLayout_3 = QtWidgets.QFormLayout()
+        self.formLayout_3.setSpacing(6)
+        self.formLayout_3.setObjectName("formLayout_3")
+        self.label_DeviceInfo = QtWidgets.QLabel(self.DeviceSim)
+        self.label_DeviceInfo.setObjectName("label_DeviceInfo")
+        self.formLayout_3.setWidget(0, QtWidgets.QFormLayout.LabelRole, self.label_DeviceInfo)
+        self.comboBox_3 = QtWidgets.QComboBox(self.DeviceSim)
+        self.comboBox_3.setObjectName("comboBox_3")
+        self.formLayout_3.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.comboBox_3)
+        self.verticalLayout.addLayout(self.formLayout_3)
+        self.tabWidget_.addTab(self.DeviceSim, "")
+        self.gridLayout_5.addWidget(self.tabWidget_, 0, 0, 1, 1)
+
         self.groupBox_trace = QtWidgets.QGroupBox(self.centralWidget)
         self.groupBox_trace.setObjectName("groupBox_trace")
         self.gridLayout = QtWidgets.QGridLayout(self.groupBox_trace)
@@ -234,7 +290,7 @@ class Ui_MainWindow(QMainWindow):
         self.actionDelect_Img.setEnabled(False)
         self.actionRemote_folder.setEnabled(False)
         self.statusBar.showMessage("Status: not connected")
-        self.VersionQL = QLabel("Version: 0.0.2")
+        self.VersionQL = QLabel("Version: 0.0.3")
         self.VersionQL.setStyleSheet('font-size:9px')
         date = "Data: {}".format(QDate.currentDate().toString(Qt.ISODate))
         self.DataQL = QLabel(date)
@@ -254,6 +310,9 @@ class Ui_MainWindow(QMainWindow):
         self.QP.setColor(QtGui.QPalette.Text, Qt.white)
         self.textEdit_trace.setPalette(self.QP)
 
+        with open(os.path.join(os.getcwd(),"device.json"),'r', encoding="utf8") as f:
+            self.device_dict = json.load(f)
+            f.close()
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -267,6 +326,8 @@ class Ui_MainWindow(QMainWindow):
         self.actionRemote_folder.triggered.connect(self.remoteFolder)
         self.B_SendCmd.clicked.connect(lambda: self.SendCommand(self.LE_SendCmd.text()))
         self.thread = {}
+
+        self.tabWidget_.setCurrentIndex(0)
         
 
     def retranslateUi(self, MainWindow):
@@ -304,6 +365,14 @@ class Ui_MainWindow(QMainWindow):
         self.actionHelp.setText(_translate("MainWindow", "About USB Simulator"))
         self.actionRemote_folder.setText(_translate("MainWindow", "Remote folder"))
     
+        self.tabWidget_.setTabText(self.tabWidget_.indexOf(self.USBFS), _translate("MainWindow", "File Systems"))
+        self.label_Device.setText(_translate("MainWindow", "Device Class"))
+        self.radioButton_0.setText(_translate("MainWindow", "supported"))
+        self.radioButton_1.setText(_translate("MainWindow", "unsupported"))
+        self.label_DeviceInfo.setText(_translate("MainWindow", "Device Info"))
+        self.tabWidget_.setTabText(self.tabWidget_.indexOf(self.DeviceSim), _translate("MainWindow", "Device Simulation"))
+
+
     @staticmethod
     def MSG(title, message, type):
         '''
