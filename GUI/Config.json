@@ -1,17 +1,17 @@
 {
     "PuTTYConf": {
       "PuTTYPath": "C:/Program Files/PuTTY/putty.exe",
-      "IPAddress": "192.168.2.36",
+      "IPAddress": "192.168.188.38",
       "Key": "raspberry",
-      "Log": "C:/Users/ironm/Desktop/putty.log"
+      "Log": "C:/Users/lu_x4/Desktop/putty.log"
     },
     "Others": {
       "WoDa": false,
       "Samba": false
     },
     "WiFi": {
-      "ssid": "MagentaWLAN-25MQ",
-      "psk": "08220570084526563753"
+      "ssid": "AMB-StreamWLAN",
+      "psk": "1bis56789"
     }
 
   }
