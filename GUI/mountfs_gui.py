@@ -6,10 +6,11 @@
 ##########################
 # Import all needed libs #
 ##########################
+import json
 import os
 import sys
 import time
-import json
+from subprocess import PIPE, Popen, check_output, run
 
 import fsc
 
@@ -150,6 +151,7 @@ def menu():
     sys.stdout.write("8: hfsplus" + "\n")
     sys.stdout.write("9: partitions" + "\n")
     sys.stdout.write("10: Software update" + "\n")
+    sys.stdout.write("11: device simultion" + "\n")
     sys.stdout.write(Green + "r: remount" + "\n")
     sys.stdout.write("q: quit and eject the USB" + "\n")
     sys.stdout.write("e: eject current USB drive" + "\n")
@@ -184,13 +186,52 @@ def modifyfile(file:str, img:str, MP:str):
     writing_file.write(new_file_content)
     writing_file.close()
 
+def reqcheck():
+    '''
+    Requirements
+    ConfigFs must be avaiable, if it not avaiable it needs to be mounted firstly
+    modules and device tree also
+    '''
+    cmdfindmnt = "findmnt | grep 'configfs'"
+    status = True
+    mount_OK = Popen(cmdfindmnt, shell=True, stdout=PIPE, stderr=PIPE).communicate()[0].decode('utf-8')
+    if 'configfs' not in mount_OK:
+        status = False
+        sys.stdout.write("Checking mount status of configfs: {} \n".format(status))
+        Popen('sudo mount -t configfs none /sys/kernel/config',shell=True, stdout=None, stderr=None)
+        return reqcheck()
+    sys.stdout.write("Checking mount status of configfs: {} \n".format(status))
+
+    devicetree = Popen("cat /boot/config.txt", shell=True, stdout=PIPE, stderr=PIPE).communicate()[0].decode('utf-8')
+    if 'dwc2' not in devicetree:
+        status = False
+        sys.stdout.write("Checking devicetree: {} \n".format(status))
+        Popen('echo "dtoverlay=dwc2" | sudo tee -a /boot/config.txt', shell=True, stdout=PIPE, stderr=PIPE)
+        return reqcheck()
+    sys.stdout.write("Checking devicetree: {} \n".format('dtoverlay=dwc2'))
+    modules = Popen("cat /etc/modules", shell=True, stdout=PIPE, stderr=PIPE).communicate()[0].decode('utf-8')
+    if 'libcomposite' not in modules:
+        status = False
+        sys.stdout.write("Checking modules: {} \n".format(status))
+        sys.stdout.write("loading libcomposite modules \n")
+        Popen('modprobe libcomposite', shell=True, stdout=PIPE, stderr=PIPE)
+        Popen('echo "libcomposite" | sudo tee -a /etc/modules',shell=True, stdout=PIPE, stderr=PIPE)
+        return reqcheck()
+    if 'dwc2' not in modules:
+        status = False
+        sys.stdout.write("Checking modules: {} \n".format(status))
+        Popen('echo "dwc2" | sudo tee -a /etc/modules', shell=True, stdout=PIPE, stderr=PIPE)
+        return reqcheck()
+    sys.stdout.write("Checking modules: {} {} \n".format('libcomposite', 'dwc2'))
+
+
 ##########################
 #     Recursive Algo     #
 ##########################
 def USBSIM(FileImgDic, MPDic, WaDo, Samba):
 
     def checkinput(Input):
-        if (Input.lower() not in ["r", "q", "c", "e", "d"]) and (Input not in [str(i) for i in range(diclen)]):
+        if (Input.lower() not in ["r", "q", "c", "e", "d"]) and (Input not in [str(i) for i in range(diclen)+1]):
             print(Red + "Warning: " + "invalid input, retry to enter" + C_off)
             return False
         return True
@@ -260,6 +301,8 @@ def USBSIM(FileImgDic, MPDic, WaDo, Samba):
             except FileExistsError as e:
                 print(Red + e + C_off)
             return USBSIM(FileImgDic, MPDic, WaDo, Samba)
+        elif Input == "11":
+            print("going to simulate device: xxx")
 
         # base case: USB simulator
         else:

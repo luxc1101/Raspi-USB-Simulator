@@ -4,10 +4,10 @@
 # Autor:     Xiaochuan Lu
 # Abteilung: SWTE
 #*****************************************************
+import json
 import os
 import sys
 import time
-import json
 
 import win32ui
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -44,8 +44,6 @@ class Ui_MainWindow(QMainWindow):
         Filesysdict[device_dict["FileSys"][str(i)]["name"]] = [device_dict["FileSys"][str(i)]["img"].split('.')[0],str(i)]
         FileImgDic[i] = device_dict["FileSys"][str(i)]["img"]
         MPDic[i] = device_dict["FileSys"][str(i)]["mnt"]
-
-    print(Filesysdict)
 
     def configWin(self):
         '''
@@ -408,8 +406,7 @@ class Ui_MainWindow(QMainWindow):
         '''
         self.Param = param
         try:
-            self.app = Application().start(
-                r"{} -ssh pi@{}".format(param["PuTTY_Path"], param["IP"]))
+            self.app = Application().start(r"{} -ssh pi@{}".format(param["PuTTY_Path"], param["IP"]))
             self.Putty = self.app.PuTTY
             self.Putty.wait('ready')
             time.sleep(1)
@@ -421,7 +418,7 @@ class Ui_MainWindow(QMainWindow):
                 # PT_sec_alert.Cancel.click()
             if not os.path.exists(self.Logging):
                 self.statusBar.showMessage("Login failed")
-                Ui_MainWindow.MSG(title="Error", message="Please check PuTTY configuration and WiFi", type="e")
+                Ui_MainWindow.MSG(title="Error", message="Please check PuTTY's configuration and WiFi", type="e")
                 return
             time.sleep(1)
             self.SendCommand(param["Key"])
@@ -532,25 +529,28 @@ class Ui_MainWindow(QMainWindow):
         self.comboBox.setEnabled(False)
         self.actionDelect_Img.setEnabled(False)
         self.tabWidget_.setEnabled(False)
-        try:
-            self.thread[1].file.close()
-            self.thread[1].stop()
-            del(self.thread[1])
-        except:
-            pass
-        self.thread[1] = TraceThread(parent=None, Logfile=self.Logging, 
-                                    sleep_time_in_seconds=0.05, 
-                                    img=self.Filesysdict[self.comboBox.currentText()][0],
-                                    imgstaus=self.LB_Img,
-                                    statusbar=self.statusBar,
-                                    remoteParam = self.Param,
-                                    remote = self.actionRemote_folder
-                                    )
-        self.thread[1].start()
-        self.thread[1].trace_singal.connect(self.Update_logging)
-        self.SendCommand(self.Filesysdict[self.comboBox.currentText()][1])
-        # self.statusBar.showMessage("{} mount successfully".format(self.comboBox.currentText()))
-        
+        if self.tabWidget_.currentIndex() == 0:
+            try:
+                self.thread[1].file.close()
+                self.thread[1].stop()
+                del(self.thread[1])
+            except:
+                pass
+            self.thread[1] = TraceThread(parent=None, Logfile=self.Logging, 
+                                        sleep_time_in_seconds=0.05, 
+                                        img=self.Filesysdict[self.comboBox.currentText()][0],
+                                        imgstaus=self.LB_Img,
+                                        statusbar=self.statusBar,
+                                        remoteParam = self.Param,
+                                        remote = self.actionRemote_folder
+                                        )
+            self.thread[1].start()
+            self.thread[1].trace_singal.connect(self.Update_logging)
+            self.SendCommand(self.Filesysdict[self.comboBox.currentText()][1])
+            # self.statusBar.showMessage("{} mount successfully".format(self.comboBox.currentText()))
+        if self.tabWidget_.currentIndex() == 1:
+            self.SendCommand("11")
+
     def Eject(self):
         '''
         eject the current USB drive device
@@ -594,9 +594,6 @@ class Ui_MainWindow(QMainWindow):
         else:
             self.comboBox_3.clear()
  
-
-
-
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++                                                 
