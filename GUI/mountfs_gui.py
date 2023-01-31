@@ -9,50 +9,59 @@
 import os
 import sys
 import time
+import json
 
 import fsc
 
 ##########################
 #       Paramters        #
 ##########################
-# img file dict
-FileImgDic = {}
-FileImgDic[0] = "mib_compliance.img"  # fat32
-FileImgDic[1] = "ext2.img"
-FileImgDic[2] = "ext3.img"
-FileImgDic[3] = "ext4.img"
-FileImgDic[4] = "fat16.img"
-FileImgDic[5] = "fat32.img"
-FileImgDic[6] = "ntfs.img"
-FileImgDic[7] = "exfat.img"
-FileImgDic[8] = "hfsplus.img"
-FileImgDic[9] = "part.img"
-FileImgDic[10] = "sw.img"  # ntfs
-# mount point dict
-MPDic = {}
-MPDic[0] = "/mnt/usb_mib_compliance"
-MPDic[1] = "/mnt/usb_ext2"
-MPDic[2] = "/mnt/usb_ext3"
-MPDic[3] = "/mnt/usb_ext4"
-MPDic[4] = "/mnt/usb_fat16"
-MPDic[5] = "/mnt/usb_fat32"
-MPDic[6] = "/mnt/usb_ntfs"
-MPDic[7] = "/mnt/usb_exfat"
-MPDic[8] = "/mnt/usb_hfsplus"
-MPDic[9] = "/mnt/usb_part_fat32"
-MPDic[10] = "/mnt/usb_sw"
+# # img file dict
+# FileImgDic = {}
+# FileImgDic[0] = "mib_compliance.img"  # ntfs
+# FileImgDic[1] = "ext2.img"
+# FileImgDic[2] = "ext3.img"
+# FileImgDic[3] = "ext4.img"
+# FileImgDic[4] = "fat16.img"
+# FileImgDic[5] = "fat32.img"
+# FileImgDic[6] = "ntfs.img"
+# FileImgDic[7] = "exfat.img"
+# FileImgDic[8] = "hfsplus.img"
+# FileImgDic[9] = "part.img"
+# FileImgDic[10] = "sw.img"  # ntfs
+# # mount point dict
+# MPDic = {}
+# MPDic[0] = "/mnt/usb_mib_compliance"
+# MPDic[1] = "/mnt/usb_ext2"
+# MPDic[2] = "/mnt/usb_ext3"
+# MPDic[3] = "/mnt/usb_ext4"
+# MPDic[4] = "/mnt/usb_fat16"
+# MPDic[5] = "/mnt/usb_fat32"
+# MPDic[6] = "/mnt/usb_ntfs"
+# MPDic[7] = "/mnt/usb_exfat"
+# MPDic[8] = "/mnt/usb_hfsplus"
+# MPDic[9] = "/mnt/usb_part_fat32"
+# MPDic[10] = "/mnt/usb_sw"
 
+with open(os.path.join(os.getcwd(),"device.json"),'r', encoding="utf8") as f:
+    device_dict = json.load(f)
+    f.close()
+FileImgDic, MPDic = {}, {}
+for i in range(len(device_dict["FileSys"])):
+    FileImgDic[i] = device_dict["FileSys"][str(i)]["img"]
+    MPDic[i] = device_dict["FileSys"][str(i)]["mnt"]
+
+# others
+WaDo = sys.argv[1]
+Samba = sys.argv[2]
 diclen = len(FileImgDic)
+
 # color
 Cyan = '\033[1;96m'
 Yellow = '\033[1;93m'
 Green = '\033[1;92m'
 Red = '\033[1;91m'
 C_off = '\033[0m'
-# others
-WaDo = sys.argv[1]
-Samba = sys.argv[2]
-
 ##########################
 #       Functions        #
 ##########################

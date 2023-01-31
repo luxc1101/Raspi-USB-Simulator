@@ -36,19 +36,16 @@ class Ui_MainWindow(QMainWindow):
     Putty = None
     Logging = None
     Param = None
-    Filesysdict = {
-        "MIB Compliance Media": ['mib_compliance', "0"],
-        "ext2": ["ext2","1"],
-        "ext3": ["ext3", "2"],
-        "ext4": ["ext4", "3"],
-        "fat16": ["fat16", "4"],
-        "fat32": ["fat32", "5"],
-        "ntfs": ["ntfs", "6"],
-        "exfat": ["exfat", "7"],
-        "hfsplus": ["hfsplus", "8"],
-        "partitions": ["part", "9"],
-        "Software update": ["sw", "10"],
-    }
+    with open(os.path.join(os.getcwd(),"device.json"),'r', encoding="utf8") as f:
+        device_dict = json.load(f)
+        f.close()
+    Filesysdict, FileImgDic, MPDic = {}, {}, {}
+    for i in range(len(device_dict["FileSys"])):
+        Filesysdict[device_dict["FileSys"][str(i)]["name"]] = [device_dict["FileSys"][str(i)]["img"].split('.')[0],str(i)]
+        FileImgDic[i] = device_dict["FileSys"][str(i)]["img"]
+        MPDic[i] = device_dict["FileSys"][str(i)]["mnt"]
+
+    print(Filesysdict)
 
     def configWin(self):
         '''
@@ -115,7 +112,7 @@ class Ui_MainWindow(QMainWindow):
         self.formLayout.setWidget(0, QtWidgets.QFormLayout.LabelRole, self.LB_Filesystem)
         self.comboBox = QtWidgets.QComboBox(self.groupBox_mtfs)
         self.comboBox.setObjectName("comboBox")
-        for _ in range(11):
+        for _ in range(len(self.device_dict["FileSys"])):
             self.comboBox.addItem("")
         self.formLayout.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.comboBox)
         self.horizontalLayout = QtWidgets.QHBoxLayout()
@@ -157,6 +154,8 @@ class Ui_MainWindow(QMainWindow):
         self.formLayout_2.setWidget(0, QtWidgets.QFormLayout.LabelRole, self.label_Device)
         self.comboBox_Device = QtWidgets.QComboBox(self.DeviceSim)
         self.comboBox_Device.setObjectName("comboBox_Device")
+        for _ in range(len(self.device_dict)):
+            self.comboBox_Device.addItem("")
         self.formLayout_2.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.comboBox_Device)
         self.horizontalLayout_3 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_3.setSpacing(6)
@@ -181,6 +180,7 @@ class Ui_MainWindow(QMainWindow):
         self.verticalLayout.addLayout(self.formLayout_3)
         self.tabWidget_.addTab(self.DeviceSim, "")
         self.gridLayout_5.addWidget(self.tabWidget_, 0, 0, 1, 1)
+        self.radioButton_0.setChecked(True)
 
         self.groupBox_trace = QtWidgets.QGroupBox(self.centralWidget)
         self.groupBox_trace.setObjectName("groupBox_trace")
@@ -310,10 +310,6 @@ class Ui_MainWindow(QMainWindow):
         self.QP.setColor(QtGui.QPalette.Text, Qt.white)
         self.textEdit_trace.setPalette(self.QP)
 
-        with open(os.path.join(os.getcwd(),"device.json"),'r', encoding="utf8") as f:
-            self.device_dict = json.load(f)
-            f.close()
-
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         self.actionAnpassen.triggered.connect(self.configWin)
@@ -325,6 +321,11 @@ class Ui_MainWindow(QMainWindow):
         self.actionDelect_Img.triggered.connect(self.DeleteImg)
         self.actionRemote_folder.triggered.connect(self.remoteFolder)
         self.B_SendCmd.clicked.connect(lambda: self.SendCommand(self.LE_SendCmd.text()))
+
+        self.radioButton_0.clicked.connect(self.device_info)
+        self.radioButton_1.clicked.connect(self.device_info)
+        self.comboBox_Device.currentIndexChanged.connect(self.device_info)
+
         self.thread = {}
 
         self.tabWidget_.setCurrentIndex(0)
@@ -335,17 +336,11 @@ class Ui_MainWindow(QMainWindow):
         MainWindow.setWindowTitle(_translate("MainWindow", "USB Simulator"))
         self.groupBox_mtfs.setTitle(_translate("MainWindow", "Mount Filesystem"))
         self.LB_Filesystem.setText(_translate("MainWindow", "Filesystem"))
-        self.comboBox.setItemText(0, _translate("MainWindow", "MIB Compliance Media"))
-        self.comboBox.setItemText(1, _translate("MainWindow", "ext2"))
-        self.comboBox.setItemText(2, _translate("MainWindow", "ext3"))
-        self.comboBox.setItemText(3, _translate("MainWindow", "ext4"))
-        self.comboBox.setItemText(4, _translate("MainWindow", "fat16"))
-        self.comboBox.setItemText(5, _translate("MainWindow", "fat32"))
-        self.comboBox.setItemText(6, _translate("MainWindow", "ntfs"))
-        self.comboBox.setItemText(7, _translate("MainWindow", "exfat"))
-        self.comboBox.setItemText(8, _translate("MainWindow", "hfsplus"))
-        self.comboBox.setItemText(9, _translate("MainWindow", "partitions"))
-        self.comboBox.setItemText(10, _translate("MainWindow", "Software update"))
+        for i in range(len(self.device_dict["FileSys"])):
+            self.comboBox.setItemText(i, _translate("MainWindow", self.device_dict["FileSys"][str(i)]["name"]))
+        for id, key in enumerate(self.device_dict.keys()):
+            self.comboBox_Device.setItemText(id+1, _translate("MainWindow", key))
+
         self.LB_Img.setText(_translate("MainWindow", "Img"))
         self.LB_WaDo.setText(_translate("MainWindow", "Watchdog"))
         self.LB_Samba.setText(_translate("MainWindow", "Samba"))
@@ -445,8 +440,8 @@ class Ui_MainWindow(QMainWindow):
             else:
                 self.LB_WaDo.setStyleSheet("background-color: #a4efaf; border: 1px solid black; border-radius: 4px")
                 self.LB_WaDo.setText("WaDo start")
-            # self.SendCommand("python mountfs_gui.py")
-            self.SendCommand("python {}.py '{}' '{}'".format("mountfs_gui" ,param["WaDo"], param["Samba"]))
+            # # self.SendCommand("python mountfs_gui.py")
+            self.SendCommand("python {}.py '{}' '{}'".format("mountfs_gui",param["WaDo"], param["Samba"]))
             # self.statusBar.showMessage("PuTTY open successfully")
             self.statusBar.showMessage("Login successfully")
             self.actionMount.setEnabled(True)
@@ -536,6 +531,7 @@ class Ui_MainWindow(QMainWindow):
         self.actionQuit.setEnabled(False)
         self.comboBox.setEnabled(False)
         self.actionDelect_Img.setEnabled(False)
+        self.tabWidget_.setEnabled(False)
         try:
             self.thread[1].file.close()
             self.thread[1].stop()
@@ -565,6 +561,7 @@ class Ui_MainWindow(QMainWindow):
         self.actionDelect_Img.setEnabled(True)
         self.comboBox.setEnabled(True)
         self.actionRemote_folder.setEnabled(False)
+        self.tabWidget_.setEnabled(True)
         try:
             self.SendCommand("e")
             self.thread[1].file.close()
@@ -579,6 +576,26 @@ class Ui_MainWindow(QMainWindow):
             del(self.thread[2])
         except:
             pass
+
+    def device_info(self):
+        if self.comboBox_Device.currentText() != "":
+            if self.radioButton_0.isChecked():
+                self.comboBox_3.clear()
+                supported = self.device_dict[self.comboBox_Device.currentText()]["0"]
+                for id, dev in enumerate(supported):
+                    self.comboBox_3.addItem(dev["dev"] + ':' + ' ' + dev["VID"] + ' ' +  dev["PID"])
+
+            if self.radioButton_1.isChecked():
+                self.comboBox_3.clear()
+                unsupported = self.device_dict[self.comboBox_Device.currentText()]["1"]
+                for id, dev in enumerate(unsupported):
+                    # print(str(id) + '. ' +  dev["dev"] + ':' + ' ' + dev["VID"] + ' ' +  dev["PID"])
+                    self.comboBox_3.addItem(dev["dev"] + ':' + ' ' + dev["VID"] + ' ' +  dev["PID"])
+        else:
+            self.comboBox_3.clear()
+ 
+
+
 
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
