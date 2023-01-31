@@ -224,10 +224,10 @@ class Ui_ConfigDialog(QMainWindow):
             # cmd to check the connected signal if signal -> echo oneline otherweis -> echo offline
             cmd_netsig = 'netsh wlan show interfaces | Findstr /c:"Signal" && Echo Online || Echo Offline'
             # wait a sec cause sometime connect to build needs time
-            time.sleep(1)
+            time.sleep(3)
             # data = subprocess.check_output(['netsh', 'WLAN', 'show', 'interfaces']).strip().decode('ascii', 'ignore')
             data = subprocess.check_output(cmd_netsig, shell=True).strip().decode('ascii', 'ignore')
-            #print(data)
+            print(data)
             if 'Online' in data:
                 msg.setIcon(QMessageBox.Information)
                 msg.setText("WiFi connected")
