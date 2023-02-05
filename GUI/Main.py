@@ -404,6 +404,9 @@ class Ui_MainWindow(QMainWindow):
         self.LB_Samba.setText("Samba")
         self.LB_WaDo.setStyleSheet("background-color: gray; border: 1px solid black; border-radius: 4px")
         self.LB_WaDo.setText("Watchdog")
+        # quit and eject: terminate the runing programm eject already mounted FS if needed 
+        self.SendCommand("q")
+        time.sleep(1)
         try:
             # condition of threadstop is the threadstart first, otherweis error
             self.thread[1].stop()
