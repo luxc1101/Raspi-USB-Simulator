@@ -302,7 +302,7 @@ def USBSIM(FileImgDic, MPDic, WaDo, Samba):
                 print(Red + e + C_off)
             return USBSIM(FileImgDic, MPDic, WaDo, Samba)
         elif Input == "11":
-            print("going to simulate device: xxx")
+            print("going to simulate device: ")
 
         # base case: USB simulator
         else:
