@@ -55,6 +55,7 @@ for i in range(len(device_dict["FileSys"])):
 # others
 WaDo = sys.argv[1]
 Samba = sys.argv[2]
+tab = sys.argv[3]
 diclen = len(FileImgDic)
 
 # color
@@ -231,7 +232,7 @@ def reqcheck():
 def USBSIM(FileImgDic, MPDic, WaDo, Samba):
 
     def checkinput(Input):
-        if (Input.lower() not in ["r", "q", "c", "e", "d"]) and (Input not in [str(i) for i in range(diclen)+1]):
+        if (Input.lower() not in ["r", "q", "c", "e", "d"]) and (Input not in [str(i) for i in range(diclen+1)]):
             print(Red + "Warning: " + "invalid input, retry to enter" + C_off)
             return False
         return True
@@ -302,7 +303,11 @@ def USBSIM(FileImgDic, MPDic, WaDo, Samba):
                 print(Red + e + C_off)
             return USBSIM(FileImgDic, MPDic, WaDo, Samba)
         elif Input == "11":
-            print("going to simulate device: ")
+            # print("going to simulate device: xxx")
+            Input_dev = input(Cyan + "emulated device: " + Yellow)
+            reqcheck()
+            print(Input_dev)
+            USBSIM(FileImgDic, MPDic, WaDo, Samba)
 
         # base case: USB simulator
         else:

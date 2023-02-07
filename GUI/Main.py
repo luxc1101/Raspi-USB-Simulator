@@ -152,7 +152,7 @@ class Ui_MainWindow(QMainWindow):
         self.formLayout_2.setWidget(0, QtWidgets.QFormLayout.LabelRole, self.label_Device)
         self.comboBox_Device = QtWidgets.QComboBox(self.DeviceSim)
         self.comboBox_Device.setObjectName("comboBox_Device")
-        for _ in range(len(self.device_dict)):
+        for _ in range(len(self.device_dict)-2):
             self.comboBox_Device.addItem("")
         self.formLayout_2.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.comboBox_Device)
         self.horizontalLayout_3 = QtWidgets.QHBoxLayout()
@@ -337,8 +337,8 @@ class Ui_MainWindow(QMainWindow):
         for i in range(len(self.device_dict["FileSys"])):
             self.comboBox.setItemText(i, _translate("MainWindow", self.device_dict["FileSys"][str(i)]["name"]))
         for id, key in enumerate(self.device_dict.keys()):
-            self.comboBox_Device.setItemText(id+1, _translate("MainWindow", key))
-
+            self.comboBox_Device.setItemText(id, _translate("MainWindow", key))
+        self.device_info()
         self.LB_Img.setText(_translate("MainWindow", "Img"))
         self.LB_WaDo.setText(_translate("MainWindow", "Watchdog"))
         self.LB_Samba.setText(_translate("MainWindow", "Samba"))
@@ -465,6 +465,9 @@ class Ui_MainWindow(QMainWindow):
         self.LB_Samba.setText("Samba")
         self.LB_WaDo.setStyleSheet("background-color: gray; border: 1px solid black; border-radius: 4px")
         self.LB_WaDo.setText("Watchdog")
+        # quit and eject: terminate the runing programm eject already mounted FS if needed 
+        self.SendCommand("q")
+        time.sleep(0.5)
         try:
             # condition of threadstop is the threadstart first, otherweis error
             self.thread[1].stop()
@@ -550,6 +553,9 @@ class Ui_MainWindow(QMainWindow):
             # self.statusBar.showMessage("{} mount successfully".format(self.comboBox.currentText()))
         if self.tabWidget_.currentIndex() == 1:
             self.SendCommand("11")
+            time.sleep(2)
+            self.SendCommand(self.comboBox_Device.currentText() + self.comboBox_3.currentText())
+
 
     def Eject(self):
         '''
@@ -640,7 +646,7 @@ class TraceThread(QThread):
                                 self.trace_singal.emit(self.colorText(line, "#32CD32"))
                             elif "please select" in line.lower():
                                 self.trace_singal.emit(self.colorText(line, "#00FFFF"))
-                            elif any(x in line for x in ["0: ","1: ","2: ","3: ","4: ","5: ","6: ","7: ","8: ","9: ","10: ","r: remount","e: eject","c: cancel","q: quit", "d: delete"]):
+                            elif any(x in line for x in ["0: ","1: ","2: ","3: ","4: ","5: ","6: ","7: ","8: ","9: ","10: ","11: ","r: remount","e: eject","c: cancel","q: quit", "d: delete"]):
                                 self.trace_singal.emit(self.colorText(line, "orange"))
                             elif "{} is already existed".format(self.img) in line:
                                 self.imgstatus.setStyleSheet("background-color: #a4efaf; border: 1px solid black; border-radius: 4px")
