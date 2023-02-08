@@ -6,53 +6,64 @@
 ##########################
 # Import all needed libs #
 ##########################
+import json
 import os
 import sys
 import time
+from subprocess import PIPE, Popen, check_output, run
 
 import fsc
 
 ##########################
 #       Paramters        #
 ##########################
-# img file dict
-FileImgDic = {}
-FileImgDic[0] = "mib_compliance.img"  # fat32
-FileImgDic[1] = "ext2.img"
-FileImgDic[2] = "ext3.img"
-FileImgDic[3] = "ext4.img"
-FileImgDic[4] = "fat16.img"
-FileImgDic[5] = "fat32.img"
-FileImgDic[6] = "ntfs.img"
-FileImgDic[7] = "exfat.img"
-FileImgDic[8] = "hfsplus.img"
-FileImgDic[9] = "part.img"
-FileImgDic[10] = "sw.img"  # ntfs
-# mount point dict
-MPDic = {}
-MPDic[0] = "/mnt/usb_mib_compliance"
-MPDic[1] = "/mnt/usb_ext2"
-MPDic[2] = "/mnt/usb_ext3"
-MPDic[3] = "/mnt/usb_ext4"
-MPDic[4] = "/mnt/usb_fat16"
-MPDic[5] = "/mnt/usb_fat32"
-MPDic[6] = "/mnt/usb_ntfs"
-MPDic[7] = "/mnt/usb_exfat"
-MPDic[8] = "/mnt/usb_hfsplus"
-MPDic[9] = "/mnt/usb_part_fat32"
-MPDic[10] = "/mnt/usb_sw"
+# # img file dict
+# FileImgDic = {}
+# FileImgDic[0] = "mib_compliance.img"  # ntfs
+# FileImgDic[1] = "ext2.img"
+# FileImgDic[2] = "ext3.img"
+# FileImgDic[3] = "ext4.img"
+# FileImgDic[4] = "fat16.img"
+# FileImgDic[5] = "fat32.img"
+# FileImgDic[6] = "ntfs.img"
+# FileImgDic[7] = "exfat.img"
+# FileImgDic[8] = "hfsplus.img"
+# FileImgDic[9] = "part.img"
+# FileImgDic[10] = "sw.img"  # ntfs
+# # mount point dict
+# MPDic = {}
+# MPDic[0] = "/mnt/usb_mib_compliance"
+# MPDic[1] = "/mnt/usb_ext2"
+# MPDic[2] = "/mnt/usb_ext3"
+# MPDic[3] = "/mnt/usb_ext4"
+# MPDic[4] = "/mnt/usb_fat16"
+# MPDic[5] = "/mnt/usb_fat32"
+# MPDic[6] = "/mnt/usb_ntfs"
+# MPDic[7] = "/mnt/usb_exfat"
+# MPDic[8] = "/mnt/usb_hfsplus"
+# MPDic[9] = "/mnt/usb_part_fat32"
+# MPDic[10] = "/mnt/usb_sw"
 
+with open(os.path.join(os.getcwd(),"device.json"),'r', encoding="utf8") as f:
+    device_dict = json.load(f)
+    f.close()
+FileImgDic, MPDic = {}, {}
+for i in range(len(device_dict["FileSys"])):
+    FileImgDic[i] = device_dict["FileSys"][str(i)]["img"]
+    MPDic[i] = device_dict["FileSys"][str(i)]["mnt"]
+
+# others
+WaDo = sys.argv[1]
+Samba = sys.argv[2]
+tab = sys.argv[3]
 diclen = len(FileImgDic)
+
 # color
 Cyan = '\033[1;96m'
 Yellow = '\033[1;93m'
 Green = '\033[1;92m'
 Red = '\033[1;91m'
 C_off = '\033[0m'
-# others
-WaDo = sys.argv[1]
-Samba = sys.argv[2]
-
 ##########################
 #       Functions        #
 ##########################
@@ -141,6 +152,7 @@ def menu():
     sys.stdout.write("8: hfsplus" + "\n")
     sys.stdout.write("9: partitions" + "\n")
     sys.stdout.write("10: Software update" + "\n")
+    sys.stdout.write("11: device simultion" + "\n")
     sys.stdout.write(Green + "r: remount" + "\n")
     sys.stdout.write("q: quit and eject the USB" + "\n")
     sys.stdout.write("e: eject current USB drive" + "\n")
@@ -175,13 +187,52 @@ def modifyfile(file:str, img:str, MP:str):
     writing_file.write(new_file_content)
     writing_file.close()
 
+def reqcheck():
+    '''
+    Requirements
+    ConfigFs must be avaiable, if it not avaiable it needs to be mounted firstly
+    modules and device tree also
+    '''
+    cmdfindmnt = "findmnt | grep 'configfs'"
+    status = True
+    mount_OK = Popen(cmdfindmnt, shell=True, stdout=PIPE, stderr=PIPE).communicate()[0].decode('utf-8')
+    if 'configfs' not in mount_OK:
+        status = False
+        sys.stdout.write("Checking mount status of configfs: {} \n".format(status))
+        Popen('sudo mount -t configfs none /sys/kernel/config',shell=True, stdout=None, stderr=None)
+        return reqcheck()
+    sys.stdout.write("Checking mount status of configfs: {} \n".format(status))
+
+    devicetree = Popen("cat /boot/config.txt", shell=True, stdout=PIPE, stderr=PIPE).communicate()[0].decode('utf-8')
+    if 'dwc2' not in devicetree:
+        status = False
+        sys.stdout.write("Checking devicetree: {} \n".format(status))
+        Popen('echo "dtoverlay=dwc2" | sudo tee -a /boot/config.txt', shell=True, stdout=PIPE, stderr=PIPE)
+        return reqcheck()
+    sys.stdout.write("Checking devicetree: {} \n".format('dtoverlay=dwc2'))
+    modules = Popen("cat /etc/modules", shell=True, stdout=PIPE, stderr=PIPE).communicate()[0].decode('utf-8')
+    if 'libcomposite' not in modules:
+        status = False
+        sys.stdout.write("Checking modules: {} \n".format(status))
+        sys.stdout.write("loading libcomposite modules \n")
+        Popen('modprobe libcomposite', shell=True, stdout=PIPE, stderr=PIPE)
+        Popen('echo "libcomposite" | sudo tee -a /etc/modules',shell=True, stdout=PIPE, stderr=PIPE)
+        return reqcheck()
+    if 'dwc2' not in modules:
+        status = False
+        sys.stdout.write("Checking modules: {} \n".format(status))
+        Popen('echo "dwc2" | sudo tee -a /etc/modules', shell=True, stdout=PIPE, stderr=PIPE)
+        return reqcheck()
+    sys.stdout.write("Checking modules: {} {} \n".format('libcomposite', 'dwc2'))
+
+
 ##########################
 #     Recursive Algo     #
 ##########################
 def USBSIM(FileImgDic, MPDic, WaDo, Samba):
 
     def checkinput(Input):
-        if (Input.lower() not in ["r", "q", "c", "e", "d"]) and (Input not in [str(i) for i in range(diclen)]):
+        if (Input.lower() not in ["r", "q", "c", "e", "d"]) and (Input not in [str(i) for i in range(diclen+1)]):
             print(Red + "Warning: " + "invalid input, retry to enter" + C_off)
             return False
         return True
@@ -251,6 +302,12 @@ def USBSIM(FileImgDic, MPDic, WaDo, Samba):
             except FileExistsError as e:
                 print(Red + e + C_off)
             return USBSIM(FileImgDic, MPDic, WaDo, Samba)
+        elif Input == "11":
+            # print("going to simulate device: xxx")
+            Input_dev = input(Cyan + "emulated device: " + Yellow)
+            reqcheck()
+            print(Input_dev)
+            USBSIM(FileImgDic, MPDic, WaDo, Samba)
 
         # base case: USB simulator
         else:
