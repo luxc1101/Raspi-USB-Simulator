@@ -152,7 +152,7 @@ class Ui_MainWindow(QMainWindow):
         self.formLayout_2.setWidget(0, QtWidgets.QFormLayout.LabelRole, self.label_Device)
         self.comboBox_Device = QtWidgets.QComboBox(self.DeviceSim)
         self.comboBox_Device.setObjectName("comboBox_Device")
-        for _ in range(len(self.device_dict)-2):
+        for _ in range(len(self.device_dict)-1):
             self.comboBox_Device.addItem("")
         self.formLayout_2.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.comboBox_Device)
         self.horizontalLayout_3 = QtWidgets.QHBoxLayout()

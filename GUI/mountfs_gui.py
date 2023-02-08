@@ -307,7 +307,24 @@ def USBSIM(FileImgDic, MPDic, WaDo, Samba):
             Input_dev = input(Cyan + "emulated device: " + Yellow)
             reqcheck()
             print(Input_dev)
+            root            = "/sys/kernel/config/usb_gadget"
+            udcname         = ''
+            bcdDevice       = '0x0100'                          # Device release number
+            bcdUSB          = '0x0200'                          # Initialize this descriptor to the usb version that the device supportes (accceptatble version are 0x0110 0x0200 0x0300 0x0310)
+            bDeviceClass    = '0xEF'                            # The class code indicating the behavior of this device. 
+            bDeviceSubClass = '0x02'                            # The subclass code that further defines the behavior of this device.
+            bDeviceProtocol = '0x01'                            # The protocol that the device supports.
+            serialnumber    = 'fedcba9876543210'                # Device serial number
+            manufacturer    = 'SWTE Media'                      # Manufacturer attribute
+            product         = 'SWTE Emulated multi USB Device'  # Cleartext product description
+            configuration   = 'Config 1'                        # Name of this configuration
+            MaxPower        = '250'                             # max power this configuration can consume in mA
+            bmAttributes    = '0x80'                            # Configuration characteristics (D7: Reserved (set to one), D6: Self-powered, D5: Remote Wakeup, D4...0: Reserved (reset to zero)) 
+
+
+
             USBSIM(FileImgDic, MPDic, WaDo, Samba)
+
 
         # base case: USB simulator
         else:
