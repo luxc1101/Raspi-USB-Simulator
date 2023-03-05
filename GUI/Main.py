@@ -234,7 +234,8 @@ class Ui_MainWindow(QMainWindow):
         self.actionDelect_Img.setEnabled(False)
         self.actionRemote_folder.setEnabled(False)
         self.statusBar.showMessage("Status: not connected")
-        self.VersionQL = QLabel("Version: 0.0.2")
+        self.statusBar.setStyleSheet('font-size:9px')
+        self.VersionQL = QLabel("Version: 0.0.2.1")
         self.VersionQL.setStyleSheet('font-size:9px')
         date = "Data: {}".format(QDate.currentDate().toString(Qt.ISODate))
         self.DataQL = QLabel(date)
@@ -391,6 +392,7 @@ class Ui_MainWindow(QMainWindow):
             pass
 
 
+
     def PuTTYExit(self):
         '''
         exit PuTTY
@@ -405,9 +407,8 @@ class Ui_MainWindow(QMainWindow):
         self.LB_Samba.setText("Samba")
         self.LB_WaDo.setStyleSheet("background-color: gray; border: 1px solid black; border-radius: 4px")
         self.LB_WaDo.setText("Watchdog")
-        # quit and eject: terminate the runing programm eject already mounted FS if needed 
-        self.SendCommand("q")
-        time.sleep(1)
+        self.SendCommand("e")
+        time.sleep(0.5)
         try:
             # condition of threadstop is the threadstart first, otherweis error
             self.thread[1].stop()
