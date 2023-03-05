@@ -377,7 +377,8 @@ class Ui_MainWindow(QMainWindow):
                 self.LB_WaDo.setStyleSheet("background-color: #a4efaf; border: 1px solid black; border-radius: 4px")
                 self.LB_WaDo.setText("WaDo start")
             # self.SendCommand("python mountfs_gui.py")
-            self.SendCommand("python {}.py '{}' '{}'".format("mountfs_gui" ,param["WaDo"], param["Samba"]))
+            self.SendCommand("WaDo='{}'&&Samba='{}'&&usbsim".format(param["WaDo"], param["Samba"]))
+            # self.SendCommand("python {}.py '{}' '{}'".format("mountfs_gui" ,param["WaDo"], param["Samba"]))
             # self.statusBar.showMessage("PuTTY open successfully")
             self.statusBar.showMessage("Login successfully")
             self.actionMount.setEnabled(True)
@@ -419,7 +420,7 @@ class Ui_MainWindow(QMainWindow):
             trytimes = 5
             self.app.kill()
             # diconnect wifi
-            os.system('cmd /c "netsh wlan disconnect"')
+            # os.system('cmd /c "netsh wlan disconnect"')
             while trytimes>0:
                 try:   
                     os.remove(self.Logging)
