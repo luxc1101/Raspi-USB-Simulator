@@ -244,7 +244,7 @@ class Ui_MainWindow(QMainWindow):
         self.actionDelect_Img.setEnabled(False)
         self.actionRemote_folder.setEnabled(False)
         self.statusBar.showMessage("Status: not connected")
-        self.VersionQL = QLabel("Version: 0.0.2.1")
+        self.VersionQL = QLabel("Version: 0.0.2.2")
         self.VersionQL.setStyleSheet('font-size:9px')
         date = "Data: {}".format(QDate.currentDate().toString(Qt.ISODate))
         self.DataQL = QLabel(date)
