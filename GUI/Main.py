@@ -145,11 +145,21 @@ class Ui_MainWindow(QMainWindow):
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_2.setSpacing(6)
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
+
+        self.CB_SendCmd = QtWidgets.QComboBox(self.groupBox_Cmd)
+        self.CB_SendCmd.setObjectName("CB_SendCmd")
+        key_list = ["", "remount", "quit + eject", "cancel or terminate", "power off raspi", "usbsim", "usbsim with W+S"]
+        cmd_list = ["", "r", "q", "c", "sudo halt", "WaDo='0'&&Samba='0'&&usbsim", "WaDo='2'&&Samba='2'&&usbsim"]
+        self.cmd_dic = dict(zip(key_list, cmd_list))
+        self.CB_SendCmd.addItems(self.cmd_dic.keys())
+
         self.LE_SendCmd = QtWidgets.QLineEdit(self.groupBox_Cmd)
         self.LE_SendCmd.setObjectName("LE_SendCmd")
-        self.horizontalLayout_2.addWidget(self.LE_SendCmd)
+        self.CB_SendCmd.setLineEdit(self.LE_SendCmd)
+        self.horizontalLayout_2.addWidget(self.CB_SendCmd)
         self.B_SendCmd = QtWidgets.QPushButton(self.groupBox_Cmd)
         self.B_SendCmd.setObjectName("B_SendCmd")
+        self.B_SendCmd.setFixedSize(65,25)
         self.horizontalLayout_2.addWidget(self.B_SendCmd)
         self.gridLayout_4.addLayout(self.horizontalLayout_2, 0, 0, 1, 1)
         self.gridLayout_5.addWidget(self.groupBox_Cmd, 2, 0, 1, 1)
@@ -265,7 +275,9 @@ class Ui_MainWindow(QMainWindow):
         self.actionHelp.triggered.connect(self.helpWin)
         self.actionDelect_Img.triggered.connect(self.DeleteImg)
         self.actionRemote_folder.triggered.connect(self.remoteFolder)
-        self.B_SendCmd.clicked.connect(lambda: self.SendCommand(self.LE_SendCmd.text()))
+        self.B_SendCmd.clicked.connect(lambda: self.SendCommand(self.cmd_dic[self.LE_SendCmd.text()]))
+        # enter key to send cmd
+        self.LE_SendCmd.returnPressed.connect(lambda: self.SendCommand(self.cmd_dic[self.LE_SendCmd.text()]))
         self.thread = {}
         
 
@@ -300,7 +312,7 @@ class Ui_MainWindow(QMainWindow):
         self.B_SendCmd.setText(_translate("MainWindow", "CMD Send"))
         self.groupBox_Cmd.setTitle(_translate("MainWindow", "Command Window"))
         self.textEdit_trace.setPlaceholderText(_translate("Form", "PuTTY's output is shown here"))
-        self.LE_SendCmd.setPlaceholderText(_translate("Form", "Send the command manually here"))
+        self.LE_SendCmd.setPlaceholderText(_translate("Form", "Send the CMD manually here"))
         self.actionHelp.setText(_translate("MainWindow", "About USB Simulator"))
         self.actionRemote_folder.setText(_translate("MainWindow", "Remote folder"))
     
@@ -377,7 +389,8 @@ class Ui_MainWindow(QMainWindow):
                 self.LB_WaDo.setStyleSheet("background-color: #a4efaf; border: 1px solid black; border-radius: 4px")
                 self.LB_WaDo.setText("WaDo start")
             # self.SendCommand("python mountfs_gui.py")
-            self.SendCommand("python {}.py '{}' '{}'".format("mountfs_gui" ,param["WaDo"], param["Samba"]))
+            self.SendCommand("WaDo='{}'&&Samba='{}'&&usbsim".format(param["WaDo"], param["Samba"]))
+            # self.SendCommand("python {}.py '{}' '{}'".format("mountfs_gui" ,param["WaDo"], param["Samba"]))
             # self.statusBar.showMessage("PuTTY open successfully")
             self.statusBar.showMessage("Login successfully")
             self.actionMount.setEnabled(True)
