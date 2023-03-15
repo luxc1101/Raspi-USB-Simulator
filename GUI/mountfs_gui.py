@@ -189,6 +189,38 @@ def modifyfile(file:str, img:str, MP:str):
     writing_file.write(new_file_content)
     writing_file.close()
 
+
+def create_alias(file, cmd, alias, grepstr):
+    '''
+    create separate aliases file and create own cmd in it
+    '''
+    alias_exist_cmd = "cat ~/{} | grep -q {}; echo $?".format(file, grepstr)
+    home = Popen("echo $HOME", shell=True, stdout=PIPE, stderr=None).communicate()[0].decode('utf-8').split("\n")[0]
+    # check if the separate aliases file already existed in home path 
+    if os.path.isfile(os.path.join(home, file)):
+        print("bash file existed")
+        alias_exist = int(Popen(alias_exist_cmd, shell=True, stdout=PIPE, stderr=PIPE).communicate()[0].decode('utf-8').split("\n")[0])
+        # check if the alias is existed in separate aliasis file 
+        if alias_exist == 0:
+            # existed
+            print("alias existed, no need to write")
+
+            os.system(". {}".format(os.path.join(home, '.bashrc')))
+            return
+        if alias_exist == 1:
+            # not existed
+            print("alias not existed, need to wire")
+            Popen('echo alias {}={} | sudo tee -a ~/{}'.format(cmd ,alias, file), shell=True, stdout=PIPE, stderr=PIPE)
+            return
+    print("going to create bash file and write alias in file")
+    Popen('echo alias {}={} | sudo tee -a ~/{}'.format(cmd, alias, file), shell=True, stdout=PIPE, stderr=PIPE)
+    time.sleep(2)
+    Popen("sudo chmod 777 {}".format(os.path.join(home, file)), shell=True, stdout=PIPE, stderr=PIPE)
+    os.system(". {}".format(os.path.join(home, '.bashrc')))
+    return create_alias(file, cmd, alias, grepstr)
+
+
+
 def reqcheck():
     '''
     Requirements
@@ -372,4 +404,5 @@ def USBSIM(FileImgDic, MPDic, WaDo, Samba):
         print("KeyboardInterrupt")
 
 if __name__ == "__main__":
+    create_alias(".bash_aliases", "usbsim", '''"'"python '$(ls | grep mountfs)' '$WaDo' '$Samba'"'"''', "mountfs")
     USBSIM(FileImgDic, MPDic, WaDo, Samba)
