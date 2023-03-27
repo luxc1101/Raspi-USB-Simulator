@@ -1,6 +1,7 @@
 <RCC>
-  <qresource prefix="">
+  <qresource>
     <file>Image/AnpassenIcon.png</file>
+    <file>Image/disconnect.png</file>
     <file>Image/AppIcon.png</file>
     <file>Image/putty-exit.png</file>
     <file>Image/clear.png</file>
@@ -9,5 +10,6 @@
     <file>Image/help.png</file>
     <file>Image/delete.png</file>
     <file>Image/remote.png</file>
+	<file>Image/download.png</file>
   </qresource>
 </RCC>

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>335</width>
+    <width>449</width>
     <height>505</height>
    </rect>
   </property>
@@ -260,7 +260,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>335</width>
+     <width>449</width>
      <height>21</height>
     </rect>
    </property>
@@ -272,6 +272,7 @@
     <addaction name="actionMount"/>
     <addaction name="actionEject"/>
     <addaction name="actionClear"/>
+    <addaction name="actionMIB_SWLoader"/>
     <addaction name="actionQuit"/>
     <addaction name="actionHelp"/>
     <addaction name="actionRemote_folder"/>
@@ -371,6 +372,15 @@
    </property>
    <property name="text">
     <string>Remote folder</string>
+   </property>
+  </action>
+  <action name="actionMIB_SWLoader">
+   <property name="icon">
+    <iconset resource="ProQrc.qrc">
+     <normaloff>:/Image/download.png</normaloff>:/Image/download.png</iconset>
+   </property>
+   <property name="text">
+    <string>MIB SWLoader</string>
    </property>
   </action>
  </widget>
