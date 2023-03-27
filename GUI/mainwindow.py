@@ -9,13 +9,12 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import (QFileDialog, QFrame, QLabel, QMainWindow,
-                             QMessageBox)
 
-class Ui_MainWindow(QMainWindow):
+
+class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(335, 505)
+        MainWindow.resize(449, 505)
         self.centralWidget = QtWidgets.QWidget(MainWindow)
         self.centralWidget.setObjectName("centralWidget")
         self.gridLayout_5 = QtWidgets.QGridLayout(self.centralWidget)
@@ -87,7 +86,6 @@ class Ui_MainWindow(QMainWindow):
         self.gridLayout_3.addLayout(self.formLayout, 0, 0, 1, 1)
         self.gridLayout_2.addLayout(self.gridLayout_3, 1, 0, 1, 1)
         self.gridLayout_6.addWidget(self.groupBox_mtfs, 0, 0, 1, 1)
-
         self.tabWidget_.addTab(self.USBFS, "")
         self.DeviceSim = QtWidgets.QWidget()
         self.DeviceSim.setObjectName("DeviceSim")
@@ -127,7 +125,6 @@ class Ui_MainWindow(QMainWindow):
         self.verticalLayout.addLayout(self.formLayout_3)
         self.tabWidget_.addTab(self.DeviceSim, "")
         self.gridLayout_5.addWidget(self.tabWidget_, 0, 0, 1, 1)
-
         self.groupBox_trace = QtWidgets.QGroupBox(self.centralWidget)
         self.groupBox_trace.setObjectName("groupBox_trace")
         self.gridLayout = QtWidgets.QGridLayout(self.groupBox_trace)
@@ -157,7 +154,7 @@ class Ui_MainWindow(QMainWindow):
         self.gridLayout_5.addWidget(self.groupBox_Cmd, 2, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralWidget)
         self.menuBar = QtWidgets.QMenuBar(MainWindow)
-        self.menuBar.setGeometry(QtCore.QRect(0, 0, 335, 21))
+        self.menuBar.setGeometry(QtCore.QRect(0, 0, 449, 21))
         self.menuBar.setObjectName("menuBar")
         self.menuCalls = QtWidgets.QMenu(self.menuBar)
         self.menuCalls.setObjectName("menuCalls")
@@ -210,10 +207,16 @@ class Ui_MainWindow(QMainWindow):
         icon7.addPixmap(QtGui.QPixmap(":/Image/remote.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionRemote_folder.setIcon(icon7)
         self.actionRemote_folder.setObjectName("actionRemote_folder")
+        self.actionMIB_SWLoader = QtWidgets.QAction(MainWindow)
+        icon8 = QtGui.QIcon()
+        icon8.addPixmap(QtGui.QPixmap(":/Image/download.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionMIB_SWLoader.setIcon(icon8)
+        self.actionMIB_SWLoader.setObjectName("actionMIB_SWLoader")
         self.menuCalls.addAction(self.actionAnpassen)
         self.menuCalls.addAction(self.actionMount)
         self.menuCalls.addAction(self.actionEject)
         self.menuCalls.addAction(self.actionClear)
+        self.menuCalls.addAction(self.actionMIB_SWLoader)
         self.menuCalls.addAction(self.actionQuit)
         self.menuCalls.addAction(self.actionHelp)
         self.menuCalls.addAction(self.actionRemote_folder)
@@ -228,7 +231,7 @@ class Ui_MainWindow(QMainWindow):
         self.mainToolBar.addAction(self.actionHelp)
 
         self.retranslateUi(MainWindow)
-        self.tabWidget_.setCurrentIndex(0)
+        self.tabWidget_.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -269,8 +272,8 @@ class Ui_MainWindow(QMainWindow):
         self.actionHelp.setText(_translate("MainWindow", "Help"))
         self.actionDelect_Img.setText(_translate("MainWindow", "Delete Img"))
         self.actionRemote_folder.setText(_translate("MainWindow", "Remote folder"))
-import Icons
-
+        self.actionMIB_SWLoader.setText(_translate("MainWindow", "MIB SWLoader"))
+import ProQrc_rc
 
 if __name__ == "__main__":
     import sys
