@@ -199,6 +199,14 @@ class Ui_MainWindow(QMainWindow):
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_2.setSpacing(6)
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
+
+        self.CB_SendCmd = QtWidgets.QComboBox(self.groupBox_Cmd)
+        self.CB_SendCmd.setObjectName("CB_SendCmd")
+        key_list = ["", "remount", "quit + eject", "cancel or terminate", "power off raspi", "usbsim", "usbsim with W+S"]
+        cmd_list = ["", "r", "q", "c", "sudo halt", "WaDo='0'&&Samba='0'&&usbsim", "WaDo='2'&&Samba='2'&&usbsim"]
+        self.cmd_dic = dict(zip(key_list, cmd_list))
+        self.CB_SendCmd.addItems(self.cmd_dic.keys())
+
         self.LE_SendCmd = QtWidgets.QLineEdit(self.groupBox_Cmd)
         self.LE_SendCmd.setObjectName("LE_SendCmd")
         self.CB_SendCmd.setLineEdit(self.LE_SendCmd)
