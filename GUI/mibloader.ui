@@ -6,59 +6,23 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>250</width>
-    <height>250</height>
+    <width>238</width>
+    <height>183</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_3">
+  <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="QLabel" name="LB_rename">
-       <property name="text">
-        <string>Rename</string>
-       </property>
-      </widget>
-     </item>
-     <item>
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="0" column="1">
       <widget class="QLineEdit" name="lineEdit_rename"/>
      </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
-     <item>
-      <widget class="QLabel" name="LB_source">
-       <property name="text">
-        <string>Source (url)</string>
-       </property>
-      </widget>
-     </item>
-     <item>
+     <item row="1" column="1">
       <widget class="QLineEdit" name="LE_source"/>
      </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QVBoxLayout" name="verticalLayout">
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_3">
-       <item>
-        <widget class="QLabel" name="LB_destination">
-         <property name="text">
-          <string>Destination</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="LE_destination"/>
-       </item>
-      </layout>
-     </item>
-     <item>
+     <item row="3" column="1">
       <widget class="QLabel" name="LB_usbfreespace">
        <property name="font">
         <font>
@@ -70,25 +34,7 @@
        </property>
       </widget>
      </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QVBoxLayout" name="verticalLayout_2">
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_4">
-       <item>
-        <widget class="QLabel" name="LB_tempopath">
-         <property name="text">
-          <string>TempoPath</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="LE_TempoPath"/>
-       </item>
-      </layout>
-     </item>
-     <item>
+     <item row="5" column="1">
       <widget class="QLabel" name="LB_TampoPathSpace">
        <property name="font">
         <font>
@@ -97,6 +43,62 @@
        </property>
        <property name="text">
         <string>Free space: -</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <item>
+        <widget class="QLineEdit" name="LE_destination"/>
+       </item>
+       <item>
+        <widget class="QToolButton" name="TB_browser1">
+         <property name="text">
+          <string>...</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item row="4" column="1">
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QLineEdit" name="LE_TempoPath"/>
+       </item>
+       <item>
+        <widget class="QToolButton" name="TB_browser2">
+         <property name="text">
+          <string>...</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item row="0" column="0">
+      <widget class="QLabel" name="LB_rename">
+       <property name="text">
+        <string>Rename</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="LB_source">
+       <property name="text">
+        <string>Source (url)</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="LB_destination">
+       <property name="text">
+        <string>Destination</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="LB_tempopath">
+       <property name="text">
+        <string>TempoPath</string>
        </property>
       </widget>
      </item>
