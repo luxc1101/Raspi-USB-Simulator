@@ -15,11 +15,15 @@ import urllib
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QFileDialog
 
+import Icons
+
 
 class Ui_MIBloader(object):
     def setupUi(self, MIBloader):
         MIBloader.setObjectName("MIBloader")
         MIBloader.resize(238, 183)
+        MIBloader.setWindowIcon(QtGui.QIcon(":/Image/download.png"))
+        MIBloader.setWindowFlags(QtCore.Qt.CustomizeWindowHint | QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowCloseButtonHint)
         self.verticalLayout = QtWidgets.QVBoxLayout(MIBloader)
         self.verticalLayout.setObjectName("verticalLayout")
         self.gridLayout = QtWidgets.QGridLayout()
@@ -92,8 +96,8 @@ class Ui_MIBloader(object):
         self.LE_TempoPath.setText(_translate("MIBloader", "{}".format(os.getcwd())))
         self.LB_TampoPathSpace.setText(_translate("MIBloader", "Free space: {} G".format(self.getfreespace(self.LE_TempoPath.text()))))
         self.LB_usbfreespace.setText(_translate("MIBloader", "Free sapce: -"))
-        self.TB_browser1.setText(_translate("MIBloader", "..."))
-        self.TB_browser2.setText(_translate("MIBloader", "..."))
+        self.TB_browser1.setText(_translate("MIBloader", "Browse"))
+        self.TB_browser2.setText(_translate("MIBloader", "Browse"))
         self.LB_rename.setText(_translate("MIBloader", "Rename"))
         self.LB_source.setText(_translate("MIBloader", "Source (url)"))
         self.LB_destination.setText(_translate("MIBloader", "Destination"))

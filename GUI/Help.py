@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
 
 
-import Icons
 from PyQt5 import QtCore, QtGui, QtWidgets
+
+import Icons
+
 
 class Ui_Form(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")
         Form.resize(340, 230)
+        Form.setWindowFlags(QtCore.Qt.CustomizeWindowHint | QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowCloseButtonHint)
         Form.setWindowIcon(QtGui.QIcon(":/Image/help.png"))
         self.gridLayout_3 = QtWidgets.QGridLayout(Form)
         self.gridLayout_3.setObjectName("gridLayout_3")

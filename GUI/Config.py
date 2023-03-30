@@ -26,6 +26,7 @@ class Ui_ConfigDialog(QMainWindow):
         ConfigDialog.setObjectName("ConfigDialog")
         ConfigDialog.resize(300, 280)
         ConfigDialog.setWindowIcon(QtGui.QIcon(":/Image/AnpassenIcon.png"))
+        ConfigDialog.setWindowFlags(QtCore.Qt.CustomizeWindowHint | QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowCloseButtonHint)
         self.gridLayout_3 = QtWidgets.QGridLayout(ConfigDialog)
         self.gridLayout_3.setObjectName("gridLayout_3")
         self.verticalLayout = QtWidgets.QVBoxLayout()
