@@ -10,15 +10,60 @@
 import os
 import shutil
 import sys
-import urllib
+import urllib.request
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QFileDialog
+from PyQt5.QtCore import Qt, QUrl
+from PyQt5.QtNetwork import (QNetworkAccessManager, QNetworkReply,
+                             QNetworkRequest)
+from PyQt5.QtWidgets import QFileDialog, QMessageBox, QProgressDialog
 
 import Icons
 
 
+class DownloadManager:
+    LB_text = ""
+    def __init__(self, parent=None,):
+        self.parent = parent
+        self.manager = QNetworkAccessManager()
+        self.progress = QProgressDialog(parent)
+        self.progress.setWindowTitle("download")
+        self.progress.setWindowIcon(QtGui.QIcon(":/Image/download.png"))
+        self.progress.setWindowFlags(QtCore.Qt.CustomizeWindowHint | QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowCloseButtonHint)
+        self.progress.setWindowModality(Qt.WindowModal)
+        self.progress.setAutoReset(False)
+        self.progress.setAutoClose(True)
+        self.progress.setLabelText(f"{self.LB_text}")
+        self.progress.setMinimumDuration(0)
+        self.progress.setValue(0)
+
+    def download(self, url, save_path):
+        self.request = QNetworkRequest(QUrl(url))
+        self.reply = self.manager.get(self.request)
+        self.reply.downloadProgress.connect(self.on_download_progress)
+        self.reply.finished.connect(self.on_download_finished)
+        self.save_path = save_path
+        self.progress.show()
+
+    def on_download_progress(self, bytes_received, bytes_total):
+        try:
+            percent = int(bytes_received * 100 / bytes_total)
+            self.progress.setValue(percent)
+        except ZeroDivisionError:
+            pass
+
+    def on_download_finished(self):
+        if self.reply.error() == QNetworkReply.NoError:
+            data = self.reply.readAll()
+            with open(self.save_path, "wb") as f:
+                f.write(data)
+        else:
+            error_msg = self.reply.errorString()
+            # handle error
+        self.progress.close()
+
 class Ui_MIBloader(object):
+
     def setupUi(self, MIBloader):
         MIBloader.setObjectName("MIBloader")
         MIBloader.resize(238, 183)
@@ -82,17 +127,26 @@ class Ui_MIBloader(object):
         self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Ok)
         self.buttonBox.setObjectName("buttonBox")
         self.verticalLayout.addWidget(self.buttonBox)
+        self.msg = QMessageBox()
+        self.msg.setWindowTitle("download file")
+        self.msg.setWindowIcon(QtGui.QIcon(":/Image/download.png"))
+
 
         self.retranslateUi(MIBloader)
         self.buttonBox.accepted.connect(MIBloader.accept) # type: ignore
         self.buttonBox.rejected.connect(MIBloader.reject) # type: ignore
+
+        # self.accepted.connect(lambda: self.download(url=self.LE_source.text(), newname=self.lineEdit_rename.text()))
+        self.buttonBox.accepted.connect(lambda: self.download(url=self.LE_source.text(), newname=self.lineEdit_rename.text()))
+
+
         self.TB_browser1.clicked.connect(lambda: self.resetpath(self.LE_destination,self.LB_usbfreespace))
         self.TB_browser2.clicked.connect(lambda: self.resetpath(self.LE_TempoPath,self.LB_TampoPathSpace))
         QtCore.QMetaObject.connectSlotsByName(MIBloader)
 
     def retranslateUi(self, MIBloader):
         _translate = QtCore.QCoreApplication.translate
-        MIBloader.setWindowTitle(_translate("MIBloader", "Dialog"))
+        MIBloader.setWindowTitle(_translate("MIBloader", "download dialog"))
         self.LE_TempoPath.setText(_translate("MIBloader", "{}".format(os.getcwd())))
         self.LB_TampoPathSpace.setText(_translate("MIBloader", "Free space: {} G".format(self.getfreespace(self.LE_TempoPath.text()))))
         self.LB_usbfreespace.setText(_translate("MIBloader", "Free sapce: -"))
@@ -102,9 +156,36 @@ class Ui_MIBloader(object):
         self.LB_source.setText(_translate("MIBloader", "Source (url)"))
         self.LB_destination.setText(_translate("MIBloader", "Destination"))
         self.LB_tempopath.setText(_translate("MIBloader", "TempoPath"))
+        self.LE_source.setText("http://artefact-repo.mib3.technisat-digital/bob_0_19/6d/3a/db613623031c69b6b94457b51b3590b0c5cd5f01b1460f7d999fe4228dfff9fa91b58634d59a-1.tgz")
+
     
-    def download(self, url):
-        print(url)
+    def download(self, url, newname):
+        newname = self.lineEdit_rename.text()
+        print(newname)
+        # if rename is empty (no newname) try using the url name 
+        if newname == "":
+            print('name is None')
+            # check if url string has character '/' if not return false
+            if "/" in url:
+                # use url als as newname (with extension like .tgz)
+                newname = url.split('/')[-1]
+            else:
+                self.msg.setIcon(QMessageBox.Critical)
+                self.msg.setText("file name error, please check the url or rename it")
+                self.msg.exec()
+                return False
+        # check if the new name has extension, else return false
+        if os.path.splitext(newname)[1] == "":
+            self.msg.setIcon(QMessageBox.Critical)
+            self.msg.setText("file has no extension")
+            self.msg.exec()
+            return False
+        # download file by using url and with file name in tempopath
+        self.tempopath = os.path.join(self.LE_TempoPath.text(), newname)
+        DM = DownloadManager
+        DM.LB_text = "Downloading..."
+
+
 
     def bytesto(self, bytes, to , bsize=1024):
         '''
@@ -121,7 +202,6 @@ class Ui_MIBloader(object):
         get current disk free space, return value in gigabyte
         '''
         stat = shutil.disk_usage(path)
-        print(path)
         freesp = self.bytesto(bytes=stat.free, to = 'g')
         return freesp
     
@@ -145,14 +225,19 @@ class Ui_MIBloader(object):
 
 
 
-
-
-
 if __name__ == "__main__":
-    
     app = QtWidgets.QApplication(sys.argv)
     MIBloader = QtWidgets.QDialog()
     ui = Ui_MIBloader()
     ui.setupUi(MIBloader)
     MIBloader.show()
+    if MIBloader.exec_() == QtWidgets.QDialog.Accepted:
+        url = ui.LE_source.text()
+        savepath = ui.tempopath
+        print(url)
+        print(savepath)
+        manager = DownloadManager()
+        # manager.download("http://artefact-repo.mib3.technisat-digital/bob_0_19/6d/3a/db613623031c69b6b94457b51b3590b0c5cd5f01b1460f7d999fe4228dfff9fa91b58634d59a-1.tgz", "E:/Raspberry+pi+conf+files/GUI/test.tgz")
+        manager.download(url, savepath)
+ 
     sys.exit(app.exec_())
