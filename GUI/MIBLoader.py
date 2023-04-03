@@ -236,9 +236,12 @@ class Ui_MIBloader(object):
         '''
         get current disk free space, return value in gigabyte
         '''
-        stat = shutil.disk_usage(path)
-        freesp = self.bytesto(bytes=stat.free, to = 'g')
-        return freesp
+        try:
+            stat = shutil.disk_usage(path)
+            freesp = self.bytesto(bytes=stat.free, to = 'g')
+            return freesp
+        except FileNotFoundError:
+            pass
     
     def openfolder(self):
         '''
@@ -256,9 +259,10 @@ class Ui_MIBloader(object):
         '''
         newpath = self.openfolder()
         LineE.setText(newpath)
-        LB.setText("Free space: {} G".format(self.getfreespace(newpath)))
-
-
+        if self.getfreespace(newpath) is not None:
+            LB.setText("Free space: {} G".format(self.getfreespace(newpath)))
+        else:
+            LB.setText("Free space: -")
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
