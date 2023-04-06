@@ -205,13 +205,14 @@ class Ui_MIBloader(object):
             return self.showdownloaddialog()
         # download file by using url and with file name in tempopath
         self.tempopath = os.path.join(self.LE_TempoPath.text(), newname)
+        print(self.tempopath)
         print(url)
 
         # app = QApplication(sys.argv)
         # self.manager = QtWidgets.QDialog()
         self.DM = DownloadManager()
         self.DM.url = url
-        self.DM.filename = newname
+        self.DM.filename = self.tempopath
         self.DM.description = "Downloading..."
         self.DM.initUI()
         self.DM.downloadFile()
