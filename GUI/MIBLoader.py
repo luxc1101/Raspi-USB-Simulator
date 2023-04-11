@@ -30,14 +30,26 @@ class DownloadThread(QThread):
             self.progress.emit("{} eixted".format(self.filename))
             time.sleep(2)
         else:
-            urllib.request.urlretrieve(self.url, self.filename, reporthook=self.report_hook)
+            try:
+                urllib.request.urlretrieve(self.url, self.filename, reporthook=self.report_hook)
+            except urllib.error.URLError as e:
+                reason =  "urlopen error " +  str(e.reason)
+                self.progress.emit(reason)
         
     def report_hook(self, count, block_size, total_size):
         if total_size > 0:
             progress = int(count * block_size * 100 / total_size)
             self.progress.emit(str(progress))
 
-# class CopyThread(QThread):
+class CopyThread(QThread):
+    
+    progress = pyqtSignal(str)
+
+    def __init__(self, source, target, parent=None):
+        super().__init__(parent)
+        self.source = source
+        self.target = target
+
     
 
 class DownloadManager(QWidget):
@@ -80,8 +92,11 @@ class DownloadManager(QWidget):
      
     def downloadFinished(self):
         self.thread.quit()
-        self.label.setText("Done!")
-        QtCore.QTimer.singleShot(1000, self.close)
+        if "download" not in self.label.text().lower():
+            pass
+        else:
+            self.label.setText("Done!")
+        QtCore.QTimer.singleShot(1500, self.close)
 
         
 

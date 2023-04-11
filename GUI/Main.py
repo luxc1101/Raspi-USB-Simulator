@@ -19,6 +19,7 @@ from pywinauto.application import Application
 import Icons
 from Config import Ui_ConfigDialog
 from Help import Ui_Form
+from MIBLoader import Ui_MIBloader
 
 
 class VLine(QFrame):
@@ -63,6 +64,16 @@ class Ui_MainWindow(QMainWindow):
         self.ui = Ui_Form()
         self.ui.setupUi(self.Helpwin)
         self.Helpwin.show()
+
+    def downloadWin(self):
+        '''
+        download file by using url and extract the file and copy the needed file to target path
+        '''
+        self.DownloadWin = QtWidgets.QDialog()
+        self.ui = Ui_MIBloader()
+        self.ui.setupUi(self.DownloadWin)
+        self.DownloadWin.show()
+
 
     def setupUi(self, MainWindow):
         # self.configWin()
@@ -304,7 +315,7 @@ class Ui_MainWindow(QMainWindow):
         self.actionQuit.setEnabled(False)
         self.actionDelect_Img.setEnabled(False)
         self.actionRemote_folder.setEnabled(False)
-        self.actionMIB_SWLoader.setEnabled(False)
+        self.actionMIB_SWLoader.setEnabled(True)
         self.statusBar.showMessage("Status: not connected")
         self.VersionQL = QLabel("Version: 0.0.3")
         self.VersionQL.setStyleSheet('font-size:9px')
@@ -336,6 +347,7 @@ class Ui_MainWindow(QMainWindow):
         self.actionHelp.triggered.connect(self.helpWin)
         self.actionDelect_Img.triggered.connect(self.DeleteImg)
         self.actionRemote_folder.triggered.connect(self.remoteFolder)
+        self.actionMIB_SWLoader.triggered.connect(self.downloadWin)
         self.B_SendCmd.clicked.connect(lambda: self.SendCommand(self.cmd_dic[self.LE_SendCmd.text()]))
         # enter key to send cmd
         self.LE_SendCmd.returnPressed.connect(lambda: self.SendCommand(self.cmd_dic[self.LE_SendCmd.text()]))
