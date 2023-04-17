@@ -5,8 +5,8 @@ import time
 import urllib.request
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import QThread, QTimer, pyqtSignal
-from PyQt5.QtWidgets import (QFileDialog, QMessageBox, QProgressBar,
+from PyQt5.QtCore import QThread, pyqtSignal, pyqtSlot
+from PyQt5.QtWidgets import (QFileDialog, QMessageBox, QProgressBar,QMainWindow,
                              QVBoxLayout, QWidget)
 
 import Icons
@@ -20,20 +20,27 @@ class DownloadThread(QThread):
     '''
     progress = pyqtSignal(str)
     
-    def __init__(self, url, filename, parent=None):
+    def __init__(self, url, filename, tempo_freespace, parent=None):
         super().__init__(parent)
         self.url = url
         self.filename = filename
+        self.tempo_fs = tempo_freespace
+        self.Mibloader = Ui_MIBloader()
+        
         
     def run(self):
         if os.path.isfile(self.filename):
-            self.progress.emit("{} eixted".format(self.filename))
-            time.sleep(2)
+            self.progress.emit("❗{} eixted".format(self.filename))
         else:
             try:
-                urllib.request.urlretrieve(self.url, self.filename, reporthook=self.report_hook)
+                total_size_in_byte = int(urllib.request.urlopen(self.url).headers.get('Content-Length', 0))
+                total_size_in_gib = self.Mibloader.bytesto(bytes = total_size_in_byte, to = 'g', digits=4)
+                if self.tempo_fs > total_size_in_gib:
+                    urllib.request.urlretrieve(self.url, self.filename, reporthook=self.report_hook)
+                else:    
+                    self.progress.emit("⚠️ free space in tempopath isn't enough")
             except urllib.error.URLError as e:
-                reason =  "urlopen error " +  str(e.reason)
+                reason =  "❌ urlopen error " +  str(e.reason)
                 self.progress.emit(reason)
         
     def report_hook(self, count, block_size, total_size):
@@ -59,9 +66,7 @@ class DownloadManager(QWidget):
     url = ""
     filename = ""
     description = ""
-    def __init__(self):
-        super().__init__()
-        # self.initUI()
+    tempo_freespace = 0
         
     def initUI(self):
         self.setWindowIcon(QtGui.QIcon(":/Image/download.png"))
@@ -79,11 +84,12 @@ class DownloadManager(QWidget):
         self.show()
     
     def downloadFile(self):
-        self.thread = DownloadThread(self.url, self.filename)
+        self.thread = DownloadThread(self.url, self.filename, self.tempo_freespace)
         self.thread.progress.connect(self.downloadProgress)
         self.thread.finished.connect(self.downloadFinished)
         self.thread.start()
-
+    
+    @pyqtSlot(str)
     def downloadProgress(self, P):
         if P.isdigit():
             self.progress.setValue(int(P))
@@ -95,12 +101,44 @@ class DownloadManager(QWidget):
         if "download" not in self.label.text().lower():
             pass
         else:
-            self.label.setText("Done!")
-        QtCore.QTimer.singleShot(1500, self.close)
+            self.label.setText("✅ Done!")
+        QtCore.QTimer.singleShot(1700, self.close)
 
-        
 
-class Ui_MIBloader(object):
+    # def getfreespace(self, path):
+    #     '''
+    #     get current disk free space, return value in gigabyte
+    #     '''
+    #     try:
+    #         stat = shutil.disk_usage(path)
+    #         freesp = self.bytesto(bytes=stat.free, to = 'g')
+    #         return freesp
+    #     except FileNotFoundError:
+    #         pass
+    
+    # def openfolder(self):
+    #     '''
+    #     open browser, return selected folder path
+    #     '''
+    #     folderpath = QFileDialog.getExistingDirectory(parent=None, caption="select folder", directory= "{}".format(os.path.expanduser("~/Desktop")))
+    #     return folderpath
+
+    # def resetpath(self, LineE, LB):
+    #     '''
+    #     get new path
+    #     rewrite new path in line editor
+    #     get free space of new path
+    #     rewrite free space in label
+    #     '''
+    #     newpath = self.openfolder()
+    #     LineE.setText(newpath)
+    #     if self.getfreespace(newpath) is not None:
+    #         LB.setText("Free space: {} G".format(self.getfreespace(newpath)))
+    #     else:
+    #         LB.setText("Free space: -")
+
+
+class Ui_MIBloader(QWidget):
 
     def setupUi(self, MIBloader):
         MIBloader.setObjectName("MIBloader")
@@ -182,20 +220,22 @@ class Ui_MIBloader(object):
         self.TB_browser2.clicked.connect(lambda: self.resetpath(self.LE_TempoPath,self.LB_TampoPathSpace))
         QtCore.QMetaObject.connectSlotsByName(MIBloader)
 
+        self.thread = {}
+
     def retranslateUi(self, MIBloader):
         _translate = QtCore.QCoreApplication.translate
         MIBloader.setWindowTitle(_translate("MIBloader", "download dialog"))
         self.LE_TempoPath.setText(_translate("MIBloader", "{}".format(os.getcwd())))
         self.LB_TampoPathSpace.setText(_translate("MIBloader", "Free space: {} G".format(self.getfreespace(self.LE_TempoPath.text()))))
-        self.LB_usbfreespace.setText(_translate("MIBloader", "Free sapce: -"))
+        self.LB_usbfreespace.setText(_translate("MIBloader", "Free space: - G"))
         self.TB_browser1.setText(_translate("MIBloader", "Browse"))
         self.TB_browser2.setText(_translate("MIBloader", "Browse"))
         self.LB_rename.setText(_translate("MIBloader", "Rename"))
         self.LB_source.setText(_translate("MIBloader", "Source (url)"))
         self.LB_destination.setText(_translate("MIBloader", "Destination"))
         self.LB_tempopath.setText(_translate("MIBloader", "TempoPath"))
-        self.LE_source.setText("http://artefact-repo.mib3.technisat-digital/bob_0_19/6d/3a/db613623031c69b6b94457b51b3590b0c5cd5f01b1460f7d999fe4228dfff9fa91b58634d59a-1.tgz")
-
+        # self.LE_source.setText("http://artefact-repo.mib3.technisat-digital/bob_0_19/6d/3a/db613623031c69b6b94457b51b3590b0c5cd5f01b1460f7d999fe4228dfff9fa91b58634d59a-1.tgz")
+        self.LE_source.setText("https://www.esa.int/var/esa/storage/images/esa_multimedia/images/2015/04/the_big_picture/15346488-1-eng-GB/The_big_picture.jpg")
     
     def download(self, url, newname):
         newname = self.lineEdit_rename.text()
@@ -223,12 +263,14 @@ class Ui_MIBloader(object):
         print(self.tempopath)
         print(url)
 
-        # app = QApplication(sys.argv)
-        # self.manager = QtWidgets.QDialog()
         self.DM = DownloadManager()
         self.DM.url = url
         self.DM.filename = self.tempopath
-        self.DM.description = "Downloading..."
+        self.DM.description = "⬇️ Downloading..."
+        try:
+            self.DM.tempo_freespace = float(self.LB_TampoPathSpace.text().split(' ')[-2])
+        except:
+            self.DM.tempo_freespace = 0.0
         self.DM.initUI()
         self.DM.downloadFile()
 
@@ -238,7 +280,7 @@ class Ui_MIBloader(object):
         self.ui.setupUi(self.MIBloader)
         self.MIBloader.show()
 
-    def bytesto(self, bytes, to , bsize=1024):
+    def bytesto(self, bytes, to , digits , bsize=1024):
         '''
         convert bytes to megabytes, etc
         '''
@@ -246,25 +288,30 @@ class Ui_MIBloader(object):
         r = float(bytes)
         for _ in range(a[to]):
             r = r / bsize
-        return round(r,2)
-
+        return round(r,digits)
+    
+    @pyqtSlot(str)
     def getfreespace(self, path):
         '''
         get current disk free space, return value in gigabyte
         '''
         try:
             stat = shutil.disk_usage(path)
-            freesp = self.bytesto(bytes=stat.free, to = 'g')
-            return freesp
+            self.freesp = self.bytesto(bytes=stat.free, to = 'g', digits=2)
+            return self.freesp
         except FileNotFoundError:
-            pass
-    
-    def openfolder(self):
+            self.freesp = None
+            return self.freesp
+
+    def resetpath_finish(self, LB):
         '''
-        open browser, return selected folder path
+        thread finished connect
         '''
-        folderpath = QFileDialog.getExistingDirectory(parent=None, caption="select folder", directory= "{}".format(os.path.expanduser("~/Desktop")))
-        return folderpath
+        self.thread[1].quit()
+        if self.freesp is not None:
+            LB.setText("Free space: {} G".format(self.freesp))
+        else:
+            LB.setText("Free space: - G")
 
     def resetpath(self, LineE, LB):
         '''
@@ -273,12 +320,27 @@ class Ui_MIBloader(object):
         get free space of new path
         rewrite free space in label
         '''
-        newpath = self.openfolder()
-        LineE.setText(newpath)
-        if self.getfreespace(newpath) is not None:
-            LB.setText("Free space: {} G".format(self.getfreespace(newpath)))
+        # newpath = self.openfolder()
+        self.thread[1] = BrowserThread()
+        self.thread[1].start()
+        self.thread[1].pathsignal.connect(LineE.setText)
+        self.thread[1].pathsignal.connect(self.getfreespace)
+        self.thread[1].finished.connect(lambda: self.resetpath_finish(LB=LB))
+
+class BrowserThread(QThread):
+
+    pathsignal = pyqtSignal(str)
+
+    def run(self):
+        dialog = QFileDialog()
+        dialog.setFileMode(QFileDialog.DirectoryOnly)
+        if os.path.exists(os.path.join(os.path.expanduser("~"),"Downloads"))==True:
+                folder = dialog.getExistingDirectory(None, caption="select folder", directory= "{}".format(os.path.expanduser("~/Downloads")))
         else:
-            LB.setText("Free space: -")
+            folder = dialog.getExistingDirectory(parent=None, caption="select folder")
+
+        self.pathsignal.emit(folder)
+
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
