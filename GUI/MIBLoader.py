@@ -3,6 +3,7 @@ import shutil
 import sys
 import time
 import urllib.request
+import tarfile
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import QThread, pyqtSignal, pyqtSlot
@@ -37,6 +38,21 @@ class DownloadThread(QThread):
                 total_size_in_gib = self.Mibloader.bytesto(bytes = total_size_in_byte, to = 'g', digits=4)
                 if self.tempo_fs > total_size_in_gib:
                     urllib.request.urlretrieve(self.url, self.filename, reporthook=self.report_hook)
+                    time.sleep(1)
+                    # doneload sucessfully
+                    self.progress.emit("✅ Done!")
+                    time.sleep(1)
+                    # going to extract file
+                    self.progress.emit("📁 Extracting file")
+                    time.sleep(1)
+                    try:
+                        with tarfile.open(self.filename, 'r:gz') as tar:
+                            tar.extractall()
+                        # extract finish
+                        self.progress.emit("✅ Extracting finish")
+                    except tarfile.ReadError as e:
+                        # extract error
+                        self.progress.emit("❌ {}".format(e))
                 else:    
                     self.progress.emit("⚠️ free space in tempopath isn't enough")
             except urllib.error.URLError as e:
@@ -52,10 +68,29 @@ class CopyThread(QThread):
     
     progress = pyqtSignal(str)
 
-    def __init__(self, source, target, parent=None):
+    def __init__(self, tempo_source, target, target_freespace, parent=None):
         super().__init__(parent)
-        self.source = source
+        self.source = tempo_source
         self.target = target
+        self.target_fs = target_freespace
+        self.Mibloader = Ui_MIBloader()
+
+    def run(self):
+        if len(os.listdir(self.target)) == 0:
+            try:
+                total_size_source_in_byte = os.path.getsize(self.source)
+                total_size_source_in_gib = self.Mibloader.bytesto(bytes = total_size_source_in_byte, to = 'g', digits=4)
+                if self.target_fs > total_size_source_in_gib:
+                    print("copy")
+                else:
+                    self.progress.emit("⚠️ free space in targetpath isn't enough")
+            except:
+                pass
+
+
+
+
+
 
     
 
@@ -98,12 +133,8 @@ class DownloadManager(QWidget):
      
     def downloadFinished(self):
         self.thread.quit()
-        if "download" not in self.label.text().lower():
-            pass
-        else:
-            self.label.setText("✅ Done!")
-        QtCore.QTimer.singleShot(1700, self.close)
 
+        QtCore.QTimer.singleShot(1700, self.close)
 
     # def getfreespace(self, path):
     #     '''
