@@ -4,7 +4,7 @@ import sys
 import time
 import urllib.request
 import tarfile
-
+from tqdm import tqdm
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import QThread, pyqtSignal, pyqtSlot
 from PyQt5.QtWidgets import (QFileDialog, QMainWindow, QMessageBox,
@@ -26,8 +26,7 @@ class DownloadThread(QThread):
         self.url = url
         self.filename = filename
         self.tempo_fs = tempo_freespace
-        self.Mibloader = Ui_MIBloader()
-        
+        self.Mibloader = Ui_MIBloader()        
         
     def run(self):
         if os.path.isfile(self.filename):
@@ -47,9 +46,17 @@ class DownloadThread(QThread):
                     time.sleep(1)
                     try:
                         with tarfile.open(self.filename, 'r:gz') as tar:
-                            tar.extractall()
+                            # return the member of the archive as list
+                            members = tar.getmembers()
+                            # get the list length as total files
+                            total_files = len(members)
+                            for i, member in enumerate(members,1):
+                                # extract the single member of members
+                                tar.extract(member)
+                                # send percentage number to progress 
+                                self.progress.emit(str(int(i/total_files*100)))
                         # extract finish
-                        self.progress.emit("✅ Extracting finish")
+                        self.progress.emit("✅ Extracting finished")
                     except tarfile.ReadError as e:
                         # extract error
                         self.progress.emit("❌ {}".format(e))
@@ -61,8 +68,8 @@ class DownloadThread(QThread):
         
     def report_hook(self, count, block_size, total_size):
         if total_size > 0:
-            progress = int(count * block_size * 100 / total_size)
-            self.progress.emit(str(progress))
+            progress_download = int(count * block_size * 100 / total_size)
+            self.progress.emit(str(progress_download))
 
 class CopyThread(QThread):
     
@@ -78,30 +85,35 @@ class CopyThread(QThread):
     def run(self):
         if len(os.listdir(self.target)) == 0:
             try:
+                # get total_size space of source in byte
                 total_size_source_in_byte = os.path.getsize(self.source)
+                # get totel_size space of source in GiB
                 total_size_source_in_gib = self.Mibloader.bytesto(bytes = total_size_source_in_byte, to = 'g', digits=4)
+                # compare the target freespace with totel_size space of souce in GiB
                 if self.target_fs > total_size_source_in_gib:
-                    print("copy")
+                    for item in os.listdir(self.source):
+                        print(item)
+                        if os.path.isdir(os.path.join(self.source, item)):
+                            shutil.copytree(os.path.join(self.source, item), self.target)
                 else:
                     self.progress.emit("⚠️ free space in targetpath isn't enough")
             except:
                 pass
 
 
-
-
-
-
-    
-
 class DownloadManager(QWidget):
     '''
     Download Ui - showing the the download pregress and status
     '''
+    # var in download progress
     url = ""
     filename = ""
     description = ""
     tempo_freespace = 0
+    # var in copy progress
+    tempo_source = ""
+    target  = ""
+    target_freespace = 0                             
         
     def initUI(self):
         self.setWindowIcon(QtGui.QIcon(":/Image/download.png"))
@@ -119,10 +131,15 @@ class DownloadManager(QWidget):
         self.show()
     
     def downloadFile(self):
-        self.thread = DownloadThread(self.url, self.filename, self.tempo_freespace)
-        self.thread.progress.connect(self.downloadProgress)
-        self.thread.finished.connect(self.downloadFinished)
-        self.thread.start()
+        self.thread_d = DownloadThread(self.url, self.filename, self.tempo_freespace)
+        self.thread_d.progress.connect(self.downloadProgress)
+        self.thread_d.finished.connect(self.downloadFinished)
+        self.thread_d.start()
+
+    def copyFile(self):
+        self.thread_c = CopyThread(tempo_source=self.tempo_source,target=self.target, target_freespace=self.target_freespace)
+        self.thread_c.finished.connect(self.copyFinished)
+        self.thread_c.start()
     
     @pyqtSlot(str)
     def downloadProgress(self, P):
@@ -132,42 +149,12 @@ class DownloadManager(QWidget):
             self.label.setText(f"{P}")
      
     def downloadFinished(self):
-        self.thread.quit()
-
+        self.thread_d.quit()
         QtCore.QTimer.singleShot(1700, self.close)
 
-    # def getfreespace(self, path):
-    #     '''
-    #     get current disk free space, return value in gigabyte
-    #     '''
-    #     try:
-    #         stat = shutil.disk_usage(path)
-    #         freesp = self.bytesto(bytes=stat.free, to = 'g')
-    #         return freesp
-    #     except FileNotFoundError:
-    #         pass
-    
-    # def openfolder(self):
-    #     '''
-    #     open browser, return selected folder path
-    #     '''
-    #     folderpath = QFileDialog.getExistingDirectory(parent=None, caption="select folder", directory= "{}".format(os.path.expanduser("~/Desktop")))
-    #     return folderpath
-
-    # def resetpath(self, LineE, LB):
-    #     '''
-    #     get new path
-    #     rewrite new path in line editor
-    #     get free space of new path
-    #     rewrite free space in label
-    #     '''
-    #     newpath = self.openfolder()
-    #     LineE.setText(newpath)
-    #     if self.getfreespace(newpath) is not None:
-    #         LB.setText("Free space: {} G".format(self.getfreespace(newpath)))
-    #     else:
-    #         LB.setText("Free space: -")
-
+    def copyFinished(self):
+        self.thread_c.quit()
+        QtCore.QTimer.singleShot(1700, self.close)
 
 class Ui_MIBloader(QWidget):
 
@@ -266,8 +253,8 @@ class Ui_MIBloader(QWidget):
         self.LB_destination.setText(_translate("MIBloader", "Destination"))
         self.LB_tempopath.setText(_translate("MIBloader", "TempoPath"))
         # self.LE_source.setText("http://artefact-repo.mib3.technisat-digital/bob_0_19/6d/3a/db613623031c69b6b94457b51b3590b0c5cd5f01b1460f7d999fe4228dfff9fa91b58634d59a-1.tgz")
-        self.LE_source.setText("https://www.esa.int/var/esa/storage/images/esa_multimedia/images/2015/04/the_big_picture/15346488-1-eng-GB/The_big_picture.jpg")
-    
+        # self.LE_source.setText("https://www.esa.int/var/esa/storage/images/esa_multimedia/images/2015/04/the_big_picture/15346488-1-eng-GB/The_big_picture.jpg")
+        self.LE_source.setText("file:///C:/Users/ironm/Downloads/pokemon.tgz")
     def download(self, url, newname):
         newname = self.lineEdit_rename.text()
         print(newname)
@@ -304,6 +291,14 @@ class Ui_MIBloader(QWidget):
             self.DM.tempo_freespace = 0.0
         self.DM.initUI()
         self.DM.downloadFile()
+        
+        self.CM = DownloadManager()
+        self.CM.tempo_source = "D:/Raspberry/Code/GUI/PokemonExercise"
+        self.CM.target  = ""
+        self.CM.target_freespace = 0             
+        
+        self.DM.initUI()
+        
 
     def showdownloaddialog(self):
         self.MIBloader = QtWidgets.QDialog()
