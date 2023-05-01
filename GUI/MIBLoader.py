@@ -83,22 +83,33 @@ class CopyThread(QThread):
         self.Mibloader = Ui_MIBloader()
 
     def run(self):
-        if len(os.listdir(self.target)) == 0:
+        # print("run")
+        # print([f for f in os.listdir(self.target) if not f.startswith("'")])
+        if len([f for f in os.listdir(self.target) if f != 'System Volume Information']) == 0:
             try:
                 # get total_size space of source in byte
                 total_size_source_in_byte = os.path.getsize(self.source)
                 # get totel_size space of source in GiB
                 total_size_source_in_gib = self.Mibloader.bytesto(bytes = total_size_source_in_byte, to = 'g', digits=4)
+                print(total_size_source_in_gib)
                 # compare the target freespace with totel_size space of souce in GiB
                 if self.target_fs > total_size_source_in_gib:
                     for item in os.listdir(self.source):
-                        print(item)
                         if os.path.isdir(os.path.join(self.source, item)):
-                            shutil.copytree(os.path.join(self.source, item), self.target)
+                            print(os.path.join(self.source, item))
+                            print(os.path.join(self.target, item))
+                            shutil.copytree(os.path.join(self.source, item), os.path.join(self.target, item))
                 else:
                     self.progress.emit("⚠️ free space in targetpath isn't enough")
             except:
-                pass
+                print("copy failed")
+        else:
+            for f in os.listdir(self.target):
+                if f != 'System Volume Information':
+                     shutil.rmtree(os.path.join(self.target, f))
+            # Recursive 
+            return self.run()
+            
 
 
 class DownloadManager(QWidget):
@@ -137,7 +148,8 @@ class DownloadManager(QWidget):
         self.thread_d.start()
 
     def copyFile(self):
-        self.thread_c = CopyThread(tempo_source=self.tempo_source,target=self.target, target_freespace=self.target_freespace)
+        self.thread_c = CopyThread(self.tempo_source,self.target, self.target_freespace)
+        self.thread_c.progress.connect(self.downloadProgress)
         self.thread_c.finished.connect(self.copyFinished)
         self.thread_c.start()
     
@@ -278,9 +290,7 @@ class Ui_MIBloader(QWidget):
             return self.showdownloaddialog()
         # download file by using url and with file name in tempopath
         self.tempopath = os.path.join(self.LE_TempoPath.text(), newname)
-        print(self.tempopath)
-        print(url)
-
+        # download thread 
         self.DM = DownloadManager()
         self.DM.url = url
         self.DM.filename = self.tempopath
@@ -291,13 +301,20 @@ class Ui_MIBloader(QWidget):
             self.DM.tempo_freespace = 0.0
         self.DM.initUI()
         self.DM.downloadFile()
-        
+        # copy thread
         self.CM = DownloadManager()
-        self.CM.tempo_source = "D:/Raspberry/Code/GUI/PokemonExercise"
-        self.CM.target  = ""
-        self.CM.target_freespace = 0             
-        
-        self.DM.initUI()
+        self.CM.tempo_source = "D:/Raspberry/Code/GUI/PokemonExercise/"
+        self.CM.target = self.LE_destination.text()
+        print(self.CM.target)
+        self.CM.description = "📀 Copying..."
+        try:
+            self.CM.target_freespace = float(self.LB_usbfreespace.text().split(' ')[-2])
+            print(self.CM.target_freespace)
+        except:
+            self.CM.target_freespace = 0.0
+
+        self.CM.initUI()
+        self.CM.copyFile()
         
 
     def showdownloaddialog(self):
