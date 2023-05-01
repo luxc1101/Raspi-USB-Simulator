@@ -53,10 +53,10 @@ for i in range(len(device_dict["FileSys"])):
     MPDic[i] = device_dict["FileSys"][str(i)]["mnt"]
 
 # others
-WaDo = sys.argv[0]
-Samba = sys.argv[1]
-# WaDo = sys.argv[1]
-# Samba = sys.argv[2]
+# WaDo = sys.argv[0]
+# Samba = sys.argv[1]
+WaDo = sys.argv[1]
+Samba = sys.argv[2]
 # tab = sys.argv[3]
 diclen = len(FileImgDic)
 
@@ -399,5 +399,5 @@ def USBSIM(FileImgDic, MPDic, WaDo, Samba):
         print("KeyboardInterrupt")
 
 if __name__ == "__main__":
-    create_alias(".bash_aliases", "usbsim", '''"'"python '$(ls | grep mountfs)' '$WaDo' '$Samba'"'"''', "mountfs")
+    # create_alias(".bash_aliases", "usbsim", '''"'"python '$(ls | grep mountfs)' '$WaDo' '$Samba'"'"''', "mountfs")
     USBSIM(FileImgDic, MPDic, WaDo, Samba)
