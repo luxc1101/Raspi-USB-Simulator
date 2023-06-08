@@ -1,10 +1,10 @@
 import os
 import shutil
 import sys
+import tarfile
 import time
 import urllib.request
-import tarfile
-from tqdm import tqdm
+
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import QThread, pyqtSignal, pyqtSlot
 from PyQt5.QtWidgets import (QFileDialog, QMainWindow, QMessageBox,
