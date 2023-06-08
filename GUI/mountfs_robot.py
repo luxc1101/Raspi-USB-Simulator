@@ -128,12 +128,9 @@ def menu():
     sys.stdout.write("9: partitions" + "\n")
     sys.stdout.write("10: Software update" + "\n")
     sys.stdout.write("11: device simultion" + "\n")
-    sys.stdout.write(Green + "r: remount" + "\n")
-    sys.stdout.write("q: quit and eject the USB" + "\n")
-    sys.stdout.write("e: eject current USB drive" + "\n")
+    sys.stdout.write(Green + "q: quit and eject the USB" + "\n")
     sys.stdout.write(
-        "c: cancel or terminate the currently running program" + "\n")
-    sys.stdout.write("d: delete filesystem image"+ C_off + "\n")
+        "c: cancel or terminate the currently running program" + C_off +"\n")
 
 def modifyfile(file:str, img:str, MP:str):
     '''
@@ -168,7 +165,7 @@ def modifyfile(file:str, img:str, MP:str):
 def USBSIM(FileImgDic, MPDic, WaDo, Samba, ID):
 
     def checkinput(Input):
-        if (Input.lower() not in ["r", "q", "c", "e", "d"]) and (Input not in [str(i) for i in range(diclen+1)]):
+        if (Input.lower() not in ["q", "c"]) and (Input not in [str(i) for i in range(diclen+1)]):
             print(Red + "Warning: " + "invalid input, retry to enter" + C_off)
             return False
         return True
@@ -191,22 +188,6 @@ def USBSIM(FileImgDic, MPDic, WaDo, Samba, ID):
             # return USBSIM(FileImgDic, MPDic, WaDo, Samba)
         
         # base case: remount
-        elif Input.lower() == "r":
-            print(Cyan + "list the already remounted filesytems")
-            lsblk()
-            Input = input(
-                Cyan + "which filesystem will be remounted: " + C_off)
-            if checkinput(Input):
-                print(Cyan + "remount " + Red +
-                        Imgdic[int(Input)] + Cyan + " filesystem")
-                remount(Imgdic[int(Input)])
-                # check if samba and watchdog service active or not, active return '0' deactive return '2' 
-                if int(Samba) == 2:
-                    sambaconf(PKG='samba', img= Imgdic[int(Input)].lower(), MP= MPdic[int(Input)])
-                if int(WaDo) == 2:
-                    modifyfile(file="fswd.py", img = Imgdic[int(Input)].lower(), MP= MPdic[int(Input)])
-                    os.system("sudo systemctl restart fswd")
-                # return USBSIM(FileImgDic, MPDic, WaDo, Samba)
         
         # base case: cancel currently programm
         elif Input.lower() == "c":
@@ -222,24 +203,8 @@ def USBSIM(FileImgDic, MPDic, WaDo, Samba, ID):
             return
 
         # base case: eject current mounted USB Filesystem or refresh
-        elif Input.lower() == "e":
-            print(Cyan + "eject current USB drive and refresh")
-            os.system('sudo /sbin/modprobe g_multi -r')  # unmount first
-            # return USBSIM(FileImgDic, MPDic, WaDo, Samba)
 
         # base case: delete filesystem img
-        elif Input.lower() == "d":
-            dInput = input(Cyan + "which filesystem will be deleted: " + C_off)
-            try:
-                os.system("sudo rm {}.img".format(dInput))
-                lpd = os.popen("lsblk -f | grep '/mnt/usb_{}'".format(dInput)).read().split("\n")[0].split(" ")[0]
-                os.system("sudo umount /dev/{}".format(lpd))
-                os.system("sudo rm -r /mnt/usb_{}".format(dInput))
-                print("delete {}.img -> umount {} -> remove /mnt/usb_{}".format(dInput, lpd, dInput))
-            except FileExistsError as e:
-                print(Red + e + C_off)
-            # return USBSIM(FileImgDic, MPDic, WaDo, Samba)
-
 
         # base case: USB simulator
         else:
