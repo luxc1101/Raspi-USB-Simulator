@@ -187,7 +187,8 @@ def USBSIM(FileImgDic, MPDic, WaDo, Samba, ID):
         
         # base case: invalid input
         if not checkinput(Input):
-            return USBSIM(FileImgDic, MPDic, WaDo, Samba)
+            pass
+            # return USBSIM(FileImgDic, MPDic, WaDo, Samba)
         
         # base case: remount
         elif Input.lower() == "r":
@@ -205,7 +206,7 @@ def USBSIM(FileImgDic, MPDic, WaDo, Samba, ID):
                 if int(WaDo) == 2:
                     modifyfile(file="fswd.py", img = Imgdic[int(Input)].lower(), MP= MPdic[int(Input)])
                     os.system("sudo systemctl restart fswd")
-                return USBSIM(FileImgDic, MPDic, WaDo, Samba)
+                # return USBSIM(FileImgDic, MPDic, WaDo, Samba)
         
         # base case: cancel currently programm
         elif Input.lower() == "c":
@@ -224,7 +225,7 @@ def USBSIM(FileImgDic, MPDic, WaDo, Samba, ID):
         elif Input.lower() == "e":
             print(Cyan + "eject current USB drive and refresh")
             os.system('sudo /sbin/modprobe g_multi -r')  # unmount first
-            return USBSIM(FileImgDic, MPDic, WaDo, Samba)
+            # return USBSIM(FileImgDic, MPDic, WaDo, Samba)
 
         # base case: delete filesystem img
         elif Input.lower() == "d":
@@ -237,7 +238,7 @@ def USBSIM(FileImgDic, MPDic, WaDo, Samba, ID):
                 print("delete {}.img -> umount {} -> remove /mnt/usb_{}".format(dInput, lpd, dInput))
             except FileExistsError as e:
                 print(Red + e + C_off)
-            return USBSIM(FileImgDic, MPDic, WaDo, Samba)
+            # return USBSIM(FileImgDic, MPDic, WaDo, Samba)
 
 
         # base case: USB simulator
@@ -296,9 +297,9 @@ def USBSIM(FileImgDic, MPDic, WaDo, Samba, ID):
                 print(Cyan + "+" * 60 + C_off)
 
             
-            return USBSIM(FileImgDic, MPDic, WaDo, Samba)
+            # return USBSIM(FileImgDic, MPDic, WaDo, Samba, ID)
     except KeyboardInterrupt:
         print("KeyboardInterrupt")
 
 if __name__ == "__main__":
-    USBSIM(FileImgDic, MPDic, WaDo, Samba)
+    USBSIM(FileImgDic, MPDic, WaDo, Samba, ID)
