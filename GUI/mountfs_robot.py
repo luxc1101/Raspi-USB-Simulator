@@ -21,17 +21,15 @@ with open(os.path.join(os.getcwd(),"device.json"),'r', encoding="utf8") as f:
     device_dict = json.load(f)
     f.close()
 FileImgDic, MPDic = {}, {}
-for i in range(len(device_dict["FileSys"])):
-    FileImgDic[i] = device_dict["FileSys"][str(i)]["img"]
-    MPDic[i] = device_dict["FileSys"][str(i)]["mnt"]
+for k in device_dict["FileSysRobot"].keys():
+    FileImgDic[k] = device_dict["FileSysRobot"][k]["img"]
+    MPDic[k] = device_dict["FileSysRobot"][k]["mnt"]
 
 # others
-# WaDo = sys.argv[0]
-# Samba = sys.argv[1]
 WaDo = sys.argv[1]
 Samba = sys.argv[2]
-ID = sys.argv[3]
-diclen = len(FileImgDic)
+FS = sys.argv[3].upper()
+dictkey = FileImgDic.keys()
 
 # color
 Cyan = '\033[1;96m'
@@ -39,16 +37,14 @@ Yellow = '\033[1;93m'
 Green = '\033[1;92m'
 Red = '\033[1;91m'
 C_off = '\033[0m'
+
 ##########################
 #       Functions        #
 ##########################
-
-
 def getfsname(img: str):
     return img.split(".")[0]
 
 # remount filesystem
-
 
 def remount(file):
     os.system('sudo /sbin/modprobe g_multi -r')
@@ -116,26 +112,11 @@ def sambaconf(PKG: str, img: str, MP: str):
 ## menu
 def menu():
     sys.stdout.write(Cyan + "Please select one filesystem to mount" + "\n")
-    sys.stdout.write(Yellow + "0: MIB Compliance Media" + "\n")
-    sys.stdout.write("1: ext2" + "\n")
-    sys.stdout.write("2: ext3" + "\n")
-    sys.stdout.write("3: ext4" + "\n")
-    sys.stdout.write("4: fat16" + "\n")
-    sys.stdout.write("5: fat32" + "\n")
-    sys.stdout.write("6: ntfs" + "\n")
-    sys.stdout.write("7: exfat" + "\n")
-    sys.stdout.write("8: hfsplus" + "\n")
-    sys.stdout.write("9: partitions" + "\n")
-    sys.stdout.write("10: Software update" + "\n")
-    sys.stdout.write("11: device simultion" + "\n")
-    sys.stdout.write(Green + "q: quit and eject the USB" + "\n")
-    sys.stdout.write(
-        "c: cancel or terminate the currently running program" + C_off +"\n")
 
 def modifyfile(file:str, img:str, MP:str):
-    '''
-    modify the watchdog file, the path unter wachting will be change mit mounted filsystem
-    '''
+    
+    # modify the watchdog file, the path unter wachting will be change mit mounted filsystem
+    
     reading_file = open(file, "r")
     new_file_content = ""
     for line in reading_file:
@@ -162,10 +143,13 @@ def modifyfile(file:str, img:str, MP:str):
 ##########################
 #     Recursive Algo     #
 ##########################
-def USBSIM(FileImgDic, MPDic, WaDo, Samba, ID):
+def USBSIM(FileImgDic, MPDic, WaDo, Samba, FS):
 
     def checkinput(Input):
-        if (Input.lower() not in ["q", "c"]) and (Input not in [str(i) for i in range(diclen+1)]):
+        '''
+        check if the input is valid, retrun True or False
+        '''
+        if (Input not in ["QUIT", "CANCEL"]) and (Input not in dictkey):
             print(Red + "Warning: " + "invalid input, retry to enter" + C_off)
             return False
         return True
@@ -178,39 +162,38 @@ def USBSIM(FileImgDic, MPDic, WaDo, Samba, ID):
     try:
         Imgdic = FileImgDic
         MPdic = MPDic
-
+        Input = FS.upper()
         menu()
-        Input = ID
         
         # base case: invalid input
         if not checkinput(Input):
-            pass
+            return
             # return USBSIM(FileImgDic, MPDic, WaDo, Samba)
         
-        # base case: remount
+        # base case: remount    NO USE
         
         # base case: cancel currently programm
-        elif Input.lower() == "c":
+        elif Input == "CANCEL":
             print(Cyan + "terminate the programm")
             lsblk()
             return
 
-        # base case: quit and eject
-        elif Input.lower() == "q":
+        # base case: quit and eject     NO USE
+        elif Input == "QUIT":
             print(Cyan + "terminate the programm and eject")
             lsblk()
             os.system('sudo /sbin/modprobe g_multi -r')  # unmount first
             return
 
-        # base case: eject current mounted USB Filesystem or refresh
+        # base case: eject current mounted USB Filesystem or refresh    NO USE
 
-        # base case: delete filesystem img
+        # base case: delete filesystem img     NO USE
 
         # base case: USB simulator
         else:
-            fsname = getfsname(Imgdic[int(Input)])
-            lcimg = Imgdic[int(Input)].lower()
-            MPpath = MPdic[int(Input)]
+            fsname = getfsname(Imgdic[Input])
+            lcimg = Imgdic[Input].lower()
+            MPpath = MPdic[Input]
             print(Cyan + "prepare to mount " + Red + fsname + Cyan + " filesystem" + C_off)
             # check if the img file is already existed or not
             if os.path.exists("./{}".format(lcimg)):
@@ -234,7 +217,7 @@ def USBSIM(FileImgDic, MPDic, WaDo, Samba, ID):
                     # showing info about the mounted filesystem
                 print(Cyan + "Information about the mounted filesystem:")
                 print("="*60 + Yellow)
-                if int(Input) != 9:
+                if Input != "PARTITION":
                     # other filesystem
                     os.system("findmnt | grep -i {} | grep 'mnt'".format(fsname))
                     os.system("lsblk --fs -o NAME,FSTYPE,FSAVAIL,FSUSE%,MOUNTPOINT | grep -i {} | grep 'mnt'".format(fsname))
@@ -262,9 +245,11 @@ def USBSIM(FileImgDic, MPDic, WaDo, Samba, ID):
                 print(Cyan + "+" * 60 + C_off)
 
             
-            # return USBSIM(FileImgDic, MPDic, WaDo, Samba, ID)
+            # return USBSIM(FileImgDic, MPDic, WaDo, Samba, FS)
     except KeyboardInterrupt:
         print("KeyboardInterrupt")
 
 if __name__ == "__main__":
-    USBSIM(FileImgDic, MPDic, WaDo, Samba, ID)
+    # pass
+    USBSIM(FileImgDic, MPDic, WaDo, Samba, FS)
+
