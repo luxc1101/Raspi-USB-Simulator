@@ -219,9 +219,8 @@ def USBSIM(FileImgDic, MPDic, WaDo, Samba, FS):
                 print("="*60 + Yellow)
                 if Input != "PARTITION":
                     # other filesystem
-                    os.system("findmnt | grep -i {} | grep 'mnt'".format(fsname))
-                    os.system("lsblk --fs -o NAME,FSTYPE,FSAVAIL,FSUSE%,MOUNTPOINT | grep -i {} | grep 'mnt'".format(fsname))
-                    print(Cyan + "=" * 60)
+                    os.system("findmnt | grep -i {} | while read MP SOURCE FS OP; do echo MountPoint:$MP Source:$SOURCE FStype:$FS Option:$OP; done".format(MPpath))
+                    os.system("lsblk --fs -o NAME,FSTYPE,FSAVAIL,FSUSE%,MOUNTPOINT | grep -i {} | while read NAME FS FSAVAIL FSUSE MP; do echo Name:$NAME FStype:$FS FSavaiable:$FSAVAIL FSused:$FSUSE MountPoint:$MP; done".format(MPpath))
                     print(">"*60)
                     # samba service config
                     if int(Samba) == 2:
