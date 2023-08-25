@@ -47,7 +47,7 @@ def Cfilesystem(img: str, MP: str):
         elif "ext4" in limg:
             # if not os.path.isdir(MP):
             os.system("sudo mkdir -p {}".format(MP))
-            os.system("sudo mkfs.ext4 -L SimEXT3 {}".format(limg))
+            os.system("sudo mkfs.ext4 -L SimEXT4 {}".format(limg))
             os.system("sudo tune2fs -c0 -i0 {}".format(limg))
         elif "fat16" in limg:
             # if not os.path.isdir(MP):
