@@ -87,7 +87,10 @@ class Ui_Form(object):
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">+ add wifi auto connection and disconnection; </span></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">+ fix cmd send line issue (after clicken clear the cmd content </span><a href=\"https://doc.qt.io/qt-6/qlineedit.html\"><span style=\" font-size:8pt; font-weight:600; text-decoration: underline; color:#0000ff;\">QLineEdit</span></a><span style=\" font-size:8pt;\">); </span></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">+ change the file system from </span><span style=\" font-size:8pt; text-decoration: underline;\">fat32</span><span style=\" font-size:8pt;\"> to </span><span style=\" font-size:8pt; text-decoration: underline;\">ntfs</span><span style=\" font-size:8pt;\"> for not</span><span style=\" font-size:8pt; text-decoration: underline;\">mib complicance media</span><span style=\" font-size:8pt;\">;</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">+ change the remote folder path;</span></p></body></html>"))
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">+ change the remote folder path;</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt; font-weight:600; text-decoration: underline;\">0.0.2.3: </span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">+ fix that command button or press enter key will lead exe crash issue; </span></p>\n"
+"</body></html>"))
 
 
 if __name__ == "__main__":

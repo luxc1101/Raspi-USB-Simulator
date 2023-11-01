@@ -243,8 +243,10 @@ class Ui_MainWindow(QMainWindow):
         self.actionQuit.setEnabled(False)
         self.actionDelect_Img.setEnabled(False)
         self.actionRemote_folder.setEnabled(False)
+        self.B_SendCmd.setEnabled(False)
+        self.CB_SendCmd.setEnabled(False)
         self.statusBar.showMessage("Status: not connected")
-        self.VersionQL = QLabel("Version: 0.0.2.2")
+        self.VersionQL = QLabel("Version: 0.0.2.3")
         self.VersionQL.setStyleSheet('font-size:9px')
         date = "Data: {}".format(QDate.currentDate().toString(Qt.ISODate))
         self.DataQL = QLabel(date)
@@ -275,9 +277,9 @@ class Ui_MainWindow(QMainWindow):
         self.actionHelp.triggered.connect(self.helpWin)
         self.actionDelect_Img.triggered.connect(self.DeleteImg)
         self.actionRemote_folder.triggered.connect(self.remoteFolder)
-        self.B_SendCmd.clicked.connect(lambda: self.SendCommand(self.cmd_dic[self.LE_SendCmd.text()]))
+        self.B_SendCmd.clicked.connect(lambda: self.SendCommand(self.LE_SendCmd.text()))
         # enter key to send cmd
-        self.LE_SendCmd.returnPressed.connect(lambda: self.SendCommand(self.cmd_dic[self.LE_SendCmd.text()]))
+        self.LE_SendCmd.returnPressed.connect(lambda: self.SendCommand(self.LE_SendCmd.text()))
         self.thread = {}
         
 
@@ -345,8 +347,16 @@ class Ui_MainWindow(QMainWindow):
         '''
         send command to PuTTY Terminal
         '''
-        self.Putty.send_keystrokes(cmd)
+        if cmd in self.cmd_dic.keys():
+            self.Putty.send_keystrokes(self.cmd_dic[cmd])
+            if self.cmd_dic[cmd] == "q":
+                self.actionEject.setEnabled(False)
+                self.actionQuit.setEnabled(True)
+        else:
+            self.Putty.send_keystrokes(cmd)
+        
         self.Putty.send_keystrokes("{ENTER}")
+
         if len(self.LE_SendCmd.text()) != 0:
             self.LE_SendCmd.clear()
 
@@ -399,6 +409,8 @@ class Ui_MainWindow(QMainWindow):
             self.actionDelect_Img.setEnabled(True)
             self.actionAnpassen.setEnabled(False)
             self.actionRemote_folder.setEnabled(False)
+            self.B_SendCmd.setEnabled(True)
+            self.CB_SendCmd.setEnabled(True)
         except:
             pass
 
@@ -413,6 +425,8 @@ class Ui_MainWindow(QMainWindow):
         self.actionQuit.setEnabled(False)
         self.comboBox.setEnabled(False)
         self.actionDelect_Img.setEnabled(False)
+        self.B_SendCmd.setEnabled(False)
+        self.CB_SendCmd.setEnabled(False)
         self.statusBar.showMessage("Logout and PuTTY exited")
         self.LB_Samba.setStyleSheet("background-color: gray; border: 1px solid black; border-radius: 4px")
         self.LB_Samba.setText("Samba")
