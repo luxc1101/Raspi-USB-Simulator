@@ -315,7 +315,7 @@ class Ui_MainWindow(QMainWindow):
         self.actionQuit.setEnabled(False)
         self.actionDelect_Img.setEnabled(False)
         self.actionRemote_folder.setEnabled(False)
-        self.actionMIB_SWLoader.setEnabled(True)
+        self.actionMIB_SWLoader.setEnabled(False)
         self.B_SendCmd.setEnabled(False)
         self.CB_SendCmd.setEnabled(False)
         self.statusBar.showMessage("Status: not connected")
