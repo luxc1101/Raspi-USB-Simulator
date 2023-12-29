@@ -32,6 +32,9 @@ class VLine(QFrame):
         self.setFrameShape(self.VLine|self.Sunken)
 
 class Ui_MainWindow(QMainWindow):
+    '''
+    raspi simulator GUI main window
+    '''
     Putty = None
     Logging = None
     Param = None
@@ -51,7 +54,8 @@ class Ui_MainWindow(QMainWindow):
 
     def configWin(self):
         '''
-        show configuration dialog and pass config param to main window
+        call configuration dialog
+        pass config param to main window
         '''
         self.Confwin = QtWidgets.QDialog()
         self.ui = Ui_ConfigDialog()
@@ -61,7 +65,7 @@ class Ui_MainWindow(QMainWindow):
         
     def helpWin(self):
         '''
-        show info about this tool and quick user guide
+        call info about this tool and quick user guide
         '''
         self.Helpwin = QtWidgets.QDialog()
         self.ui = Ui_Form()
@@ -76,23 +80,24 @@ class Ui_MainWindow(QMainWindow):
 ###########################################################################
         self.centralWidget = QtWidgets.QWidget(MainWindow)
         self.centralWidget.setObjectName("centralWidget")
-        self.gridLayout_5 = QtWidgets.QGridLayout(self.centralWidget)
-        self.gridLayout_5.setContentsMargins(11, 11, 11, 11)
-        self.gridLayout_5.setSpacing(6)
-        self.gridLayout_5.setObjectName("gridLayout_5")
-        self.groupBox_mtfs = QtWidgets.QGroupBox(self.centralWidget)
+        self.gridLayout_base = QtWidgets.QGridLayout(self.centralWidget)
+        self.gridLayout_base.setContentsMargins(11, 11, 11, 11)
+        self.gridLayout_base.setSpacing(6)
+        self.gridLayout_base.setObjectName("gridLayout_base")
+        self.groupBox_mtfs = QtWidgets.QGroupBox(self.centralWidget) # gourp box mount filesystem
         self.groupBox_mtfs.setObjectName("groupBox_mtfs")
-        font = QtGui.QFont()
-        font.setBold(True)
-        font.setWeight(75)
+        
+        font = QtGui.QFont() # create font
+        font.setBold(True) # bold
+        font.setWeight(75) # weight
 
-        self.gridLayout_2 = QtWidgets.QGridLayout(self.groupBox_mtfs)
-        self.gridLayout_2.setContentsMargins(11, 11, 11, 11)
-        self.gridLayout_2.setSpacing(6)
-        self.gridLayout_2.setObjectName("gridLayout_2")
-        self.gridLayout_3 = QtWidgets.QGridLayout()
-        self.gridLayout_3.setSpacing(6)
-        self.gridLayout_3.setObjectName("gridLayout_3")
+        self.gridLayout_second = QtWidgets.QGridLayout(self.groupBox_mtfs)
+        self.gridLayout_second.setContentsMargins(11, 11, 11, 11)
+        self.gridLayout_second.setSpacing(6)
+        self.gridLayout_second.setObjectName("gridLayout_second")
+        self.gridLayout_mtfs_helper = QtWidgets.QGridLayout()
+        self.gridLayout_mtfs_helper.setSpacing(6)
+        self.gridLayout_mtfs_helper.setObjectName("gridLayout_mtfs_helper")
         self.formLayout = QtWidgets.QFormLayout()
         self.formLayout.setSpacing(6)
         self.formLayout.setObjectName("formLayout")
@@ -107,15 +112,15 @@ class Ui_MainWindow(QMainWindow):
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setSpacing(6)
         self.horizontalLayout.setObjectName("horizontalLayout")
-        self.LB_Img = QtWidgets.QLabel(self.groupBox_mtfs)
+        self.LB_Img = QtWidgets.QLabel(self.groupBox_mtfs) # label filesystem img
         self.LB_Img.setAlignment(QtCore.Qt.AlignCenter)
         self.LB_Img.setObjectName("LB_Img")
         self.horizontalLayout.addWidget(self.LB_Img)
-        self.LB_WaDo = QtWidgets.QLabel(self.groupBox_mtfs)
+        self.LB_WaDo = QtWidgets.QLabel(self.groupBox_mtfs) # label watchdog
         self.LB_WaDo.setAlignment(QtCore.Qt.AlignCenter)
         self.LB_WaDo.setObjectName("LB_WaDo")
         self.horizontalLayout.addWidget(self.LB_WaDo)
-        self.LB_Samba = QtWidgets.QLabel(self.groupBox_mtfs)
+        self.LB_Samba = QtWidgets.QLabel(self.groupBox_mtfs) # label samba 
         self.LB_Samba.setAlignment(QtCore.Qt.AlignCenter)
         self.LB_Samba.setObjectName("LB_Samba")
         self.horizontalLayout.addWidget(self.LB_Samba)
@@ -123,9 +128,9 @@ class Ui_MainWindow(QMainWindow):
         self.LB_Status = QtWidgets.QLabel(self.groupBox_mtfs)
         self.LB_Status.setObjectName("LB_Status")
         self.formLayout.setWidget(1, QtWidgets.QFormLayout.LabelRole, self.LB_Status)
-        self.gridLayout_3.addLayout(self.formLayout, 0, 0, 1, 1)
-        self.gridLayout_2.addLayout(self.gridLayout_3, 0, 0, 1, 1)
-        self.gridLayout_5.addWidget(self.groupBox_mtfs, 0, 0, 1, 1)
+        self.gridLayout_mtfs_helper.addLayout(self.formLayout, 0, 0, 1, 1)
+        self.gridLayout_second.addLayout(self.gridLayout_mtfs_helper, 0, 0, 1, 1)
+        self.gridLayout_base.addWidget(self.groupBox_mtfs, 0, 0, 1, 1)
         self.groupBox_trace = QtWidgets.QGroupBox(self.centralWidget)
         self.groupBox_trace.setObjectName("groupBox_trace")
         self.gridLayout = QtWidgets.QGridLayout(self.groupBox_trace)
@@ -135,13 +140,13 @@ class Ui_MainWindow(QMainWindow):
         self.textEdit_trace = QtWidgets.QTextEdit(self.groupBox_trace, readOnly= True)
         self.textEdit_trace.setObjectName("textEdit_trace")
         self.gridLayout.addWidget(self.textEdit_trace, 0, 0, 1, 1)
-        self.gridLayout_5.addWidget(self.groupBox_trace, 1, 0, 1, 1)
+        self.gridLayout_base.addWidget(self.groupBox_trace, 1, 0, 1, 1)
         self.groupBox_Cmd = QtWidgets.QGroupBox(self.centralWidget)
         self.groupBox_Cmd.setObjectName("groupBox_Cmd")
-        self.gridLayout_4 = QtWidgets.QGridLayout(self.groupBox_Cmd)
-        self.gridLayout_4.setContentsMargins(11, 11, 11, 11)
-        self.gridLayout_4.setSpacing(6)
-        self.gridLayout_4.setObjectName("gridLayout_4")
+        self.gridLayout_cmdline = QtWidgets.QGridLayout(self.groupBox_Cmd)
+        self.gridLayout_cmdline.setContentsMargins(11, 11, 11, 11)
+        self.gridLayout_cmdline.setSpacing(6)
+        self.gridLayout_cmdline.setObjectName("gridLayout_cmdline")
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_2.setSpacing(6)
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
@@ -150,8 +155,8 @@ class Ui_MainWindow(QMainWindow):
         self.CB_SendCmd.setObjectName("CB_SendCmd")
         key_list = ["", "remount", "quit + eject", "cancel or terminate", "power off raspi", "usbsim", "usbsim with W+S"]
         cmd_list = ["", "r", "q", "c", "sudo halt", "WaDo='0'&&Samba='0'&&usbsim", "WaDo='2'&&Samba='2'&&usbsim"]
-        self.cmd_dic = dict(zip(key_list, cmd_list))
-        self.CB_SendCmd.addItems(self.cmd_dic.keys())
+        self.cmd_dic = dict(zip(key_list, cmd_list)) # command dictionary
+        self.CB_SendCmd.addItems(self.cmd_dic.keys()) # add command dirctionary keys to combobox
 
         self.LE_SendCmd = QtWidgets.QLineEdit(self.groupBox_Cmd)
         self.LE_SendCmd.setObjectName("LE_SendCmd")
@@ -161,8 +166,8 @@ class Ui_MainWindow(QMainWindow):
         self.B_SendCmd.setObjectName("B_SendCmd")
         self.B_SendCmd.setFixedSize(65,25)
         self.horizontalLayout_2.addWidget(self.B_SendCmd)
-        self.gridLayout_4.addLayout(self.horizontalLayout_2, 0, 0, 1, 1)
-        self.gridLayout_5.addWidget(self.groupBox_Cmd, 2, 0, 1, 1)
+        self.gridLayout_cmdline.addLayout(self.horizontalLayout_2, 0, 0, 1, 1)
+        self.gridLayout_base.addWidget(self.groupBox_Cmd, 2, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralWidget)
         self.menuBar = QtWidgets.QMenuBar(MainWindow)
         self.menuBar.setGeometry(QtCore.QRect(0, 0, 349, 21))
@@ -367,7 +372,7 @@ class Ui_MainWindow(QMainWindow):
         self.Param = param
         try:
             self.app = Application().start(
-                r"{} -ssh pi@{}".format(param["PuTTY_Path"], param["IP"]))
+                r"{} -ssh pi@{}".format(param["PuTTY_Path"], param["IP"])) # call PuTTY
             self.Putty = self.app.PuTTY
             self.Putty.wait('ready')
             time.sleep(1)
@@ -413,7 +418,6 @@ class Ui_MainWindow(QMainWindow):
             self.CB_SendCmd.setEnabled(True)
         except:
             pass
-
 
 
     def PuTTYExit(self):
