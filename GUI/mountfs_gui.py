@@ -118,9 +118,9 @@ def sambaconf(PKG: str, img: str, MP: str):
             "grep -n 'raspiusb' {} | cut -d: -f1".format(conf)).read().split("\n")[0]
         # print ("the lineNr is: {}".format(lineNr))
         os.system(
-            "sudo sed -i '{}s/.*/[raspiusb_{}]/' {}".format(lineNr, getfsname(img), conf))
-        os.system("sudo sed -i '/mnt/d' {}".format(conf))
-        os.system("sudo sed -i -e '$a path = {}' {}".format(MP, conf))
+            "sudo sed -i '{}s/.*/[raspiusb_{}]/' {}".format(lineNr, getfsname(img), conf)) # rename remote folder
+        os.system("sudo sed -i '/mnt/d' {}".format(conf)) # delete the line containing '/mnt/'
+        os.system("sudo sed -i -e '$a path = {}' {}".format(MP, conf)) # add path line
 
     os.system("sudo systemctl restart smbd.service")
     sys.stdout.write("{}status of samba service-> \n".format(Cyan))
@@ -296,7 +296,7 @@ def USBSIM(FileImgDic, MPDic, WaDo, Samba):
                 if int(Samba) == 2:
                     sambaconf(PKG='samba', img= Imgdic[int(Input)].lower(), MP= MPdic[int(Input)])
                 if int(WaDo) == 2:
-                    modifyfile(file="fswd.py", img = Imgdic[int(Input)].lower(), MP= MPdic[int(Input)])
+                    modifyfile(file="fswd.sh", img = Imgdic[int(Input)].lower(), MP= MPdic[int(Input)])
                     os.system("sudo systemctl restart fswd")
                 return USBSIM(FileImgDic, MPDic, WaDo, Samba)
         
@@ -377,7 +377,7 @@ def USBSIM(FileImgDic, MPDic, WaDo, Samba):
                         sambaconf(PKG='samba', img= lcimg, MP= MPpath)
                     if int(WaDo) == 2:
                         print(Cyan + "status of watchdog service-> " + Yellow)
-                        modifyfile(file="fswd.py", img = lcimg, MP= MPpath)
+                        modifyfile(file="fswd.sh", img = lcimg, MP= MPpath)
                         os.system("sudo systemctl restart fswd")
                         os.system("sudo systemctl status fswd | grep -E 'Loaded|Active|CGroup|python'")
                         print(Red + MPpath + Yellow + "  is unter watching, action timeout is 10s")

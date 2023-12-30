@@ -630,7 +630,7 @@ class Remote(QThread):
         self.img = img
     def run(self):
         try:
-        # QFileDialog.getExistingDirectory(parent=None, caption="Open directory", directory= "//{}".format(self.remoteParam["IP"]))
+            # QFileDialog.getExistingDirectory(parent=None, caption="Open directory", directory= "//{}/raspiusb_{}".format(self.remoteParam["IP"], self.img))
             QFileDialog.getOpenFileName(parent=None, caption="Open directory", directory= "//{}/raspiusb_{}".format(self.remoteParam["IP"], self.img))
         except:
             pass
