@@ -449,7 +449,8 @@ class Ui_MainWindow(QMainWindow):
         '''
         self.Param = param
         try:
-            self.app = Application().start(r"{} -ssh pi@{}".format(param["PuTTY_Path"], param["IP"]))
+            self.app = Application().start(
+                r"{} -ssh pi@{}".format(param["PuTTY_Path"], param["IP"])) # call PuTTY
             self.Putty = self.app.PuTTY
             self.Putty.wait('ready')
             time.sleep(1)
