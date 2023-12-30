@@ -172,13 +172,15 @@ def modifyfile(file:str, img:str, MP:str):
         newline = line
         if "/home/pi/" in line:
             oldline = line
-            newline = oldline.split("'/home/pi/")[0] + "'/home/pi/{}'".format(img)
+            # newline = oldline.split("'/home/pi/")[0] + "'/home/pi/{}'".format(img)
+            newline = oldline.split("/home/pi/")[0] + "/home/pi/{}".format(img)
             # print(oldline)
             newline = line.replace(oldline, newline) + "\n"
             # print(newline)
         elif "/mnt/" in line:
             oldline = line
-            newline = oldline.split("'/mnt/")[0] + "'{}'".format(MP)
+            # newline = oldline.split("'/mnt/")[0] + "'{}'".format(MP)
+            newline = oldline.split("/mnt/")[0] + "{}".format(MP)
             newline = line.replace(oldline, newline) + "\n"
         
         new_file_content += newline 
