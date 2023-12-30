@@ -172,13 +172,15 @@ def modifyfile(file:str, img:str, MP:str):
         newline = line
         if "/home/pi/" in line:
             oldline = line
-            newline = oldline.split("'/home/pi/")[0] + "'/home/pi/{}'".format(img)
+            # newline = oldline.split("'/home/pi/")[0] + "'/home/pi/{}'".format(img)
+            newline = oldline.split("/home/pi/")[0] + "/home/pi/{}".format(img)
             # print(oldline)
             newline = line.replace(oldline, newline) + "\n"
             # print(newline)
         elif "/mnt/" in line:
             oldline = line
-            newline = oldline.split("'/mnt/")[0] + "'{}'".format(MP)
+            # newline = oldline.split("'/mnt/")[0] + "'{}'".format(MP)
+            newline = oldline.split("/mnt/")[0] + "{}".format(MP)
             newline = line.replace(oldline, newline) + "\n"
         
         new_file_content += newline 
@@ -269,7 +271,7 @@ def USBSIM(FileImgDic, MPDic, WaDo, Samba):
                 if int(Samba) == 2:
                     sambaconf(PKG='samba', img= Imgdic[int(Input)].lower(), MP= MPdic[int(Input)])
                 if int(WaDo) == 2:
-                    modifyfile(file="fswd.py", img = Imgdic[int(Input)].lower(), MP= MPdic[int(Input)])
+                    modifyfile(file="fswd.sh", img = Imgdic[int(Input)].lower(), MP= MPdic[int(Input)])
                     os.system("sudo systemctl restart fswd")
                 return USBSIM(FileImgDic, MPDic, WaDo, Samba)
         
@@ -367,7 +369,7 @@ def USBSIM(FileImgDic, MPDic, WaDo, Samba):
                         sambaconf(PKG='samba', img= lcimg, MP= MPpath)
                     if int(WaDo) == 2:
                         print(Cyan + "status of watchdog service-> " + Yellow)
-                        modifyfile(file="fswd.py", img = lcimg, MP= MPpath)
+                        modifyfile(file="fswd.sh", img = lcimg, MP= MPpath)
                         os.system("sudo systemctl restart fswd")
                         os.system("sudo systemctl status fswd | grep -E 'Loaded|Active|CGroup|python'")
                         print(Red + MPpath + Yellow + "  is unter watching, action timeout is 10s")
