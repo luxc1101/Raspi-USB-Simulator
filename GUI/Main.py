@@ -183,9 +183,9 @@ class Ui_MainWindow(QMainWindow):
         self.label_DeviceInfo = QtWidgets.QLabel(self.DeviceSim)
         self.label_DeviceInfo.setObjectName("label_DeviceInfo")
         self.formLayout_3.setWidget(0, QtWidgets.QFormLayout.LabelRole, self.label_DeviceInfo)
-        self.comboBox_3 = QtWidgets.QComboBox(self.DeviceSim)
-        self.comboBox_3.setObjectName("comboBox_3")
-        self.formLayout_3.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.comboBox_3)
+        self.comboBox_details = QtWidgets.QComboBox(self.DeviceSim)
+        self.comboBox_details.setObjectName("comboBox_details")
+        self.formLayout_3.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.comboBox_details)
         self.verticalLayout.addLayout(self.formLayout_3)
         self.tabWidget_.addTab(self.DeviceSim, "")
         self.gridLayout_5.addWidget(self.tabWidget_, 0, 0, 1, 1)
@@ -430,7 +430,6 @@ class Ui_MainWindow(QMainWindow):
         '''
         send command to PuTTY Terminal
         '''
-        self.Putty.send_keystrokes(cmd)
         if cmd in self.cmd_dic.keys():
             self.Putty.send_keystrokes(self.cmd_dic[cmd])
             if self.cmd_dic[cmd] == "q":
@@ -438,8 +437,9 @@ class Ui_MainWindow(QMainWindow):
                 self.actionQuit.setEnabled(True)
         else:
             self.Putty.send_keystrokes(cmd)
-
+        
         self.Putty.send_keystrokes("{ENTER}")
+
         if len(self.LE_SendCmd.text()) != 0:
             self.LE_SendCmd.clear()
 
@@ -462,7 +462,7 @@ class Ui_MainWindow(QMainWindow):
                 # PT_sec_alert.Cancel.click()
             if not os.path.exists(self.Logging):
                 self.statusBar.showMessage("Login failed")
-                Ui_MainWindow.MSG(title="Error", message="Please check PuTTY's configuration and WiFi", type="e")
+                Ui_MainWindow.MSG(title="Error", message="Please check PuTTY configuration and WiFi", type="e")
                 return
             time.sleep(1)
             self.SendCommand(param["Key"])
@@ -481,8 +481,9 @@ class Ui_MainWindow(QMainWindow):
             else:
                 self.LB_WaDo.setStyleSheet("background-color: #a4efaf; border: 1px solid black; border-radius: 4px")
                 self.LB_WaDo.setText("WaDo start")
-            # # self.SendCommand("python mountfs_gui.py")
-            self.SendCommand("python {}.py '{}' '{}'".format("mountfs_gui",param["WaDo"], param["Samba"]))
+            # self.SendCommand("python mountfs_gui.py")
+            self.SendCommand("WaDo='{}'&&Samba='{}'&&usbsim".format(param["WaDo"], param["Samba"]))
+            # self.SendCommand("python {}.py '{}' '{}'".format("mountfs_gui" ,param["WaDo"], param["Samba"]))
             # self.statusBar.showMessage("PuTTY open successfully")
             self.statusBar.showMessage("Login successfully")
             self.actionMount.setEnabled(True)
@@ -583,7 +584,7 @@ class Ui_MainWindow(QMainWindow):
         self.comboBox.setEnabled(False)
         self.actionDelect_Img.setEnabled(False)
         self.tabWidget_.setEnabled(False)
-        if self.tabWidget_.currentIndex() == 0:
+        if self.tabWidget_.currentIndex() == 0: # tab 0: filesystem
             try:
                 self.thread[1].file.close()
                 self.thread[1].stop()
@@ -602,10 +603,10 @@ class Ui_MainWindow(QMainWindow):
             self.thread[1].trace_singal.connect(self.Update_logging)
             self.SendCommand(self.Filesysdict[self.comboBox.currentText()][1])
             # self.statusBar.showMessage("{} mount successfully".format(self.comboBox.currentText()))
-        if self.tabWidget_.currentIndex() == 1:
+        if self.tabWidget_.currentIndex() == 1: # tab 1: device simulation
             self.SendCommand("11")
-            time.sleep(2)
-            self.SendCommand(self.comboBox_Device.currentText() + self.comboBox_3.currentText())
+            time.sleep(1) # waiting for input
+            self.SendCommand(self.comboBox_Device.currentText() + self.comboBox_details.currentText()) # input current device name and device details 
 
 
     def Eject(self):
@@ -637,19 +638,19 @@ class Ui_MainWindow(QMainWindow):
     def device_info(self):
         if self.comboBox_Device.currentText() != "":
             if self.radioButton_0.isChecked():
-                self.comboBox_3.clear()
+                self.comboBox_details.clear()
                 supported = self.device_dict[self.comboBox_Device.currentText()]["0"]
                 for id, dev in enumerate(supported):
-                    self.comboBox_3.addItem(dev["dev"] + ':' + ' ' + dev["VID"] + ' ' +  dev["PID"])
+                    self.comboBox_details.addItem(dev["dev"] + ':' + ' ' + dev["VID"] + ' ' + dev["PID"])
 
             if self.radioButton_1.isChecked():
-                self.comboBox_3.clear()
+                self.comboBox_details.clear()
                 unsupported = self.device_dict[self.comboBox_Device.currentText()]["1"]
                 for id, dev in enumerate(unsupported):
                     # print(str(id) + '. ' +  dev["dev"] + ':' + ' ' + dev["VID"] + ' ' +  dev["PID"])
-                    self.comboBox_3.addItem(dev["dev"] + ':' + ' ' + dev["VID"] + ' ' +  dev["PID"])
+                    self.comboBox_details.addItem(dev["dev"] + ':' + ' ' + dev["VID"] + ' ' + dev["PID"])
         else:
-            self.comboBox_3.clear()
+            self.comboBox_details.clear()
  
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

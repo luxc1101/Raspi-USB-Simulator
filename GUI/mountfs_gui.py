@@ -292,6 +292,8 @@ def USBSIM(FileImgDic, MPDic, WaDo, Samba):
         elif Input.lower() == "e":
             print(Cyan + "eject current USB drive and refresh")
             os.system('sudo /sbin/modprobe g_multi -r')  # unmount first
+            os.system('udcname=""')
+            os.system('sudo bash -c "echo $udcname > /sys/kernel/config/usb_gadget/g1/UDC"')
             return USBSIM(FileImgDic, MPDic, WaDo, Samba)
 
         # base case: delete filesystem img
@@ -310,22 +312,62 @@ def USBSIM(FileImgDic, MPDic, WaDo, Samba):
             # print("going to simulate device: xxx")
             Input_dev = input(Cyan + "emulated device: " + Yellow)
             reqcheck()
-            print(Input_dev)
+            VID             = Input_dev.split(' ')[-2]
+            PID             = Input_dev.split(' ')[-1]
             root            = "/sys/kernel/config/usb_gadget"
             udcname         = ''
-            bcdDevice       = '0x0100'                          # Device release number
+            bcdDevice       = '0x0100'                          # Device release number v1.0.0
             bcdUSB          = '0x0200'                          # Initialize this descriptor to the usb version that the device supportes (accceptatble version are 0x0110 0x0200 0x0300 0x0310)
             bDeviceClass    = '0xEF'                            # The class code indicating the behavior of this device. 
             bDeviceSubClass = '0x02'                            # The subclass code that further defines the behavior of this device.
             bDeviceProtocol = '0x01'                            # The protocol that the device supports.
-            serialnumber    = 'fedcba9876543210'                # Device serial number
-            manufacturer    = 'SWTE Media'                      # Manufacturer attribute
+            serialnumber    = 'swtemedia9876543210'             # Device serial number
+            manufacturer    = 'SWTEMedia'                       # Manufacturer attribute
             product         = 'SWTE Emulated multi USB Device'  # Cleartext product description
             configuration   = 'Config 1'                        # Name of this configuration
             MaxPower        = '250'                             # max power this configuration can consume in mA
             bmAttributes    = '0x80'                            # Configuration characteristics (D7: Reserved (set to one), D6: Self-powered, D5: Remote Wakeup, D4...0: Reserved (reset to zero)) 
+            HOST            = '00:dc:c8:f7:75:14'               # HOST PC
+            SELF            = '00:dd:dc:eb:6d:a1'               # BadUSB
+            print("VID: {} PID: {}".format(VID, PID))
+            ### create the gadgets
+            os.system('sudo mkdir -p {}/g1'.format(root))                                       # create directory for gadget
 
+            os.system('sudo bash -c "echo {} > {}/g1/idVendor"'.format(VID, root))              # create vendor id
+            os.system('sudo bash -c "echo {} > {}/g1/idProduct"'.format(PID, root))             # create product id
 
+            os.system('sudo bash -c "echo "'"{}"'" > {}/g1/bcdUSB"'.format(bcdUSB, root))
+            os.system('sudo bash -c "echo "'"{}"'" > {}/g1/bcdDevice"'.format(bcdDevice, root))       # create device release number
+            os.system('sudo bash -c "echo "'"{}"'" > {}/g1/bDeviceClass"'.format(bDeviceClass, root)) # create classification
+            os.system('sudo bash -c "echo "'"{}"'" > {}/g1/bDeviceSubClass"'.format(bDeviceSubClass, root)) # create sub classification 
+            os.system('sudo bash -c "echo "'"{}"'" > {}/g1/bDeviceProtocol"'.format(bDeviceProtocol, root))
+
+            os.system('sudo mkdir -p {}/g1/strings/0x409'.format(root)) # setup standard device attribute strings LANGID 0x409 US-Eng
+            os.system('sudo bash -c "echo "'"{}"'" > {}/g1/strings/0x409/serialnumber'.format(serialnumber, root))
+            os.system('sudo bash -c "echo "'"{}"'" > {}/g1/strings/0x409/manufacturer'.format(manufacturer, root))
+            os.system('sudo bash -c "echo "'"{}"'" > {}/g1/strings/0x409/product'.format(product, root))
+
+            ### create the configuration
+            os.system('sudo mkdir -p {}/g1/configs/c.1/string/0x409'.format(root))                                                  # configuration directory
+            os.system('sudo bash -c "echo "'"{}"'" > {}/g1/configs/c.1/strings/0x409/configuration"'.format(configuration, root))   # name of this configuration
+            os.system('sudo bash -c "echo "'"{}"'" > {}/g1/configs/c.1/MaxPower"'.format(MaxPower, root))                           # some attrubutes setting for configuration, e.g. max power in mA
+            os.system('sudo bash -c "echo "'"{}"'" > {}/g1/configs/c.1/bmAttributes"'.format(bmAttributes, root))                   # configuration characteristics
+
+            ### create the function
+            ## ethernet adapter ECM
+            os.system('sudo mkdir -p {}/g1/functions/ecm.usb0'.format(root)) # add a function e.g. ecm (ethernet control model)
+            os.system('HOST="{}"&&SELF="{}"'.format(HOST, SELF)) # HOSTPC and BadUSB
+            os.system('sudo bash -c "echo $HOST > {}/g1/functions/ecm.usb0/host_addr"'.format(root))
+            os.system('sudo bash -c "echo $SELF > {}/g1/functions/ecm.usb0/dev_addr"'.format(root))
+
+            ## human interface device HID
+
+            ### associatong the function with configuration
+            os.system('sudo ln -s {}/g1/functions/ecm.usb0 {}/g1/configs/c.1'.format(root, root)) # put the function into the configuration by creating a symlink
+
+            ### enable the gadget
+            os.system('udcname="$(ls /sys/class/udc)"')
+            os.system('sudo bash -c "echo $udcname > {}/g1/UDC"'.format(root))
 
             USBSIM(FileImgDic, MPDic, WaDo, Samba)
 

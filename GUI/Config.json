@@ -1,17 +1,17 @@
 {
-    "PuTTYConf": {
-      "PuTTYPath": "C:/Program Files/PuTTY/putty.exe",
-      "IPAddress": "192.168.2.36",
-      "Key": "raspberry",
-      "Log": "C:/Users/ironm/Desktop/putty.log"
-    },
-    "Others": {
-      "WoDa": false,
-      "Samba": false
-    },
-    "WiFi": {
-      "ssid": "MagentaWLAN-25MQ",
-      "psk": "1bis56789"
-    }
-
+  "PuTTYConf": {
+    "PuTTYPath": "C:/Program Files/PuTTY/putty.exe",
+    "IPAddress": "192.168.2.36",
+    "Key": "raspberry",
+    "Log": "C:/Users/ironm/Desktop/putty.log"
+  },
+  "Others": {
+    "WoDa": false,
+    "Samba": false
+  },
+  "WiFi": {
+    "ssid": "MagentaWLAN-25MQ",
+    "psk": "08220570084526563753"
   }
+
+}
