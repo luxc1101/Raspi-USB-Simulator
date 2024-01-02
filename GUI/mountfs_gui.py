@@ -369,8 +369,8 @@ def USBSIM(FileImgDic, MPDic, WaDo, Samba):
 
             ### enable the gadget
             print("enable the gadget")
-            os.system("udcname='$(ls /sys/class/udc)'")
-            os.system("sudo bash -c 'echo $udcname > {}/g1/UDC'".format(root))
+            print(os.popen("udcname='$(ls /sys/class/udc)'").read().split("\n")[0])
+            os.system("sudo bash -c 'echo {} > {}/g1/UDC'".format(os.popen("udcname='$(ls /sys/class/udc)'").read().split("\n")[0], root))
 
             USBSIM(FileImgDic, MPDic, WaDo, Samba)
 
