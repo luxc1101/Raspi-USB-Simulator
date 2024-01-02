@@ -343,10 +343,10 @@ def USBSIM(FileImgDic, MPDic, WaDo, Samba):
             os.system("sudo bash -c 'echo {} > {}/g1/bDeviceSubClass'".format(bDeviceSubClass, root)) # create sub classification 
             os.system("sudo bash -c 'echo {} > {}/g1/bDeviceProtocol'".format(bDeviceProtocol, root))
             print("make dir strings/0x409")
-            os.system('sudo mkdir -p {}/g1/strings/0x409'.format(root)) # setup standard device attribute strings LANGID 0x409 US-Eng
-            os.system('sudo bash -c "echo {} > {}/g1/strings/0x409/serialnumber'.format(serialnumber, root))
-            os.system('sudo bash -c "echo {} > {}/g1/strings/0x409/manufacturer'.format(manufacturer, root))
-            os.system('sudo bash -c "echo {} > {}/g1/strings/0x409/product'.format(product, root))
+            os.system("sudo mkdir -p {}/g1/strings/0x409".format(root)) # setup standard device attribute strings LANGID 0x409 US-Eng
+            os.system("sudo bash -c 'echo {} > {}/g1/strings/0x409/serialnumber'".format(serialnumber, root))
+            os.system("sudo bash -c 'echo {} > {}/g1/strings/0x409/manufacturer'".format(manufacturer, root))
+            os.system("sudo bash -c 'echo {} > {}/g1/strings/0x409/product'".format(product, root))
             print("make dir configs/c.1/strings/0x409")
             ### create the configuration
             os.system("sudo mkdir -p {}/g1/configs/c.1/strings/0x409".format(root))                                                  # configuration directory
@@ -358,9 +358,8 @@ def USBSIM(FileImgDic, MPDic, WaDo, Samba):
             ## ethernet adapter ECMls 
             print("make dir /functions/ecm.usb0")
             os.system("sudo mkdir -p {}/g1/functions/ecm.usb0".format(root)) # add a function e.g. ecm (ethernet control model)
-            os.system("HOST={}&&SELF={}".format(HOST, SELF)) # HOSTPC and BadUSB
-            os.system("sudo bash -c 'echo $HOST > {}/g1/functions/ecm.usb0/host_addr'".format(root))
-            os.system("sudo bash -c 'echo $SELF > {}/g1/functions/ecm.usb0/dev_addr'".format(root))
+            os.system("sudo bash -c 'echo {} > {}/g1/functions/ecm.usb0/host_addr'".format(HOST, root))
+            os.system("sudo bash -c 'echo {} > {}/g1/functions/ecm.usb0/dev_addr'".format(SELF, root))
 
             ## human interface device HID
 
