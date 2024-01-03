@@ -292,8 +292,14 @@ def USBSIM(FileImgDic, MPDic, WaDo, Samba):
         elif Input.lower() == "e":
             print(Cyan + "eject current USB drive and refresh")
             os.system('sudo /sbin/modprobe g_multi -r')  # unmount first
-            os.system('udcname=""')
-            os.system('sudo bash -c "echo $udcname > /sys/kernel/config/usb_gadget/g1/UDC"')
+            ### clean up emulated device ###
+            os.system('sudo bash -c "echo '' > /sys/kernel/config/usb_gadget/g1/UDC" > error 2>&1') # enabling gadget
+            os.system('func="$(ls /sys/kernel/config/usb_gadget/g1/functions/)" > error 2>&1 && sudo rm /sys/kernel/config/usb_gadget/g1/configs/c.1/$func > error 2>&1') # remove functions from configuration
+            os.system('sudo rmdir /sys/kernel/config/usb_gadget/g1/configs/c.1/strings/0x409 > error 2>&1') # remove string dir in the configuration
+            os.system('sudo rmdir /sys/kernel/config/usb_gadget/g1/configs/c.1 > error 2>&1') # remove the configurations
+            os.system('func="$(ls /sys/kernel/config/usb_gadget/g1/functions/)" > error 2>&1 && sudo rmdir /sys/kernel/config/usb_gadget/g1/functions/$func > error 2>&1') # remove functions
+            os.system('sudo rmdir sys/kernel/config/usb_gadget/g1/strings/0x409 > error 2>&1') # remove string dir in gadget
+            os.system('sudo rmdir /sys/kernel/config/usb_gadget/g1 > error 2>&1') # finally remove the while gadget
             return USBSIM(FileImgDic, MPDic, WaDo, Samba)
 
         # base case: delete filesystem img
@@ -314,6 +320,7 @@ def USBSIM(FileImgDic, MPDic, WaDo, Samba):
             reqcheck()
             VID             = Input_dev.split(' ')[-2]
             PID             = Input_dev.split(' ')[-1]
+            DevType         = Input_dev.split(' ')[0]
             root            = "/sys/kernel/config/usb_gadget"
             udcname         = ''
             bcdDevice       = "0x0100"                          # Device release number v1.0.0
@@ -329,6 +336,10 @@ def USBSIM(FileImgDic, MPDic, WaDo, Samba):
             bmAttributes    = "0x80"                            # Configuration characteristics (D7: Reserved (set to one), D6: Self-powered, D5: Remote Wakeup, D4...0: Reserved (reset to zero)) 
             HOST            = "00:dc:c8:f7:75:14"               # HOST PC
             SELF            = "00:dd:dc:eb:6d:a1"               # BadUSB
+            PROTOCOL        = 1                                 # 1 for keyboard
+            SUBCLASS        = 1                                 # 1 for keyboard
+            DESCRIPTOR      = "kybd-descriptor.bin"             # binary blob of report descriptor
+            REPORT_LENGTH   = 8                                 # number of bytes per report
             print("VID: {} PID: {}".format(VID, PID))
             ### create the gadgets
             print("make dir g1")
@@ -356,21 +367,33 @@ def USBSIM(FileImgDic, MPDic, WaDo, Samba):
 
             ### create the function
             ## ethernet adapter ECMls 
-            print("make dir /functions/ecm.usb0")
-            os.system("sudo mkdir -p {}/g1/functions/ecm.usb0".format(root)) # add a function e.g. ecm (ethernet control model)
-            os.system("sudo bash -c 'echo {} > {}/g1/functions/ecm.usb0/host_addr'".format(HOST, root))
-            os.system("sudo bash -c 'echo {} > {}/g1/functions/ecm.usb0/dev_addr'".format(SELF, root))
+            if DevType == "ECM":
+                print("make dir /functions/ecm.usb0")
+                os.system("sudo mkdir -p {}/g1/functions/ecm.usb0".format(root)) # add a function e.g. ecm (Ethernet Control Model)
+                os.system("sudo bash -c 'echo {} > {}/g1/functions/ecm.usb0/host_addr'".format(HOST, root))
+                os.system("sudo bash -c 'echo {} > {}/g1/functions/ecm.usb0/dev_addr'".format(SELF, root))
+            ## associatong the function with configuration
+                print("ln")
+                os.system("sudo ln -s {}/g1/functions/ecm.usb0 {}/g1/configs/c.1".format(root, root)) # put the function into the configuration by creating a symlink
 
             ## human interface device HID
+            if DevType == "HID":
+                print("make dir /functions/hid.usb0")
+                os.system("sudo mkdir -p {}/g1/functions/hid.usb0".format(root)) # add a function e.g. hid (Human Interface Device)
+                os.system("sudo bash -c 'echo {} > {}/g1/functions/hid.usb0/protocol'".format(PROTOCOL, root)) # set the HID protocol
+                os.system("sudo bash -c 'echo {} > {}/g1/functions/hid.usb0/subclass'".format(SUBCLASS, root)) # set the device subclass
+                os.system("sudo bash -c 'echo {} > {}/g1/functions/hid.usb0/report_length'".format(REPORT_LENGTH, root)) # set the byte length of HID reports
+                os.system("sudo bash -c 'cat {} > {}/g1/functions/hid.usb0/report_desc'".format(DESCRIPTOR, root)) # write the binary blob of the report descriptor to report_desc; see HID class spec
+            ## associatong the function with configuration
+                print("ln")
+                os.system("sudo ln -s {}/g1/functions/hid.usb0 {}/g1/configs/c.1".format(root, root)) # put the function into the configuration by creating a symlink
 
-            ### associatong the function with configuration
-            print("ln")
-            os.system("sudo ln -s {}/g1/functions/ecm.usb0 {}/g1/configs/c.1".format(root, root)) # put the function into the configuration by creating a symlink
 
             ### enable the gadget
             print("enable the gadget")
-            print(os.popen("udcname='$(ls /sys/class/udc)'").read().split("\n")[0])
-            os.system("sudo bash -c 'echo {} > {}/g1/UDC'".format(os.popen("udcname='$(ls /sys/class/udc)'").read().split("\n")[0], root))
+            udcname = os.popen("ls /sys/class/udc").read().split("\n")[0]
+            print(udcname)
+            os.system("sudo bash -c 'echo {} > {}/g1/UDC'".format(udcname, root))
 
             USBSIM(FileImgDic, MPDic, WaDo, Samba)
 

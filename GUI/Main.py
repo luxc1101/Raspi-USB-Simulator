@@ -78,7 +78,7 @@ class Ui_MainWindow(QMainWindow):
     def setupUi(self, MainWindow):
         # self.configWin()
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(320, 400)
+        MainWindow.resize(320, 550)
         MainWindow.setWindowIcon(QtGui.QIcon(":/Image/AppIcon.png"))
 ###########################################################################
         self.centralWidget = QtWidgets.QWidget(MainWindow)
@@ -89,6 +89,7 @@ class Ui_MainWindow(QMainWindow):
         self.gridLayout_5.setObjectName("gridLayout_5")
 
         self.tabWidget_ = QtWidgets.QTabWidget(self.centralWidget)
+        self.tabWidget_.setMaximumHeight(140)
         self.tabWidget_.setObjectName("tabWidget_")
         self.USBFS = QtWidgets.QWidget()
         self.USBFS.setObjectName("USBFS")
@@ -584,29 +585,29 @@ class Ui_MainWindow(QMainWindow):
         self.comboBox.setEnabled(False)
         self.actionDelect_Img.setEnabled(False)
         self.tabWidget_.setEnabled(False)
+        try:
+            self.thread[1].file.close()
+            self.thread[1].stop()
+            del(self.thread[1])
+        except:
+            pass
+        self.thread[1] = TraceThread(parent=None, Logfile=self.Logging, 
+                                    sleep_time_in_seconds=0.05, 
+                                    img=self.Filesysdict[self.comboBox.currentText()][0],
+                                    imgstaus=self.LB_Img,
+                                    statusbar=self.statusBar,
+                                    remoteParam = self.Param,
+                                    remote = self.actionRemote_folder
+                                    )
+        self.thread[1].start()
+        self.thread[1].trace_singal.connect(self.Update_logging)
         if self.tabWidget_.currentIndex() == 0: # tab 0: filesystem
-            try:
-                self.thread[1].file.close()
-                self.thread[1].stop()
-                del(self.thread[1])
-            except:
-                pass
-            self.thread[1] = TraceThread(parent=None, Logfile=self.Logging, 
-                                        sleep_time_in_seconds=0.05, 
-                                        img=self.Filesysdict[self.comboBox.currentText()][0],
-                                        imgstaus=self.LB_Img,
-                                        statusbar=self.statusBar,
-                                        remoteParam = self.Param,
-                                        remote = self.actionRemote_folder
-                                        )
-            self.thread[1].start()
-            self.thread[1].trace_singal.connect(self.Update_logging)
             self.SendCommand(self.Filesysdict[self.comboBox.currentText()][1])
             # self.statusBar.showMessage("{} mount successfully".format(self.comboBox.currentText()))
         if self.tabWidget_.currentIndex() == 1: # tab 1: device simulation
             self.SendCommand("11")
             time.sleep(1) # waiting for input
-            self.SendCommand(self.comboBox_Device.currentText() + self.comboBox_details.currentText()) # input current device name and device details 
+            self.SendCommand(self.comboBox_Device.currentText() + " " + self.comboBox_details.currentText()) # input current device name and device details 
 
 
     def Eject(self):
@@ -700,6 +701,8 @@ class TraceThread(QThread):
                                 self.trace_singal.emit(self.colorText(line, "#00FFFF"))
                             elif any(x in line for x in ["0: ","1: ","2: ","3: ","4: ","5: ","6: ","7: ","8: ","9: ","10: ","11: ","r: remount","e: eject","c: cancel","q: quit", "d: delete"]):
                                 self.trace_singal.emit(self.colorText(line, "orange"))
+                            elif "emulated device" in line.lower():
+                                self.trace_singal.emit(self.colorText(line, "#32CD32"))
                             elif "{} is already existed".format(self.img) in line:
                                 self.imgstatus.setStyleSheet("background-color: #a4efaf; border: 1px solid black; border-radius: 4px")
                                 self.imgstatus.setText(self.img)
