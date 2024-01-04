@@ -54,7 +54,7 @@ class Ui_Form(object):
         self.LB_Contact.setText(_translate("Form", "Contact: "))
         self.LB_Name.setText(_translate("Form", "<a href='mailto:xiaochuan.lu@joynext.com'>Xiaochuan Lu</a> (SWTE)"))
         self.LB_Tutorial.setText(_translate("Form", "Tutorial:"))
-        self.LB_TutorialLink.setText(_translate("Form", "<a href=\"https://git1.jnd.joynext.com/lu_x4/priapos/-/blob/master/README.md\">USB filesystem simulator</a>"))
+        self.LB_TutorialLink.setText(_translate("Form", "<a href=\"https://git1.jnd.joynext.com/lu_x4/priapos/-/blob/master/README.md\">Raspi USB Simulator</a>"))
         self.textEdit.setHtml(_translate("Form", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
@@ -87,6 +87,8 @@ class Ui_Form(object):
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">+ change the remote folder path;</span></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt; font-weight:600; text-decoration: underline;\">0.0.2.3: </span></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">+ fix that command button or press enter key will lead exe crash issue; </span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt; font-weight:600; text-decoration: underline;\">0.0.3.0: </span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">+ add Device Simulation functionalites; </span></p>\n"
 "</body></html>"))
 
 # if __name__ == "__main__":

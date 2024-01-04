@@ -19,7 +19,7 @@ from pywinauto.application import Application
 import Icons
 from Config import Ui_ConfigDialog
 from Help import Ui_Form
-from MIBLoader import Ui_MIBloader
+# from MIBLoader import Ui_MIBloader
 
 
 class VLine(QFrame):
@@ -65,14 +65,14 @@ class Ui_MainWindow(QMainWindow):
         self.ui.setupUi(self.Helpwin)
         self.Helpwin.show()
 
-    def downloadWin(self):
-        '''
-        download file by using url and extract the file and copy the needed file to target path
-        '''
-        self.DownloadWin = QtWidgets.QDialog()
-        self.ui = Ui_MIBloader()
-        self.ui.setupUi(self.DownloadWin)
-        self.DownloadWin.show()
+    # def downloadWin(self):
+    #     '''
+    #     download file by using url and extract the file and copy the needed file to target path
+    #     '''
+    #     self.DownloadWin = QtWidgets.QDialog()
+    #     self.ui = Ui_MIBloader()
+    #     self.ui.setupUi(self.DownloadWin)
+    #     self.DownloadWin.show()
 
 
     def setupUi(self, MainWindow):
@@ -284,18 +284,18 @@ class Ui_MainWindow(QMainWindow):
         icon7.addPixmap(QtGui.QPixmap(":/Image/remote.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionRemote_folder.setIcon(icon7)
         self.actionRemote_folder.setObjectName("actionRemote_folder")
-        self.actionMIB_SWLoader = QtWidgets.QAction(MainWindow)
-        icon8 = QtGui.QIcon()
-        icon8.addPixmap(QtGui.QPixmap(":/Image/download.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.actionMIB_SWLoader.setIcon(icon8)
-        self.actionMIB_SWLoader.setObjectName("actionMIB_SWLoader") 
+        # self.actionMIB_SWLoader = QtWidgets.QAction(MainWindow)
+        # icon8 = QtGui.QIcon()
+        # icon8.addPixmap(QtGui.QPixmap(":/Image/download.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        # self.actionMIB_SWLoader.setIcon(icon8)
+        # self.actionMIB_SWLoader.setObjectName("actionMIB_SWLoader") 
 
         self.menuCalls.addAction(self.actionAnpassen)
         self.menuCalls.addAction(self.actionMount)
         self.menuCalls.addAction(self.actionEject)
         self.menuCalls.addAction(self.actionRemote_folder)       
         self.menuCalls.addAction(self.actionClear)
-        self.menuCalls.addAction(self.actionMIB_SWLoader)
+        # self.menuCalls.addAction(self.actionMIB_SWLoader)
         self.menuCalls.addAction(self.actionDelect_Img)
         self.menuCalls.addAction(self.actionQuit)
         self.menuCalls.addAction(self.actionHelp)
@@ -305,7 +305,7 @@ class Ui_MainWindow(QMainWindow):
         self.mainToolBar.addAction(self.actionEject)
         self.mainToolBar.addAction(self.actionRemote_folder)
         self.mainToolBar.addAction(self.actionClear)
-        self.mainToolBar.addAction(self.actionMIB_SWLoader)
+        # self.mainToolBar.addAction(self.actionMIB_SWLoader)
         self.mainToolBar.addAction(self.actionDelect_Img)
         self.mainToolBar.addAction(self.actionQuit)
         self.mainToolBar.addAction(self.actionHelp)
@@ -316,7 +316,7 @@ class Ui_MainWindow(QMainWindow):
         self.actionQuit.setEnabled(False)
         self.actionDelect_Img.setEnabled(False)
         self.actionRemote_folder.setEnabled(False)
-        self.actionMIB_SWLoader.setEnabled(False)
+        # self.actionMIB_SWLoader.setEnabled(False)
         self.B_SendCmd.setEnabled(False)
         self.CB_SendCmd.setEnabled(False)
         self.statusBar.showMessage("Status: not connected")
@@ -350,7 +350,7 @@ class Ui_MainWindow(QMainWindow):
         self.actionHelp.triggered.connect(self.helpWin)
         self.actionDelect_Img.triggered.connect(self.DeleteImg)
         self.actionRemote_folder.triggered.connect(self.remoteFolder)
-        self.actionMIB_SWLoader.triggered.connect(self.downloadWin)
+        # self.actionMIB_SWLoader.triggered.connect(self.downloadWin)
         self.B_SendCmd.clicked.connect(lambda: self.SendCommand(self.LE_SendCmd.text()))
         # enter key to send cmd
         self.LE_SendCmd.returnPressed.connect(lambda: self.SendCommand(self.LE_SendCmd.text()))
@@ -385,7 +385,7 @@ class Ui_MainWindow(QMainWindow):
         self.actionEject.setText(_translate("MainWindow", "Eject/Refresh"))
         self.actionMount.setText(_translate("MainWindow", "Mount"))
         self.actionClear.setText(_translate("MainWindow", "Clear"))
-        self.actionMIB_SWLoader.setText(_translate("MainWindow", "MIB SWLoader"))
+        # self.actionMIB_SWLoader.setText(_translate("MainWindow", "MIB SWLoader"))
         self.actionDelect_Img.setText(_translate("MainWindow", "Delete Img"))
         self.B_SendCmd.setText(_translate("MainWindow", "CMD Send"))
         self.groupBox_Cmd.setTitle(_translate("MainWindow", "Command Window"))
