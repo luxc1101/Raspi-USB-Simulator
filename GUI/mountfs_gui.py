@@ -17,32 +17,6 @@ import fsc
 ##########################
 #       Paramters        #
 ##########################
-# # img file dict
-# FileImgDic = {}
-# FileImgDic[0] = "mib_compliance.img"  # ntfs
-# FileImgDic[1] = "ext2.img"
-# FileImgDic[2] = "ext3.img"
-# FileImgDic[3] = "ext4.img"
-# FileImgDic[4] = "fat16.img"
-# FileImgDic[5] = "fat32.img"
-# FileImgDic[6] = "ntfs.img"
-# FileImgDic[7] = "exfat.img"
-# FileImgDic[8] = "hfsplus.img"
-# FileImgDic[9] = "part.img"
-# FileImgDic[10] = "sw.img"  # ntfs
-# # mount point dict
-# MPDic = {}
-# MPDic[0] = "/mnt/usb_mib_compliance"
-# MPDic[1] = "/mnt/usb_ext2"
-# MPDic[2] = "/mnt/usb_ext3"
-# MPDic[3] = "/mnt/usb_ext4"
-# MPDic[4] = "/mnt/usb_fat16"
-# MPDic[5] = "/mnt/usb_fat32"
-# MPDic[6] = "/mnt/usb_ntfs"
-# MPDic[7] = "/mnt/usb_exfat"
-# MPDic[8] = "/mnt/usb_hfsplus"
-# MPDic[9] = "/mnt/usb_part_fat32"
-# MPDic[10] = "/mnt/usb_sw"
 
 with open(os.path.join(os.getcwd(),"device.json"),'r', encoding="utf8") as f:
     device_dict = json.load(f)
@@ -53,8 +27,6 @@ for i in range(len(device_dict["FileSys"])):
     MPDic[i] = device_dict["FileSys"][str(i)]["mnt"]
 
 # others
-# WaDo = sys.argv[0]
-# Samba = sys.argv[1]
 WaDo = sys.argv[1]
 Samba = sys.argv[2]
 # tab = sys.argv[3]
@@ -340,25 +312,26 @@ def USBSIM(FileImgDic, MPDic, WaDo, Samba):
             SUBCLASS        = 1                                 # 1 for keyboard
             DESCRIPTOR      = "kybd-descriptor.bin"             # binary blob of report descriptor
             REPORT_LENGTH   = 8                                 # number of bytes per report
-            print("VID: {} PID: {}".format(VID, PID))
+
+            # print("VID: {} PID: {}".format(VID, PID))
             ### create the gadgets
-            print("make dir g1")
+            # print("make dir g1")
             os.system("sudo mkdir -p {}/g1".format(root))                                       # create directory for gadget
-            print("PID VID")
+            # print("PID VID")
             os.system("sudo bash -c 'echo {} > {}/g1/idVendor'".format(VID, root))              # create vendor id
             os.system("sudo bash -c 'echo {} > {}/g1/idProduct'".format(PID, root))             # create product id
-            print("bcd abd bDev")
+            # print("bcd abd bDev")
             os.system("sudo bash -c 'echo {} > {}/g1/bcdUSB'".format(bcdUSB, root))
             os.system("sudo bash -c 'echo {} > {}/g1/bcdDevice'".format(bcdDevice, root))       # create device release number
             os.system("sudo bash -c 'echo {} > {}/g1/bDeviceClass'".format(bDeviceClass, root)) # create classification
             os.system("sudo bash -c 'echo {} > {}/g1/bDeviceSubClass'".format(bDeviceSubClass, root)) # create sub classification 
             os.system("sudo bash -c 'echo {} > {}/g1/bDeviceProtocol'".format(bDeviceProtocol, root))
-            print("make dir strings/0x409")
+            # print("make dir strings/0x409")
             os.system("sudo mkdir -p {}/g1/strings/0x409".format(root)) # setup standard device attribute strings LANGID 0x409 US-Eng
             os.system("sudo bash -c 'echo {} > {}/g1/strings/0x409/serialnumber'".format(serialnumber, root))
             os.system("sudo bash -c 'echo {} > {}/g1/strings/0x409/manufacturer'".format(manufacturer, root))
             os.system("sudo bash -c 'echo {} > {}/g1/strings/0x409/product'".format(product, root))
-            print("make dir configs/c.1/strings/0x409")
+            # print("make dir configs/c.1/strings/0x409")
             ### create the configuration
             os.system("sudo mkdir -p {}/g1/configs/c.1/strings/0x409".format(root))                                                  # configuration directory
             os.system("sudo bash -c 'echo {} > {}/g1/configs/c.1/strings/0x409/configuration'".format(configuration, root))   # name of this configuration
@@ -373,7 +346,7 @@ def USBSIM(FileImgDic, MPDic, WaDo, Samba):
                 os.system("sudo bash -c 'echo {} > {}/g1/functions/ecm.usb0/host_addr'".format(HOST, root))
                 os.system("sudo bash -c 'echo {} > {}/g1/functions/ecm.usb0/dev_addr'".format(SELF, root))
             ## associatong the function with configuration
-                print("ln")
+                # print("ln")
                 os.system("sudo ln -s {}/g1/functions/ecm.usb0 {}/g1/configs/c.1".format(root, root)) # put the function into the configuration by creating a symlink
 
             ## human interface device HID
@@ -385,14 +358,23 @@ def USBSIM(FileImgDic, MPDic, WaDo, Samba):
                 os.system("sudo bash -c 'echo {} > {}/g1/functions/hid.usb0/report_length'".format(REPORT_LENGTH, root)) # set the byte length of HID reports
                 os.system("sudo bash -c 'cat {} > {}/g1/functions/hid.usb0/report_desc'".format(DESCRIPTOR, root)) # write the binary blob of the report descriptor to report_desc; see HID class spec
             ## associatong the function with configuration
-                print("ln")
+                # print("ln")
                 os.system("sudo ln -s {}/g1/functions/hid.usb0 {}/g1/configs/c.1".format(root, root)) # put the function into the configuration by creating a symlink
 
+            ## AOAP ETC TEST Serial Adapter
+            if DevType in ["AOAP", "ETC", "TEST"]:
+                print("make dir /functions/acm.usb0")
+                os.system("sudo mkdir -p {}/g1/functions/acm.usb0".format(root)) # add a function
+            ## associatong the function with configuration
+                # print("ln")
+                os.system("sudo ln -s {}/g1/functions/acm.usb0 {}/g1/configs/c.1".format(root, root)) # put the function into the configuration by creating a symlink
+                os.system("sudo systemctl enable getty@ttyGS0.service")
+                # os.system("sudo screen /dev/ttyACM0 115200")
 
             ### enable the gadget
             print("enable the gadget")
             udcname = os.popen("ls /sys/class/udc").read().split("\n")[0]
-            print(udcname)
+            # print(udcname)
             os.system("sudo bash -c 'echo {} > {}/g1/UDC'".format(udcname, root))
 
             USBSIM(FileImgDic, MPDic, WaDo, Samba)
